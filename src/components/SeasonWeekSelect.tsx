@@ -50,25 +50,31 @@ export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
           if (season !== undefined && week !== undefined) onSelect(season, week)
         }}
       >
-        <label htmlFor="season-select">Season</label>
-        <select id="season-select" value={season} onChange={(e) => handleSeasonChange(e.target.value)}>
-          {seasons.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="field">
+          <label htmlFor="season-select">Season</label>
+          <select id="season-select" value={season} onChange={(e) => handleSeasonChange(e.target.value)}>
+            {seasons.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label htmlFor="week-select">Week</label>
-        <select id="week-select" value={week} onChange={(e) => setWeek(Number(e.target.value))}>
-          {weeks.map((w) => (
-            <option key={w} value={w}>
-              Week {w}
-            </option>
-          ))}
-        </select>
+        <div className="field">
+          <label htmlFor="week-select">Week</label>
+          <select id="week-select" value={week} onChange={(e) => setWeek(Number(e.target.value))}>
+            {weeks.map((w) => (
+              <option key={w} value={w}>
+                Week {w}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <button type="submit">View Week</button>
+        <button type="submit" className="btn btn-primary">
+          View Week
+        </button>
       </form>
     </main>
   )

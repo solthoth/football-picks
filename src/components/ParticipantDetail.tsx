@@ -1,5 +1,6 @@
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
+import { CheckIcon, ChevronLeftIcon, ClockIcon, XIcon } from './icons'
 
 interface ParticipantDetailProps {
   pool: Pool
@@ -26,14 +27,21 @@ function correctLabel(correct: boolean | null): string {
   return 'Pending'
 }
 
+function OutcomeIcon({ correct }: { correct: boolean | null }) {
+  if (correct === true) return <CheckIcon />
+  if (correct === false) return <XIcon />
+  return <ClockIcon />
+}
+
 export function ParticipantDetail({ pool, participantName, onBack }: ParticipantDetailProps) {
   const participant = pool.participants.find((p) => p.name === participantName)
 
   if (!participant) {
     return (
       <main className="participant-detail">
-        <button type="button" onClick={onBack}>
-          &larr; Back
+        <button type="button" className="back-link" onClick={onBack}>
+          <ChevronLeftIcon />
+          Back
         </button>
         <p>Couldn't find {participantName} in this week's pool.</p>
       </main>
@@ -45,18 +53,32 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
 
   return (
     <main className="participant-detail">
-      <button type="button" onClick={onBack}>
-        &larr; Back to participants
+      <button type="button" className="back-link" onClick={onBack}>
+        <ChevronLeftIcon />
+        Back to participants
       </button>
 
       <h1>{participant.name}</h1>
       <p>
         Season {pool.season} &middot; Week {pool.week}
       </p>
-      <p className="summary">
-        {summary.correct} correct, {summary.incorrect} incorrect, {summary.pending} pending out of{' '}
-        {summary.totalGames} games
-      </p>
+
+      <div className="stat-row" role="group" aria-label="Pick summary">
+        <span className="stat-pill stat-pill--success">
+          <CheckIcon />
+          {summary.correct} Correct
+        </span>
+        <span className="stat-pill stat-pill--danger">
+          <XIcon />
+          {summary.incorrect} Incorrect
+        </span>
+        <span className="stat-pill stat-pill--pending">
+          <ClockIcon />
+          {summary.pending} Pending
+        </span>
+      </div>
+      <p className="summary-note">out of {summary.totalGames} games</p>
+
       {participant.tieBreakerTotalScore !== null && (
         <p className="tie-breaker">Tiebreaker guess (combined score): {participant.tieBreakerTotalScore}</p>
       )}
@@ -75,12 +97,21 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
             const result = pool.results[outcome.gameId]
             return (
               <tr key={outcome.gameId} data-outcome={outcome.correct === null ? 'pending' : outcome.correct}>
-                <td>
+                <td data-label="Matchup">
                   {outcome.away} @ {outcome.home}
                 </td>
-                <td>{outcome.pickedTeam ?? '—'}</td>
-                <td>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</td>
-                <td>{correctLabel(outcome.correct)}</td>
+                <td data-label="Pick">
+                  <span>{outcome.pickedTeam ?? '—'}</span>
+                </td>
+                <td data-label="Result">
+                  <span>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</span>
+                </td>
+                <td data-label="Outcome">
+                  <span className="outcome-value">
+                    <OutcomeIcon correct={outcome.correct} />
+                    {correctLabel(outcome.correct)}
+                  </span>
+                </td>
               </tr>
             )
           })}

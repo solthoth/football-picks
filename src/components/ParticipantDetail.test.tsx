@@ -23,7 +23,11 @@ const pool: Pool = {
 describe('ParticipantDetail', () => {
   it('shows a summary of correct/incorrect/pending picks', () => {
     render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
-    expect(screen.getByText(/1 correct, 1 incorrect, 1 pending out of 3 games/i)).toBeInTheDocument()
+    const summary = screen.getByRole('group', { name: /pick summary/i })
+    expect(summary).toHaveTextContent('1 Correct')
+    expect(summary).toHaveTextContent('1 Incorrect')
+    expect(summary).toHaveTextContent('1 Pending')
+    expect(screen.getByText(/out of 3 games/i)).toBeInTheDocument()
   })
 
   it('shows the tiebreaker guess', () => {
