@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom'
-import './App.css'
 import { ParticipantDetailPage } from './pages/ParticipantDetailPage'
 import { ParticipantListPage } from './pages/ParticipantListPage'
 import { SeasonWeekSelectPage } from './pages/SeasonWeekSelectPage'

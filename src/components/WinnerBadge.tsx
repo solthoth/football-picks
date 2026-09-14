@@ -1,10 +1,6 @@
-import { TrophyIcon } from './icons'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import Chip from '@mui/material/Chip'
 
 export function WinnerBadge() {
-  return (
-    <span className="winner-badge">
-      <TrophyIcon />
-      Week Winner
-    </span>
-  )
+  return <Chip icon={<EmojiEventsIcon />} label="Week Winner" color="warning" size="small" sx={{ fontWeight: 700 }} />
 }

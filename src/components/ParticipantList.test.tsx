@@ -1,7 +1,8 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
+import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { ParticipantList } from './ParticipantList'
 
 const pool: Pool = {
@@ -14,6 +15,23 @@ const pool: Pool = {
   ],
   results: {
     game_01: { kickoffTime: null, status: 'final', awayScore: 10, homeScore: 13, winner: 'Seahawks' },
+  },
+}
+
+const poolWithWinner: Pool = {
+  season: 2026,
+  week: 1,
+  games: [
+    { id: 'game_01', away: 'Patriots', home: 'Seahawks' },
+    { id: 'game_02', away: '49ers', home: 'Rams' },
+  ],
+  participants: [
+    { name: 'Steve', picks: { game_01: 'Seahawks', game_02: 'Rams' }, tieBreakerTotalScore: 44 },
+    { name: 'Greg', picks: { game_01: 'Patriots', game_02: 'Rams' }, tieBreakerTotalScore: 40 },
+  ],
+  results: {
+    game_01: { kickoffTime: '2026-09-13T17:00:00Z', status: 'final', awayScore: 10, homeScore: 13, winner: 'Seahawks' },
+    game_02: { kickoffTime: '2026-09-14T20:00:00Z', status: 'final', awayScore: 20, homeScore: 10, winner: '49ers' },
   },
 }
 
@@ -52,23 +70,6 @@ describe('ParticipantList', () => {
 })
 
 describe('ParticipantList week winner badge', () => {
-  const poolWithWinner: Pool = {
-    season: 2026,
-    week: 1,
-    games: [
-      { id: 'game_01', away: 'Patriots', home: 'Seahawks' },
-      { id: 'game_02', away: '49ers', home: 'Rams' },
-    ],
-    participants: [
-      { name: 'Steve', picks: { game_01: 'Seahawks', game_02: 'Rams' }, tieBreakerTotalScore: 44 },
-      { name: 'Greg', picks: { game_01: 'Patriots', game_02: 'Rams' }, tieBreakerTotalScore: 40 },
-    ],
-    results: {
-      game_01: { kickoffTime: '2026-09-13T17:00:00Z', status: 'final', awayScore: 10, homeScore: 13, winner: 'Seahawks' },
-      game_02: { kickoffTime: '2026-09-14T20:00:00Z', status: 'final', awayScore: 20, homeScore: 10, winner: '49ers' },
-    },
-  }
-
   it("shows a winner badge next to the week's winner only", () => {
     render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
 
@@ -90,5 +91,38 @@ describe('ParticipantList week winner badge', () => {
     render(<ParticipantList pool={poolPending} onSelect={vi.fn()} onBack={vi.fn()} />)
 
     expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('ParticipantList mobile layout', () => {
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it('renders participants as cards instead of a table below the sm breakpoint', () => {
+    mockMatchMediaMatches(true)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Steve' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Greg' })).toBeInTheDocument()
+  })
+
+  it('still calls onSelect when a participant card is tapped', async () => {
+    mockMatchMediaMatches(true)
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'Greg' }))
+
+    expect(onSelect).toHaveBeenCalledWith('Greg')
+  })
+
+  it('still shows the winner badge on the mobile card layout', () => {
+    mockMatchMediaMatches(true)
+    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
+
+    expect(screen.getByText(/week winner/i)).toBeInTheDocument()
   })
 })

@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
+import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { ParticipantDetail } from './ParticipantDetail'
 
 const pool: Pool = {
@@ -68,5 +69,33 @@ describe('ParticipantDetail', () => {
     }
     render(<ParticipantDetail pool={pendingPool} participantName="Steve" onBack={vi.fn()} />)
     expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('ParticipantDetail mobile layout', () => {
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it('renders picks as cards instead of a table below the sm breakpoint', () => {
+    mockMatchMediaMatches(true)
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.getByText('Patriots @ Seahawks')).toBeInTheDocument()
+    expect(screen.getByText('49ers @ Rams')).toBeInTheDocument()
+    expect(screen.getByText('Falcons @ Steelers')).toBeInTheDocument()
+  })
+
+  it('still shows the winner badge and lets the user navigate back on mobile', async () => {
+    mockMatchMediaMatches(true)
+    const user = userEvent.setup()
+    const onBack = vi.fn()
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={onBack} />)
+
+    expect(screen.getByText(/week winner/i)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /back to participants/i }))
+    expect(onBack).toHaveBeenCalled()
   })
 })

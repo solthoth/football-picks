@@ -1,7 +1,25 @@
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import CancelIcon from '@mui/icons-material/Cancel'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import Chip from '@mui/material/Chip'
+import Container from '@mui/material/Container'
+import Stack from '@mui/material/Stack'
+import { useTheme } from '@mui/material/styles'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
-import { CheckIcon, ChevronLeftIcon, ClockIcon, XIcon } from './icons'
 import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantDetailProps {
@@ -29,100 +47,152 @@ function correctLabel(correct: boolean | null): string {
   return 'Pending'
 }
 
-function OutcomeIcon({ correct }: { correct: boolean | null }) {
-  if (correct === true) return <CheckIcon />
-  if (correct === false) return <XIcon />
-  return <ClockIcon />
+function outcomeColor(correct: boolean | null): 'success' | 'error' | 'textSecondary' {
+  if (correct === true) return 'success'
+  if (correct === false) return 'error'
+  return 'textSecondary'
+}
+
+function OutcomeIcon({ correct, fontSize = 'small' }: { correct: boolean | null; fontSize?: 'small' | 'inherit' }) {
+  if (correct === true) return <CheckCircleIcon color="success" fontSize={fontSize} />
+  if (correct === false) return <CancelIcon color="error" fontSize={fontSize} />
+  return <AccessTimeIcon color="disabled" fontSize={fontSize} />
 }
 
 export function ParticipantDetail({ pool, participantName, onBack }: ParticipantDetailProps) {
   const participant = pool.participants.find((p) => p.name === participantName)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   if (!participant) {
     return (
-      <main className="participant-detail">
-        <button type="button" className="back-link" onClick={onBack}>
-          <ChevronLeftIcon />
+      <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
+        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
           Back
-        </button>
-        <p>Couldn't find {participantName} in this week's pool.</p>
-      </main>
+        </Button>
+        <Typography>Couldn't find {participantName} in this week's pool.</Typography>
+      </Container>
     )
   }
 
   const outcomes = getPickOutcomes(pool, participant)
   const summary = summarizeOutcomes(participant.name, outcomes)
   const { winnerName } = determineWeekWinner(pool)
+  const isWinner = participant.name === winnerName
 
   return (
-    <main className="participant-detail">
-      <button type="button" className="back-link" onClick={onBack}>
-        <ChevronLeftIcon />
+    <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
+      <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
         Back to participants
-      </button>
+      </Button>
 
-      <div className="detail-heading">
-        <h1>{participant.name}</h1>
-        {participant.name === winnerName && <WinnerBadge />}
-      </div>
-      <p>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+        <Typography variant="h4" component="h1">
+          {participant.name}
+        </Typography>
+        {isWinner && <WinnerBadge />}
+      </Stack>
+      <Typography color="textSecondary" gutterBottom>
         Season {pool.season} &middot; Week {pool.week}
-      </p>
+      </Typography>
 
-      <div className="stat-row" role="group" aria-label="Pick summary">
-        <span className="stat-pill stat-pill--success">
-          <CheckIcon />
-          {summary.correct} Correct
-        </span>
-        <span className="stat-pill stat-pill--danger">
-          <XIcon />
-          {summary.incorrect} Incorrect
-        </span>
-        <span className="stat-pill stat-pill--pending">
-          <ClockIcon />
-          {summary.pending} Pending
-        </span>
-      </div>
-      <p className="summary-note">out of {summary.totalGames} games</p>
+      <Stack direction="row" spacing={1} role="group" aria-label="Pick summary" sx={{ flexWrap: 'wrap', mt: 2 }}>
+        <Chip icon={<CheckCircleIcon />} label={`${summary.correct} Correct`} color="success" variant="outlined" />
+        <Chip icon={<CancelIcon />} label={`${summary.incorrect} Incorrect`} color="error" variant="outlined" />
+        <Chip icon={<AccessTimeIcon />} label={`${summary.pending} Pending`} variant="outlined" />
+      </Stack>
+      <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
+        out of {summary.totalGames} games
+      </Typography>
 
       {participant.tieBreakerTotalScore !== null && (
-        <p className="tie-breaker">Tiebreaker guess (combined score): {participant.tieBreakerTotalScore}</p>
+        <Chip
+          label={`Tiebreaker guess (combined score): ${participant.tieBreakerTotalScore}`}
+          variant="outlined"
+          sx={{ mt: 2 }}
+        />
       )}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Matchup</th>
-            <th>Pick</th>
-            <th>Result</th>
-            <th>Outcome</th>
-          </tr>
-        </thead>
-        <tbody>
+      {isMobile ? (
+        <Stack spacing={1.5} sx={{ mt: 3 }}>
           {outcomes.map((outcome) => {
             const result = pool.results[outcome.gameId]
             return (
-              <tr key={outcome.gameId} data-outcome={outcome.correct === null ? 'pending' : outcome.correct}>
-                <td data-label="Matchup">
+              <Card
+                key={outcome.gameId}
+                variant="outlined"
+                sx={{ borderLeftWidth: 4, borderLeftColor: `${outcomeColor(outcome.correct)}.main`, p: 2 }}
+              >
+                <Typography sx={{ fontWeight: 600, mb: 1 }}>
                   {outcome.away} @ {outcome.home}
-                </td>
-                <td data-label="Pick">
-                  <span>{outcome.pickedTeam ?? '—'}</span>
-                </td>
-                <td data-label="Result">
-                  <span>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</span>
-                </td>
-                <td data-label="Outcome">
-                  <span className="outcome-value">
-                    <OutcomeIcon correct={outcome.correct} />
-                    {correctLabel(outcome.correct)}
-                  </span>
-                </td>
-              </tr>
+                </Typography>
+                <Stack spacing={0.5}>
+                  <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="textSecondary">
+                      PICK
+                    </Typography>
+                    <Typography variant="body2">{outcome.pickedTeam ?? '—'}</Typography>
+                  </Stack>
+                  <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="textSecondary">
+                      RESULT
+                    </Typography>
+                    <Typography variant="body2">
+                      {statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" color="textSecondary">
+                      OUTCOME
+                    </Typography>
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                      <OutcomeIcon correct={outcome.correct} />
+                      <Typography variant="body2" color={outcomeColor(outcome.correct)} sx={{ fontWeight: 600 }}>
+                        {correctLabel(outcome.correct)}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Card>
             )
           })}
-        </tbody>
-      </table>
-    </main>
+        </Stack>
+      ) : (
+        <TableContainer sx={{ mt: 3 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Matchup</TableCell>
+                <TableCell>Pick</TableCell>
+                <TableCell>Result</TableCell>
+                <TableCell>Outcome</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {outcomes.map((outcome) => {
+                const result = pool.results[outcome.gameId]
+                return (
+                  <TableRow key={outcome.gameId} hover>
+                    <TableCell>
+                      {outcome.away} @ {outcome.home}
+                    </TableCell>
+                    <TableCell>{outcome.pickedTeam ?? '—'}</TableCell>
+                    <TableCell>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <OutcomeIcon correct={outcome.correct} />
+                        <Typography variant="body2" color={outcomeColor(outcome.correct)} sx={{ fontWeight: 600 }}>
+                          {correctLabel(outcome.correct)}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   )
 }
