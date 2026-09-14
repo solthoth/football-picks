@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
@@ -48,5 +48,47 @@ describe('ParticipantList', () => {
     await user.click(screen.getByRole('button', { name: /change season\/week/i }))
 
     expect(onBack).toHaveBeenCalled()
+  })
+})
+
+describe('ParticipantList week winner badge', () => {
+  const poolWithWinner: Pool = {
+    season: 2026,
+    week: 1,
+    games: [
+      { id: 'game_01', away: 'Patriots', home: 'Seahawks' },
+      { id: 'game_02', away: '49ers', home: 'Rams' },
+    ],
+    participants: [
+      { name: 'Steve', picks: { game_01: 'Seahawks', game_02: 'Rams' }, tieBreakerTotalScore: 44 },
+      { name: 'Greg', picks: { game_01: 'Patriots', game_02: 'Rams' }, tieBreakerTotalScore: 40 },
+    ],
+    results: {
+      game_01: { kickoffTime: '2026-09-13T17:00:00Z', status: 'final', awayScore: 10, homeScore: 13, winner: 'Seahawks' },
+      game_02: { kickoffTime: '2026-09-14T20:00:00Z', status: 'final', awayScore: 20, homeScore: 10, winner: '49ers' },
+    },
+  }
+
+  it("shows a winner badge next to the week's winner only", () => {
+    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
+
+    const steveRow = screen.getByRole('button', { name: 'Steve' }).closest('tr') as HTMLElement
+    const gregRow = screen.getByRole('button', { name: 'Greg' }).closest('tr') as HTMLElement
+
+    expect(within(steveRow).getByText(/week winner/i)).toBeInTheDocument()
+    expect(within(gregRow).queryByText(/week winner/i)).not.toBeInTheDocument()
+  })
+
+  it('shows no winner badge while the week is not decided yet', () => {
+    const poolPending: Pool = {
+      ...poolWithWinner,
+      results: {
+        ...poolWithWinner.results,
+        game_01: { ...poolWithWinner.results.game_01, status: 'in_progress', winner: null },
+      },
+    }
+    render(<ParticipantList pool={poolPending} onSelect={vi.fn()} onBack={vi.fn()} />)
+
+    expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
   })
 })

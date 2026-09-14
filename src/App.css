@@ -282,6 +282,46 @@ th {
   font-variant-numeric: tabular-nums;
 }
 
+.winner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-gold-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.winner-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.detail-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.detail-heading h1 {
+  margin: 0;
+}
+
 .participant-list table button {
   background: none;
   border: none;
@@ -293,7 +333,6 @@ th {
   padding: var(--space-2) 0;
   min-height: 44px;
   text-align: left;
-  width: 100%;
   touch-action: manipulation;
 }
 
@@ -344,7 +383,9 @@ th {
     min-width: 0;
   }
 
-  .participant-list td[data-label='Name'] button {
+  .participant-list td[data-label='Name'] .name-cell button {
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

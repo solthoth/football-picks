@@ -1,6 +1,8 @@
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
+import { determineWeekWinner } from '../domain/weekWinner'
 import { CheckIcon, ChevronLeftIcon, ClockIcon, XIcon } from './icons'
+import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantDetailProps {
   pool: Pool
@@ -50,6 +52,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
 
   const outcomes = getPickOutcomes(pool, participant)
   const summary = summarizeOutcomes(participant.name, outcomes)
+  const { winnerName } = determineWeekWinner(pool)
 
   return (
     <main className="participant-detail">
@@ -58,7 +61,10 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
         Back to participants
       </button>
 
-      <h1>{participant.name}</h1>
+      <div className="detail-heading">
+        <h1>{participant.name}</h1>
+        {participant.name === winnerName && <WinnerBadge />}
+      </div>
       <p>
         Season {pool.season} &middot; Week {pool.week}
       </p>

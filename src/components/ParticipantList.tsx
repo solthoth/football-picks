@@ -1,6 +1,8 @@
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
+import { determineWeekWinner } from '../domain/weekWinner'
 import { ChevronLeftIcon } from './icons'
+import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantListProps {
   pool: Pool
@@ -17,6 +19,7 @@ function medalClass(rank: number): string {
 
 export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
+  const { winnerName } = determineWeekWinner(pool)
 
   return (
     <main className="participant-list">
@@ -46,9 +49,12 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
                 <span className={medalClass(entry.rank)}>{entry.rank}</span>
               </td>
               <td data-label="Name">
-                <button type="button" onClick={() => onSelect(entry.name)}>
-                  {entry.name}
-                </button>
+                <span className="name-cell">
+                  <button type="button" onClick={() => onSelect(entry.name)}>
+                    {entry.name}
+                  </button>
+                  {entry.name === winnerName && <WinnerBadge />}
+                </span>
               </td>
               <td data-label="Correct">
                 <span className="record-pill">

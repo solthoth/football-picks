@@ -52,4 +52,21 @@ describe('ParticipantDetail', () => {
     await user.click(screen.getByRole('button', { name: /back/i }))
     expect(onBack).toHaveBeenCalled()
   })
+
+  it("shows a winner badge next to the participant's name once the week is decided", () => {
+    // Sole participant, and both non-tiebreaker games (game_01, game_02) are
+    // already final -> Steve is the winner regardless of game_03 (the
+    // tiebreaker/"Monday" game, still scheduled) since there's no one to tie with.
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    expect(screen.getByText(/week winner/i)).toBeInTheDocument()
+  })
+
+  it('shows no winner badge while a non-tiebreaker game is still in progress', () => {
+    const pendingPool: Pool = {
+      ...pool,
+      results: { ...pool.results, game_01: { ...pool.results.game_01, status: 'in_progress', winner: null } },
+    }
+    render(<ParticipantDetail pool={pendingPool} participantName="Steve" onBack={vi.fn()} />)
+    expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
+  })
 })
