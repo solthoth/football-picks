@@ -48,12 +48,35 @@ describe('ParticipantList', () => {
     expect(rows[1]).toHaveTextContent('Greg')
   })
 
-  it('calls onSelect with the clicked participant', async () => {
+  it('calls onSelect when the row is clicked', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
 
-    await user.click(screen.getByRole('button', { name: 'Greg' }))
+    await user.click(screen.getByText('Greg').closest('tr') as HTMLElement)
+
+    expect(onSelect).toHaveBeenCalledWith('Greg')
+  })
+
+  it('calls onSelect when any cell in the row is clicked, not just the name', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+
+    const row = screen.getByText('Greg').closest('tr') as HTMLElement
+    await user.click(within(row).getByText(/pending/i))
+
+    expect(onSelect).toHaveBeenCalledWith('Greg')
+  })
+
+  it('activates the row via the keyboard', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+
+    const row = screen.getByText('Greg').closest('tr') as HTMLElement
+    row.focus()
+    await user.keyboard('{Enter}')
 
     expect(onSelect).toHaveBeenCalledWith('Greg')
   })
@@ -73,8 +96,8 @@ describe('ParticipantList week winner badge', () => {
   it("shows a winner badge next to the week's winner only", () => {
     render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
 
-    const steveRow = screen.getByRole('button', { name: 'Steve' }).closest('tr') as HTMLElement
-    const gregRow = screen.getByRole('button', { name: 'Greg' }).closest('tr') as HTMLElement
+    const steveRow = screen.getByText('Steve').closest('tr') as HTMLElement
+    const gregRow = screen.getByText('Greg').closest('tr') as HTMLElement
 
     expect(within(steveRow).getByText(/week winner/i)).toBeInTheDocument()
     expect(within(gregRow).queryByText(/week winner/i)).not.toBeInTheDocument()
@@ -104,8 +127,8 @@ describe('ParticipantList mobile layout', () => {
     render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Steve' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Greg' })).toBeInTheDocument()
+    expect(screen.getByText('Steve')).toBeInTheDocument()
+    expect(screen.getByText('Greg')).toBeInTheDocument()
   })
 
   it('still calls onSelect when a participant card is tapped', async () => {
@@ -114,7 +137,7 @@ describe('ParticipantList mobile layout', () => {
     const onSelect = vi.fn()
     render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
 
-    await user.click(screen.getByRole('button', { name: 'Greg' }))
+    await user.click(screen.getByText('Greg'))
 
     expect(onSelect).toHaveBeenCalledWith('Greg')
   })

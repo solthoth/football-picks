@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
+import CardActionArea from '@mui/material/CardActionArea'
 import Chip from '@mui/material/Chip'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
@@ -31,7 +32,7 @@ function rankAvatarSx(rank: number): SxProps<Theme> {
   if (rank === 1) return { bgcolor: 'warning.main', color: 'warning.contrastText' }
   if (rank === 2) return { bgcolor: 'grey.400', color: 'common.black' }
   if (rank === 3) return { bgcolor: '#cd7f32', color: 'common.white' }
-  return { bgcolor: 'grey.200', color: 'text.secondary' }
+  return { bgcolor: 'grey.300', color: 'common.black' }
 }
 
 export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps) {
@@ -54,22 +55,22 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
       {isMobile ? (
         <Stack spacing={1.5} sx={{ mt: 2 }}>
           {leaderboard.map((entry) => (
-            <Card key={entry.name} variant="outlined" sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5 }}>
-              <Avatar sx={{ width: 32, height: 32, fontSize: 15, fontWeight: 700, flexShrink: 0, ...rankAvatarSx(entry.rank) }}>
-                {entry.rank}
-              </Avatar>
-              <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Button
-                  onClick={() => onSelect(entry.name)}
-                  sx={{ textTransform: 'none', minWidth: 0, px: 1, justifyContent: 'flex-start' }}
-                >
-                  <Typography noWrap component="span" sx={{ fontWeight: 600 }}>
+            <Card key={entry.name} variant="outlined">
+              <CardActionArea
+                onClick={() => onSelect(entry.name)}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5 }}
+              >
+                <Avatar sx={{ width: 32, height: 32, fontSize: 15, fontWeight: 700, flexShrink: 0, ...rankAvatarSx(entry.rank) }}>
+                  {entry.rank}
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography noWrap sx={{ fontWeight: 600 }}>
                     {entry.name}
                   </Typography>
-                </Button>
-                {entry.name === winnerName && <WinnerBadge />}
-              </Box>
-              <Chip label={`${entry.correct} / ${entry.totalGames}`} size="small" sx={{ flexShrink: 0 }} />
+                  {entry.name === winnerName && <WinnerBadge />}
+                </Box>
+                <Chip label={`${entry.correct} / ${entry.totalGames}`} size="small" sx={{ flexShrink: 0 }} />
+              </CardActionArea>
             </Card>
           ))}
         </Stack>
@@ -86,7 +87,19 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
             </TableHead>
             <TableBody>
               {leaderboard.map((entry) => (
-                <TableRow key={entry.name} hover>
+                <TableRow
+                  key={entry.name}
+                  hover
+                  onClick={() => onSelect(entry.name)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      onSelect(entry.name)
+                    }
+                  }}
+                  sx={{ cursor: 'pointer' }}
+                >
                   <TableCell>
                     <Avatar sx={{ width: 32, height: 32, fontSize: 15, fontWeight: 700, ...rankAvatarSx(entry.rank) }}>
                       {entry.rank}
@@ -94,9 +107,7 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                      <Button onClick={() => onSelect(entry.name)} sx={{ textTransform: 'none', fontWeight: 600 }}>
-                        {entry.name}
-                      </Button>
+                      <Typography sx={{ fontWeight: 600, color: 'primary.main' }}>{entry.name}</Typography>
                       {entry.name === winnerName && <WinnerBadge />}
                     </Stack>
                   </TableCell>

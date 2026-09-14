@@ -54,7 +54,7 @@ describe('App routing', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1')
     expect(screen.getByRole('heading', { name: /season 2026.*week 1/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Steve' }))
+    await user.click(screen.getByText('Steve').closest('tr') as HTMLElement)
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Steve')
     expect(screen.getByRole('heading', { name: 'Steve' })).toBeInTheDocument()
   })
