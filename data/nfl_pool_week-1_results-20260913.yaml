@@ -1,7 +1,7 @@
 pool:
   season: 2026
   week: 1
-  
+
 game_01:
   kickoff_time: "2026-09-10T00:20:00Z"
   status: "final"
@@ -88,10 +88,10 @@ game_14:
   winner: "Eagles"
 game_15:
   kickoff_time: "2026-09-14T00:20:00Z"
-  status: "in_progress"
-  away_score: 7
-  home_score: 21
-  winner: null
+  status: "final"
+  away_score: 20
+  home_score: 28
+  winner: "Giants"
 game_16:
   kickoff_time: null
   status: "scheduled"
