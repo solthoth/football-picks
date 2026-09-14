@@ -1,0 +1,42 @@
+# typecheck and test invoke the same pnpm scripts CI runs
+# (.github/workflows/ci.yml) so local commits and CI cannot disagree.
+# Lint is the one intentional exception: locally it runs `eslint --fix`
+# on staged files for auto-fixing DX; CI runs whole-repo `pnpm lint`
+# (`eslint .`) as the backstop. Same binary, same eslint.config.js, so
+# the fixed result a commit produces is exactly what CI re-checks.
+repos:
+  - repo: local
+    hooks:
+      - id: commitlint
+        name: commitlint
+        description: Validate commit message against Conventional Commits.
+        entry: pnpm exec commitlint --edit
+        language: system
+        stages: [commit-msg]
+        pass_filenames: true
+
+      - id: eslint
+        name: eslint (staged, --fix)
+        description: Lint and auto-fix staged JS/TS files.
+        entry: pnpm exec eslint --fix --no-warn-ignored
+        language: system
+        files: \.(ts|tsx|js|jsx|mjs|cjs)$
+        pass_filenames: true
+
+      - id: typecheck
+        name: typecheck (pnpm typecheck)
+        description: tsc -b project type-check (the type-check half of the build).
+        entry: pnpm typecheck
+        language: system
+        always_run: true
+        pass_filenames: false
+        require_serial: true
+
+      - id: test
+        name: test (pnpm test)
+        description: Vitest unit tests (same command as CI).
+        entry: pnpm test
+        language: system
+        always_run: true
+        pass_filenames: false
+        require_serial: true

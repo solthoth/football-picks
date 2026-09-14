@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "commitlint": {
+      "source": "jamie-bitflight/claude_skills",
+      "sourceType": "github",
+      "skillPath": "plugins/commitlint/skills/commitlint/SKILL.md",
+      "computedHash": "0051bfd219a6d2d5beaffbcfd94b6ba7eed017ae81dd670f1486963fcc58cec0"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "4eabc66183767153e404b39d1b839b1c37f2d82d86f0a0d7e880a579d8d62336"
+    }
+  }
+}
