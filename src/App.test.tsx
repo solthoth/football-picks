@@ -94,4 +94,10 @@ describe('App routing', () => {
     renderApp('/season/2026/week/1/participant/Nobody')
     expect(screen.getByText(/couldn't find nobody/i)).toBeInTheDocument()
   })
+
+  it('shows a generic not-found page for a URL that matches no route at all', () => {
+    renderApp('/this/route/does/not/exist')
+    expect(screen.getByRole('heading', { name: /page not found/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /football picks/i })).toHaveAttribute('href', '/')
+  })
 })

@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { NotFound } from './pages/NotFound'
 import { ParticipantDetailPage } from './pages/ParticipantDetailPage'
 import { ParticipantListPage } from './pages/ParticipantListPage'
 import { SeasonWeekSelectPage } from './pages/SeasonWeekSelectPage'
@@ -9,7 +10,7 @@ function App() {
       <Route path="/" element={<SeasonWeekSelectPage />} />
       <Route path="/season/:season/week/:week" element={<ParticipantListPage />} />
       <Route path="/season/:season/week/:week/participant/:participant" element={<ParticipantDetailPage />} />
-      <Route path="*" element={<SeasonWeekSelectPage />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
