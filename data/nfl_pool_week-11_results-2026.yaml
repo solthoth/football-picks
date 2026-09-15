@@ -1,0 +1,107 @@
+pool:
+  season: 2026
+  week: 11
+game_01:
+  away: Colts
+  home: Texans
+  kickoff_time: '2026-11-20T01:15:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_02:
+  away: Dolphins
+  home: Bills
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_03:
+  away: Ravens
+  home: Panthers
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_04:
+  away: Saints
+  home: Bears
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_05:
+  away: Titans
+  home: Cowboys
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_06:
+  away: Buccaneers
+  home: Lions
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_07:
+  away: Cardinals
+  home: Chiefs
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_08:
+  away: Jaguars
+  home: Giants
+  kickoff_time: '2026-11-22T18:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_09:
+  away: Jets
+  home: Chargers
+  kickoff_time: '2026-11-22T21:05:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_10:
+  away: Raiders
+  home: Broncos
+  kickoff_time: '2026-11-22T21:25:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_11:
+  away: Steelers
+  home: Eagles
+  kickoff_time: '2026-11-22T21:25:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_12:
+  away: Vikings
+  home: 49ers
+  kickoff_time: '2026-11-23T01:20:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_13:
+  away: Bengals
+  home: Commanders
+  kickoff_time: '2026-11-24T01:15:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null

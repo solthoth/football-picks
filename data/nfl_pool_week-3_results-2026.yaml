@@ -1,0 +1,131 @@
+pool:
+  season: 2026
+  week: 3
+game_01:
+  away: Falcons
+  home: Packers
+  kickoff_time: '2026-09-25T00:15:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_02:
+  away: Chargers
+  home: Bills
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_03:
+  away: Panthers
+  home: Browns
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_04:
+  away: Jets
+  home: Lions
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_05:
+  away: Texans
+  home: Colts
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_06:
+  away: Patriots
+  home: Jaguars
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_07:
+  away: Chiefs
+  home: Dolphins
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_08:
+  away: Titans
+  home: Giants
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_09:
+  away: Bengals
+  home: Steelers
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_10:
+  away: Seahawks
+  home: Commanders
+  kickoff_time: '2026-09-27T17:00:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_11:
+  away: Cardinals
+  home: 49ers
+  kickoff_time: '2026-09-27T20:05:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_12:
+  away: Vikings
+  home: Buccaneers
+  kickoff_time: '2026-09-27T20:05:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_13:
+  away: Ravens
+  home: Cowboys
+  kickoff_time: '2026-09-27T20:25:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_14:
+  away: Raiders
+  home: Saints
+  kickoff_time: '2026-09-27T20:25:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_15:
+  away: Rams
+  home: Broncos
+  kickoff_time: '2026-09-28T00:20:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
+game_16:
+  away: Eagles
+  home: Bears
+  kickoff_time: '2026-09-29T00:15:00Z'
+  status: scheduled
+  away_score: null
+  home_score: null
+  winner: null
