@@ -55,7 +55,7 @@ games:
     home: Giants
   - id: game_16
     away: Broncos
-    home: Bills
+    home: Chiefs
 
 participants:
   - name: Steve
@@ -75,7 +75,7 @@ participants:
       game_13: Raiders
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 44
   - name: Greg
     picks:
@@ -113,7 +113,7 @@ participants:
       game_13: Raiders
       game_14: Eagles
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 37
   - name: Austin
     picks:
@@ -151,7 +151,7 @@ participants:
       game_13: Dolphins
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 48
   - name: Vance
     picks:
@@ -170,7 +170,7 @@ participants:
       game_13: Dolphins
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 45
   - name: Adrianna
     picks:
@@ -189,7 +189,7 @@ participants:
       game_13: Dolphins
       game_14: Commanders
       game_15: Giants
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 49
   - name: Monica
     picks:
@@ -208,7 +208,7 @@ participants:
       game_13: Raiders
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 45
   - name: Kiko
     picks:
@@ -227,7 +227,7 @@ participants:
       game_13: Dolphins
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 43
   - name: Laji
     picks:
@@ -246,7 +246,7 @@ participants:
       game_13: Dolphins
       game_14: Commanders
       game_15: Cowboys
-      game_16: Bills
+      game_16: Chiefs
     tie_breaker_total_score: 42
   - name: Jose
     picks:

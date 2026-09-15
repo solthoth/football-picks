@@ -94,7 +94,7 @@ game_15:
   winner: "Giants"
 game_16:
   kickoff_time: null
-  status: "scheduled"
-  away_score: null
-  home_score: null
-  winner: null
+  status: "final"
+  away_score: 10
+  home_score: 31
+  winner: "Chiefs"
