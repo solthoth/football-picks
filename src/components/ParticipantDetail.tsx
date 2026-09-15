@@ -21,6 +21,7 @@ import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { WinnerBadge } from './WinnerBadge'
+import { WinnerCelebration } from './WinnerCelebration'
 
 interface ParticipantDetailProps {
   pool: Pool
@@ -82,6 +83,8 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
 
   return (
     <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
+      <WinnerCelebration participantName={participant.name} isWinner={isWinner} />
+
       <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
         Back to participants
       </Button>

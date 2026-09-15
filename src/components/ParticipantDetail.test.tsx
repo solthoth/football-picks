@@ -59,7 +59,7 @@ describe('ParticipantDetail', () => {
     // already final -> Steve is the winner regardless of game_03 (the
     // tiebreaker/"Monday" game, still scheduled) since there's no one to tie with.
     render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
-    expect(screen.getByText(/week winner/i)).toBeInTheDocument()
+    expect(screen.getByText('Week Winner')).toBeInTheDocument()
   })
 
   it('shows no winner badge while a non-tiebreaker game is still in progress', () => {
@@ -93,7 +93,7 @@ describe('ParticipantDetail mobile layout', () => {
     const onBack = vi.fn()
     render(<ParticipantDetail pool={pool} participantName="Steve" onBack={onBack} />)
 
-    expect(screen.getByText(/week winner/i)).toBeInTheDocument()
+    expect(screen.getByText('Week Winner')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /back to participants/i }))
     expect(onBack).toHaveBeenCalled()
