@@ -20,6 +20,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
 import { WinnerCelebration } from './WinnerCelebration'
 
@@ -82,7 +83,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
   const isWinner = winnerNames.includes(participant.name)
 
   return (
-    <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
+    <Container component="main" maxWidth="md" sx={{ py: 4 }}>
       <WinnerCelebration participantName={participant.name} isWinner={isWinner} />
 
       <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
@@ -126,15 +127,22 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                 variant="outlined"
                 sx={{ borderLeftWidth: 4, borderLeftColor: `${outcomeColor(outcome.correct)}.main`, p: 2 }}
               >
-                <Typography sx={{ fontWeight: 600, mb: 1 }}>
-                  {outcome.away} @ {outcome.home}
-                </Typography>
+                <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
+                  <TeamLogo team={outcome.away} />
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {outcome.away} @ {outcome.home}
+                  </Typography>
+                  <TeamLogo team={outcome.home} />
+                </Stack>
                 <Stack spacing={0.5}>
                   <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                     <Typography variant="caption" color="textSecondary">
                       PICK
                     </Typography>
-                    <Typography variant="body2">{outcome.pickedTeam ?? '—'}</Typography>
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                      <TeamLogo team={outcome.pickedTeam} size={16} />
+                      <Typography variant="body2">{outcome.pickedTeam ?? '—'}</Typography>
+                    </Stack>
                   </Stack>
                   <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                     <Typography variant="caption" color="textSecondary">
@@ -176,10 +184,21 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                 const result = pool.results[outcome.gameId]
                 return (
                   <TableRow key={outcome.gameId} hover>
-                    <TableCell>
-                      {outcome.away} @ {outcome.home}
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
+                        <TeamLogo team={outcome.away} />
+                        <Typography component="span" sx={{ whiteSpace: 'nowrap' }}>
+                          {outcome.away} @ {outcome.home}
+                        </Typography>
+                        <TeamLogo team={outcome.home} />
+                      </Stack>
                     </TableCell>
-                    <TableCell>{outcome.pickedTeam ?? '—'}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <TeamLogo team={outcome.pickedTeam} size={18} />
+                        <span>{outcome.pickedTeam ?? '—'}</span>
+                      </Box>
+                    </TableCell>
                     <TableCell>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
