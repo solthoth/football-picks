@@ -17,6 +17,12 @@ __pycache__/
 *.pyc
 .venv/
 
+# age/sops private keys and any decrypted secrets -- never commit these.
+# (scripts/*.enc.yaml is meant to be committed; it's already encrypted.)
+*.agekey
+age-key.txt
+scripts/nfl_api_secrets.yaml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
