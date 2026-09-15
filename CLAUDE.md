@@ -38,6 +38,33 @@ Flat config (`eslint.config.js`) extends `@eslint/js` recommended, `typescript-e
 
 Not enabled. See `README.md` if/when adding it.
 
+## Data and scripts
+
+`data/*.yaml` is the app's entire dataset (no backend, no DB) — one picks
+file and one or more results files per season/week, loaded and merged into
+typed `Pool` records by `src/data/pools.ts`/`buildPools.ts`. `scripts/` is a
+**separate Python toolchain** (not part of the pnpm/TS build, not covered by
+`pnpm lint`/`typecheck`/`test`) for producing/fixing those files:
+
+- `fetch_nfl_schedule.py` — pulls schedule/scores from NFL.com's undocumented
+  API. Credentials are SOPS+age-encrypted in `nfl_api_secrets.enc.yaml`
+  (`.sops.yaml` has the recipient key); decrypting needs the matching age
+  private key, or `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` env vars as a
+  fallback. Full setup/usage is in the script's own module docstring.
+- `remap_picks_to_schedule.py` — renumbers a hand-transcribed picks file's
+  `game_XX` ids to match a schedule/results file's numbering (by team-name
+  matchup), so the two files agree on what each game id means.
+- `gemini_ai_studio_prompt.md` — a prompt template for generating a results
+  file via Google AI Studio instead of the NFL API script.
+
+Full usage details for all three are in `README.md`'s Scripts section — treat
+that as the source of truth, don't duplicate it here.
+
+`src/assets/team-logos/*.svg` are the 32 teams' logos (downloaded from the
+NFL's own static CDN, keyed by nickname in `src/data/teamLogos.ts`) rendered
+via `src/components/TeamLogo.tsx`. They're the teams' registered trademarks —
+fine for this private/non-commercial pool, but don't repurpose them.
+
 ## Commit hygiene
 
 - **Conventional Commits** are enforced. `commitlint.config.js` extends `@commitlint/config-conventional`, so commit headers must look like `feat: ...`, `fix(scope): ...`, `chore: ...`, etc.

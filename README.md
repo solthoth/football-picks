@@ -24,9 +24,15 @@ picks, results) lives in committed YAML files and is bundled at build time.
   (correct / incorrect / pending), plus their tiebreaker guess.
 - **Week-winner tiebreaker** — the pool's payout rule (rank by correct picks,
   excluding the week's last game; break ties on that game's outcome; fall back
-  to the closest tiebreaker guess) is implemented in
+  to the closest tiebreaker guess; split the win as co-winners if that guess
+  is itself an exact tie) is implemented in
   [`src/domain/weekWinner.ts`](src/domain/weekWinner.ts) and surfaced as a
-  "Week Winner" badge once a winner can be determined.
+  "Week Winner" badge, with a confetti celebration
+  ([`src/components/WinnerCelebration.tsx`](src/components/WinnerCelebration.tsx))
+  once a winner can be determined.
+- **Team logos** — every matchup and pick shows the two teams' logos
+  ([`src/components/TeamLogo.tsx`](src/components/TeamLogo.tsx)), sourced from
+  the NFL's own CDN (see [Team logos](#team-logos) below).
 - **Mobile-first** — built with [MUI](https://mui.com/), with a responsive
   leaderboard/picks layout (table on larger screens, cards on phones).
 - **Bookmarkable routes** — every view (`/`, `/season/:season/week/:week`,
@@ -35,14 +41,17 @@ picks, results) lives in committed YAML files and is bundled at build time.
 ## Repository Structure
 
 ```
-data/                 Committed pool data: one picks file and one or more
+data/                  Committed pool data: one picks file and one or more
                        results files per season/week (see below)
-scripts/               Tooling for generating results data (see below)
+scripts/               Python tooling for generating schedule/results data
+                       and fixing up picks files (see Scripts below)
 src/
-  data/                Loads and merges data/*.yaml into typed Pool records
+  assets/team-logos/   Team logo SVGs (see Team logos below)
+  data/                Loads and merges data/*.yaml into typed Pool records,
+                       plus the team-name -> logo lookup (teamLogos.ts)
   domain/              Pure business logic (standings, week-winner rule)
   components/          Presentational UI components
-  pages/                Route-level components (wire components to the router)
+  pages/               Route-level components (wire components to the router)
 ```
 
 ### Data files
@@ -59,18 +68,60 @@ Each week has:
 Add a new week by dropping in a new picks file; update scores by refreshing
 (or replacing) its results file. No code changes needed.
 
-### Generating results data
+### Scripts
 
-[`scripts/gemini_ai_studio_prompt.md`](scripts/gemini_ai_studio_prompt.md) is a
-prompt template for [Google AI Studio](https://aistudio.google.com/): paste it
-in (with Grounding via Google Search turned on) alongside a picks file, and it
-returns a results YAML in the schema this app expects.
+Three ways to populate/fix up `data/*.yaml`, all under `scripts/`:
+
+- [`gemini_ai_studio_prompt.md`](scripts/gemini_ai_studio_prompt.md) — a
+  prompt template for [Google AI Studio](https://aistudio.google.com/): paste
+  it in (with Grounding via Google Search turned on) alongside a picks file,
+  and it returns a results YAML in the schema this app expects.
+- [`fetch_nfl_schedule.py`](scripts/fetch_nfl_schedule.py) — fetches the
+  regular-season schedule and live/final scores directly from NFL.com's own
+  (undocumented, public-credentialed) API, one results file per week. Doesn't
+  need a picks file to already exist, and is safe to re-run weekly to pick up
+  flex-schedule changes and refresh scores:
+  ```bash
+  pip install -r scripts/requirements.txt
+  python scripts/fetch_nfl_schedule.py --season 2026            # weeks 1-18
+  python scripts/fetch_nfl_schedule.py --season 2026 --weeks 3-5
+  ```
+  The API credentials it needs are public (the same ones nfl.com's own
+  frontend uses) but are kept out of plaintext via
+  [SOPS](https://github.com/getsops/sops) + [age](https://github.com/FiloSottile/age)
+  in `scripts/nfl_api_secrets.enc.yaml` (recipient key in `.sops.yaml`), purely
+  to keep automated secret scanners quiet. Decrypting requires the matching
+  age private key (ask whoever set up the repo), or you can skip SOPS entirely
+  by exporting `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` yourself. See the
+  script's module docstring for the full setup and terms-of-service caveat.
+- [`remap_picks_to_schedule.py`](scripts/remap_picks_to_schedule.py) — a
+  picks file transcribed from a pool-sheet photo numbers its games in
+  whatever order the sheet happened to list them. This renumbers a picks
+  file's `game_XX` ids (and every participant's picks) to match a schedule/
+  results file's own numbering, by matching each game's away/home teams, so
+  the two files always agree on what `game_07` means:
+  ```bash
+  python scripts/remap_picks_to_schedule.py --picks data/nfl_pool_week-1_picks.yaml --dry-run
+  python scripts/remap_picks_to_schedule.py --picks data/nfl_pool_week-1_picks.yaml
+  ```
+  Refuses to write anything if a game can't be matched unambiguously.
+
+### Team logos
+
+`src/assets/team-logos/*.svg` are the 32 teams' logos, downloaded from the
+NFL's own static asset CDN (`static.www.nfl.com/.../league/api/clubs/logos/…`,
+the same one `nfl.com/scores` itself loads) and keyed by the same team
+nickname strings used in `data/*.yaml` (see `src/data/teamLogos.ts`). Team
+names/logos are the teams' registered trademarks — fine to keep in a private,
+non-commercial pool like this one, but don't repurpose them commercially.
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 24+
 - [pnpm](https://pnpm.io/) (this repo pins it via the `packageManager` field —
   run `corepack enable pnpm` if you don't have it)
+- Python 3 — only needed to run the `scripts/` tooling (see
+  [Scripts](#scripts)), not for the app itself
 
 ## Getting Started
 
