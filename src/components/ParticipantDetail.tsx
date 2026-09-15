@@ -77,8 +77,8 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
 
   const outcomes = getPickOutcomes(pool, participant)
   const summary = summarizeOutcomes(participant.name, outcomes)
-  const { winnerName } = determineWeekWinner(pool)
-  const isWinner = participant.name === winnerName
+  const { winnerNames } = determineWeekWinner(pool)
+  const isWinner = winnerNames.includes(participant.name)
 
   return (
     <Container component="main" maxWidth="sm" sx={{ py: 4 }}>

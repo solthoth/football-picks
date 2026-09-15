@@ -37,7 +37,7 @@ function rankAvatarSx(rank: number): SxProps<Theme> {
 
 export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
-  const { winnerName } = determineWeekWinner(pool)
+  const { winnerNames } = determineWeekWinner(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -67,7 +67,7 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
                   <Typography noWrap sx={{ fontWeight: 600 }}>
                     {entry.name}
                   </Typography>
-                  {entry.name === winnerName && <WinnerBadge />}
+                  {winnerNames.includes(entry.name) && <WinnerBadge />}
                 </Box>
                 <Chip label={`${entry.correct} / ${entry.totalGames}`} size="small" sx={{ flexShrink: 0 }} />
               </CardActionArea>
@@ -108,7 +108,7 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
                   <TableCell>
                     <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                       <Typography sx={{ fontWeight: 600, color: 'primary.main' }}>{entry.name}</Typography>
-                      {entry.name === winnerName && <WinnerBadge />}
+                      {winnerNames.includes(entry.name) && <WinnerBadge />}
                     </Stack>
                   </TableCell>
                   <TableCell>

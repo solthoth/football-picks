@@ -55,7 +55,7 @@ describe('determineWeekWinner', () => {
         game_03: { kickoffTime: null, status: 'scheduled', awayScore: null, homeScore: null, winner: null },
       },
     })
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: null, reason: 'incomplete' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: [], reason: 'incomplete' })
   })
 
   it('declares a clear leader once Sunday games are final, even before the tiebreaker game is played', () => {
@@ -71,7 +71,7 @@ describe('determineWeekWinner', () => {
       },
     })
     // Leader: 2/2 Sunday games correct. Behind: 1/2. No tie -> Leader wins already.
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: 'Leader', reason: 'clear-leader' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['Leader'], reason: 'clear-leader' })
   })
 
   it('returns no winner when tied after Sunday and the tiebreaker game has not finished', () => {
@@ -86,7 +86,7 @@ describe('determineWeekWinner', () => {
         game_03: { kickoffTime: null, status: 'in_progress', awayScore: 3, homeScore: 0, winner: null },
       },
     })
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: null, reason: 'incomplete' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: [], reason: 'incomplete' })
   })
 
   it('breaks a Sunday tie using the tiebreaker game when exactly one of the tied group picked it correctly', () => {
@@ -104,7 +104,7 @@ describe('determineWeekWinner', () => {
     })
     // PickedFalcons and PickedSteelers tie 2/2 on Sunday; NotTied has 1/2.
     // Only PickedSteelers got the tiebreaker game (Steelers) right.
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: 'PickedSteelers', reason: 'monday-tiebreak' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['PickedSteelers'], reason: 'monday-tiebreak' })
   })
 
   it('falls through to the score tiebreak when the tied group split the tiebreaker game the same way as each other', () => {
@@ -121,7 +121,7 @@ describe('determineWeekWinner', () => {
     })
     // Both tied 2/2 on Sunday and both picked Steelers (tiebreaker) correctly, so
     // that doesn't separate them. Actual combined score is 33; CloseGuess (32) is closer.
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: 'CloseGuess', reason: 'score-tiebreak' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['CloseGuess'], reason: 'score-tiebreak' })
   })
 
   it('falls through to the score tiebreak using the full tied group when none of them got the tiebreaker game right', () => {
@@ -136,10 +136,10 @@ describe('determineWeekWinner', () => {
         game_03: { kickoffTime: null, status: 'final', awayScore: 13, homeScore: 20, winner: 'Steelers' },
       },
     })
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: 'CloseGuess', reason: 'score-tiebreak' })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['CloseGuess'], reason: 'score-tiebreak' })
   })
 
-  it('returns unresolved when the score tiebreak is itself an exact tie', () => {
+  it('declares co-winners when the score tiebreak is itself an exact tie', () => {
     const pool = basePool({
       participants: [
         { name: 'A', picks: { game_01: 'Seahawks', game_02: 'Rams', game_03: 'Falcons' }, tieBreakerTotalScore: 30 },
@@ -151,7 +151,40 @@ describe('determineWeekWinner', () => {
         game_03: { kickoffTime: null, status: 'final', awayScore: 13, homeScore: 20, winner: 'Steelers' },
       },
     })
-    // Actual total 33; A is off by 3, B is off by 3 -> still exactly tied.
-    expect(determineWeekWinner(pool)).toEqual({ winnerName: null, reason: 'unresolved' })
+    // Actual total 33; A is off by 3, B is off by 3 -> exactly even, both win.
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['A', 'B'], reason: 'tied-co-winners' })
+  })
+
+  it('declares co-winners when tied participants submitted the identical tiebreaker guess', () => {
+    // Mirrors a real pool scenario: two people tied on Sunday, both picked
+    // the tiebreaker game's actual winner, and both guessed the exact same
+    // combined score -- nothing left to break the tie with.
+    const pool = basePool({
+      participants: [
+        { name: 'Monica', picks: { game_01: 'Seahawks', game_02: 'Rams', game_03: 'Steelers' }, tieBreakerTotalScore: 45 },
+        { name: 'Vance', picks: { game_01: 'Seahawks', game_02: 'Rams', game_03: 'Steelers' }, tieBreakerTotalScore: 45 },
+      ],
+      results: {
+        game_01: { kickoffTime: null, status: 'final', awayScore: 10, homeScore: 20, winner: 'Seahawks' },
+        game_02: { kickoffTime: null, status: 'final', awayScore: 20, homeScore: 10, winner: '49ers' },
+        game_03: { kickoffTime: null, status: 'final', awayScore: 13, homeScore: 20, winner: 'Steelers' },
+      },
+    })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: ['Monica', 'Vance'], reason: 'tied-co-winners' })
+  })
+
+  it('returns unresolved (not co-winners) when nobody left in the tie submitted a tiebreaker guess', () => {
+    const pool = basePool({
+      participants: [
+        { name: 'A', picks: { game_01: 'Seahawks', game_02: 'Rams', game_03: 'Falcons' }, tieBreakerTotalScore: null },
+        { name: 'B', picks: { game_01: 'Seahawks', game_02: 'Rams', game_03: 'Falcons' }, tieBreakerTotalScore: null },
+      ],
+      results: {
+        game_01: { kickoffTime: null, status: 'final', awayScore: 10, homeScore: 20, winner: 'Seahawks' },
+        game_02: { kickoffTime: null, status: 'final', awayScore: 20, homeScore: 10, winner: '49ers' },
+        game_03: { kickoffTime: null, status: 'final', awayScore: 13, homeScore: 20, winner: 'Steelers' },
+      },
+    })
+    expect(determineWeekWinner(pool)).toEqual({ winnerNames: [], reason: 'unresolved' })
   })
 })
