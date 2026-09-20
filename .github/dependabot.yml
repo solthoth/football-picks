@@ -8,6 +8,13 @@ updates:
       npm-dependencies:
         patterns:
           - "*"
+    ignore:
+      # typescript-eslint only supports TypeScript <6.1 (TS 7 has no stable
+      # programmatic API until 7.1), so `pnpm lint` crashes on TS 7. Remove
+      # once typescript-eslint supports TS >=7.1:
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
