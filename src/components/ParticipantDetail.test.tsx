@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
@@ -25,15 +25,18 @@ describe('ParticipantDetail', () => {
   it('shows a summary of correct/incorrect/pending picks', () => {
     render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
     const summary = screen.getByRole('group', { name: /pick summary/i })
-    expect(summary).toHaveTextContent('1 Correct')
-    expect(summary).toHaveTextContent('1 Incorrect')
-    expect(summary).toHaveTextContent('1 Pending')
-    expect(screen.getByText(/out of 3 games/i)).toBeInTheDocument()
+    for (const label of ['Correct', 'Incorrect', 'Pending']) {
+      const tile = within(summary).getByText(label).parentElement?.parentElement
+      expect(tile).toHaveTextContent(`${label}1`)
+    }
+    expect(within(summary).getAllByText('of 3 games')).toHaveLength(3)
   })
 
   it('shows the tiebreaker guess', () => {
     render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
-    expect(screen.getByText(/tiebreaker guess.*44/i)).toBeInTheDocument()
+    const tile = screen.getByText('Tiebreaker guess').parentElement?.parentElement
+    expect(tile).toHaveTextContent('combined score')
+    expect(within(tile as HTMLElement).getByText('44')).toBeInTheDocument()
   })
 
   it('labels each pick as correct, incorrect, or pending', () => {
