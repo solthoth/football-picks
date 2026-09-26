@@ -35,6 +35,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          # Public blob container the site reads live scores from.
+          VITE_SCORES_BASE_URL: https://solthothfbpicksprod.blob.core.windows.net/scores
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
