@@ -94,6 +94,45 @@ Four ways to populate/fix up `data/*.yaml`, all under `scripts/`:
   age private key (ask whoever set up the repo), or you can skip SOPS entirely
   by exporting `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` yourself. See the
   script's module docstring for the full setup and terms-of-service caveat.
+- **Publishing live scores** — `fetch_nfl_schedule.py --upload` writes each
+  week to Azure Blob Storage (`<season>/week-<N>.json`) instead of local
+  files, so the site can show scores without a commit. Use the Make targets
+  (they wrap the script with the right flags and venv):
+
+  | Command | What it does |
+  | --- | --- |
+  | `make venv` | one-time: `.venv` + `scripts/requirements.txt` (Azure SDK) |
+  | `make publish-scores` | publish the active week to **dev** |
+  | `make publish-scores ENV=prod` | same, to **prod** (always explicit) |
+  | `make publish-scores GATE=1 [ENV=prod]` | what cron runs: skips the NFL API unless a game is live, within 10 min of kickoff, or the published copy is 12h stale |
+  | `make publish-scores WEEKS=3 [ENV=prod]` | force one week (or `1-4`) regardless of gating |
+  | `make backfill-scores [ENV=prod]` | one-time bootstrap: publish weeks 1-18 |
+  | `make test-scripts` | unit tests for the gating logic |
+
+  `WEEKS=active` (the default) is the earliest week not yet fully final. A
+  game already published as `final` is never downgraded.
+
+  **Setting up an environment (dev or prod) from scratch**
+  1. Infra exists (storage account, `scores` container, uploader identity and
+     role) — see `docs/uploading-scores.md` in `platform-foundation`.
+  2. `make venv`, then export `PLATFORM_FOUNDATION_DIR=/path/to/platform-foundation`
+     and make sure your age key is available (`SOPS_AGE_KEY_FILE`, or
+     `~/.config/sops/age/keys.txt`).
+  3. Bootstrap once: `make backfill-scores` (dev) and
+     `make backfill-scores ENV=prod`. Without this, `WEEKS=active` walks
+     forward one unpublished week per run.
+  4. Verify: `curl -s https://<account>.blob.core.windows.net/scores/2026/week-3.json`
+     (accounts: `solthothfbpicksdev`, `solthothfbpicksprod`), then schedule
+     the gated command below.
+
+  Auth is a per-environment service principal with a certificate that lives
+  SOPS-encrypted in `platform-foundation`, decrypted in memory. Ids and cert
+  filenames (edit `cert` to rotate) are in `scripts/upload_targets.yaml`;
+  details in `scripts/score_publish.py`. Scheduling (dev and prod are separate
+  jobs; cron's PATH is minimal, so set it explicitly):
+  ```cron
+  */5 * * * * cd /path/to/football-picks && PATH=/opt/homebrew/bin:/usr/bin:/bin SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/keys.txt PLATFORM_FOUNDATION_DIR=/path/to/platform-foundation make publish-scores GATE=1 ENV=prod >> /tmp/scores-prod.log 2>&1
+  ```
 - [`scaffold_picks.py`](scripts/scaffold_picks.py) — writes a new week's
   picks-file scaffold from that week's schedule/results file: the `games`
   section pre-filled with that week's away/home teams, plus a `Sample`

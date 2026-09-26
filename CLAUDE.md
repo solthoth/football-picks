@@ -53,6 +53,12 @@ files hold a `games:` map keyed by that id, so results merge into any pool. `scr
   (`.sops.yaml` has the recipient key); decrypting needs the matching age
   private key, or `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` env vars as a
   fallback. Full setup/usage is in the script's own module docstring.
+- `score_publish.py` + `upload_targets.yaml` — behind `fetch_nfl_schedule.py
+  --upload/--gate`: publishes weekly score JSON to per-environment Azure blob
+  storage using a cert-based service principal (cert SOPS-encrypted in the
+  `platform-foundation` repo). Pure gating logic is unit tested in
+  `test_score_publish.py` (`make test-scripts`). Run it via `make publish-scores` /
+  `make backfill-scores` (`ENV=dev` default, `ENV=prod` explicit).
 - `scaffold_picks.py` — writes a new week's picks-file scaffold from that
   week's schedule/results file.
 - `gemini_ai_studio_prompt.md` — a prompt template for generating a results

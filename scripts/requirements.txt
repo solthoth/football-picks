@@ -1,2 +1,4 @@
 requests>=2.34.2
 PyYAML>=6.0.3
+azure-identity>=1.25.3
+azure-storage-blob>=12.30.3

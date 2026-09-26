@@ -1,0 +1,16 @@
+# Per-environment upload targets for scripts/score_publish.py. Nothing secret
+# here: the certificate itself lives SOPS-encrypted in platform-foundation
+# (see docs/uploading-scores.md there); `cert` is its filename under
+# stacks/azure/tenant/certs/ (rotation = point it at the new one).
+dev:
+  tenant_id: e0c906a3-b766-47db-afcc-c7f76a5cea7a
+  client_id: 7aae2753-cfc0-4eb4-acf0-efd966c7c35e
+  storage_account: solthothfbpicksdev
+  container: scores
+  cert: football-picks-scores-dev-2026-09.pfx.sops
+prod:
+  tenant_id: e0c906a3-b766-47db-afcc-c7f76a5cea7a
+  client_id: f7838fae-e853-439f-84e6-9ce2bae73246
+  storage_account: solthothfbpicksprod
+  container: scores
+  cert: football-picks-scores-prod-2026-09.pfx.sops
