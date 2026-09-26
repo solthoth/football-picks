@@ -46,10 +46,22 @@ Usage:
     python scripts/fetch_nfl_schedule.py --season 2026 --weeks 2
     python scripts/fetch_nfl_schedule.py --season 2026 --weeks 1-4
 
+    # Publish to Azure Blob Storage instead of writing local files (dev by
+    # default; prod only with --env prod). --gate makes it cron-friendly:
+    # it exits without touching the NFL API unless a game is live or about
+    # to kick off. --weeks active = earliest week not yet fully final.
+    python scripts/fetch_nfl_schedule.py --season 2026 --weeks active --upload --gate
+    python scripts/fetch_nfl_schedule.py --season 2026 --weeks active --upload --gate --env prod
+
+    Upload setup and auth are described in scripts/score_publish.py.
+
 Output:
     Writes data/nfl_pool_week-<N>_results-<season>.yaml for each requested
     week, overwriting it in place on every run (no per-run timestamp -- the
     intent is to re-run this weekly and have it refresh the same files).
+
+    With --upload nothing is written locally; each week is published as
+    <season>/week-<N>.json (same shape plus an "updated_at" timestamp).
 
     Games are keyed by "<away>@<home>" (e.g. "Falcons@Packers"), ordered by
     kickoff time. That id is stable across flex scheduling and identical in
@@ -66,11 +78,14 @@ import subprocess
 import sys
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
 import yaml
+
+import score_publish
 
 TOKEN_URL = "https://api.nfl.com/identity/v3/token"
 SCHEDULE_URL = "https://api.nfl.com/football/v2/experience/weekly-game-details"
@@ -206,12 +221,51 @@ def parse_week_range(value: str) -> list[int]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--season", type=int, required=True, help="Season year, e.g. 2026")
-    parser.add_argument("--weeks", default="1-18", help='Week or range, e.g. "1-18" (default), "8", or "3,4,5"')
+    parser.add_argument(
+        "--weeks",
+        default="1-18",
+        help='Week or range, e.g. "1-18" (default), "8", or "3,4,5"; "active" (with --upload) = earliest week not fully final',
+    )
     parser.add_argument("--out-dir", type=Path, default=Path("data"), help="Directory to write results files into")
+    parser.add_argument("--upload", action="store_true", help="Publish to Azure Blob Storage instead of writing local files")
+    parser.add_argument("--env", choices=("dev", "prod"), default="dev", help="Upload target environment (default: dev)")
+    parser.add_argument(
+        "--gate",
+        action="store_true",
+        help="With --upload: skip weeks with nothing live or about to start (no NFL API call)",
+    )
     args = parser.parse_args()
 
-    weeks = parse_week_range(args.weeks)
-    args.out_dir.mkdir(parents=True, exist_ok=True)
+    if args.gate and not args.upload:
+        parser.error("--gate requires --upload")
+    if args.weeks == "active" and not args.upload:
+        parser.error('--weeks active requires --upload (it reads what is published)')
+
+    target = score_publish.load_target(args.env) if args.upload else None
+
+    if args.weeks == "active":
+        active = score_publish.find_active_week(target, args.season)
+        if active is None:
+            print("All weeks are final; nothing to do.")
+            return
+        weeks = [active]
+    else:
+        weeks = parse_week_range(args.weeks)
+
+    published_by_week: dict[int, dict[str, Any] | None] = {}
+    if args.upload:
+        for week in weeks:
+            published_by_week[week] = score_publish.fetch_published(target, args.season, week)
+        if args.gate:
+            now = datetime.now(timezone.utc)
+            gated = [w for w in weeks if not score_publish.should_run(published_by_week[w], now)]
+            for week in gated:
+                print(f"week {week}: nothing live or starting soon, skipping")
+            weeks = [w for w in weeks if w not in gated]
+            if not weeks:
+                return
+    else:
+        args.out_dir.mkdir(parents=True, exist_ok=True)
 
     client_key, client_secret = load_credentials()
 
@@ -232,9 +286,21 @@ def main() -> None:
             continue
 
         output = build_week_output(args.season, week, games)
-        out_path = args.out_dir / f"nfl_pool_week-{week}_results-{args.season}.yaml"
-        out_path.write_text(yaml.safe_dump(output, sort_keys=False, default_flow_style=False))
-        print(f"Wrote {out_path} ({len(games)} games)")
+
+        if args.upload:
+            published = published_by_week[week]
+            now = datetime.now(timezone.utc)
+            merged = score_publish.merge_without_regressing(output["games"], published)
+            if score_publish.needs_upload(merged, published, now):
+                payload = score_publish.build_payload(args.season, week, merged, now)
+                url = score_publish.upload(target, args.season, week, payload)
+                print(f"Published {url} ({len(games)} games)")
+            else:
+                print(f"week {week}: no changes, not uploading")
+        else:
+            out_path = args.out_dir / f"nfl_pool_week-{week}_results-{args.season}.yaml"
+            out_path.write_text(yaml.safe_dump(output, sort_keys=False, default_flow_style=False))
+            print(f"Wrote {out_path} ({len(games)} games)")
 
         time.sleep(0.3)
 
