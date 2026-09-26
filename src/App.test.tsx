@@ -63,7 +63,7 @@ describe('App routing', () => {
     renderApp('/season/2026/week/1/participant/Steve')
 
     expect(screen.getByRole('heading', { name: 'Steve' })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /pick summary/i })).toHaveTextContent('1 Correct')
+    expect(screen.getByRole('group', { name: /pick summary/i })).toHaveTextContent(/correct\s*1/i)
   })
 
   it('renders a deep-linked participant list page directly, as a bookmark would', () => {
