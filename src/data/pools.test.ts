@@ -20,6 +20,6 @@ describe('pools (real data/*.yaml files)', () => {
     for (const gameId of gameIds) {
       expect(pool?.results[gameId]).toBeDefined()
     }
-    expect(pool?.results.game_01).toMatchObject({ status: 'final', winner: 'Seahawks' })
+    expect(pool?.results['Patriots@Seahawks']).toMatchObject({ status: 'final', winner: 'Seahawks' })
   })
 })

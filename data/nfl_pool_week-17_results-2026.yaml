@@ -1,131 +1,132 @@
 pool:
   season: 2026
   week: 17
-game_01:
-  away: Ravens
-  home: Bengals
-  kickoff_time: '2027-01-01T01:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_02:
-  away: Saints
-  home: Falcons
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_03:
-  away: Seahawks
-  home: Panthers
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_04:
-  away: Colts
-  home: Browns
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_05:
-  away: Giants
-  home: Cowboys
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_06:
-  away: Bills
-  home: Dolphins
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_07:
-  away: Vikings
-  home: Jets
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_08:
-  away: Steelers
-  home: Titans
-  kickoff_time: '2027-01-03T18:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_09:
-  away: Raiders
-  home: Cardinals
-  kickoff_time: '2027-01-03T21:05:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_10:
-  away: Lions
-  home: Bears
-  kickoff_time: '2027-01-03T21:25:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_11:
-  away: Eagles
-  home: 49ers
-  kickoff_time: '2027-01-04T01:20:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_12:
-  away: Texans
-  home: Packers
-  kickoff_time: '2027-01-05T01:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_13:
-  away: Commanders
-  home: Jaguars
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_14:
-  away: Chiefs
-  home: Chargers
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_15:
-  away: Broncos
-  home: Patriots
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_16:
-  away: Rams
-  home: Buccaneers
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  Ravens@Bengals:
+    away: Ravens
+    home: Bengals
+    kickoff_time: '2027-01-01T01:15:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Saints@Falcons:
+    away: Saints
+    home: Falcons
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Seahawks@Panthers:
+    away: Seahawks
+    home: Panthers
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Colts@Browns:
+    away: Colts
+    home: Browns
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Giants@Cowboys:
+    away: Giants
+    home: Cowboys
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Bills@Dolphins:
+    away: Bills
+    home: Dolphins
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Vikings@Jets:
+    away: Vikings
+    home: Jets
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Steelers@Titans:
+    away: Steelers
+    home: Titans
+    kickoff_time: '2027-01-03T18:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Raiders@Cardinals:
+    away: Raiders
+    home: Cardinals
+    kickoff_time: '2027-01-03T21:05:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Lions@Bears:
+    away: Lions
+    home: Bears
+    kickoff_time: '2027-01-03T21:25:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Eagles@49ers:
+    away: Eagles
+    home: 49ers
+    kickoff_time: '2027-01-04T01:20:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Texans@Packers:
+    away: Texans
+    home: Packers
+    kickoff_time: '2027-01-05T01:15:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Commanders@Jaguars:
+    away: Commanders
+    home: Jaguars
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Chiefs@Chargers:
+    away: Chiefs
+    home: Chargers
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Broncos@Patriots:
+    away: Broncos
+    home: Patriots
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Rams@Buccaneers:
+    away: Rams
+    home: Buccaneers
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null

@@ -1,131 +1,132 @@
 pool:
   season: 2026
   week: 18
-game_01:
-  away: 49ers
-  home: Cardinals
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_02:
-  away: Steelers
-  home: Ravens
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_03:
-  away: Jets
-  home: Bills
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_04:
-  away: Falcons
-  home: Panthers
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_05:
-  away: Browns
-  home: Bengals
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_06:
-  away: Chargers
-  home: Broncos
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_07:
-  away: Lions
-  home: Packers
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_08:
-  away: Titans
-  home: Texans
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_09:
-  away: Jaguars
-  home: Colts
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_10:
-  away: Raiders
-  home: Chiefs
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_11:
-  away: Seahawks
-  home: Rams
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_12:
-  away: Bears
-  home: Vikings
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_13:
-  away: Dolphins
-  home: Patriots
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_14:
-  away: Buccaneers
-  home: Saints
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_15:
-  away: Eagles
-  home: Giants
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_16:
-  away: Cowboys
-  home: Commanders
-  kickoff_time: null
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  49ers@Cardinals:
+    away: 49ers
+    home: Cardinals
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Steelers@Ravens:
+    away: Steelers
+    home: Ravens
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Jets@Bills:
+    away: Jets
+    home: Bills
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Falcons@Panthers:
+    away: Falcons
+    home: Panthers
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Browns@Bengals:
+    away: Browns
+    home: Bengals
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Chargers@Broncos:
+    away: Chargers
+    home: Broncos
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Lions@Packers:
+    away: Lions
+    home: Packers
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Titans@Texans:
+    away: Titans
+    home: Texans
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Jaguars@Colts:
+    away: Jaguars
+    home: Colts
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Raiders@Chiefs:
+    away: Raiders
+    home: Chiefs
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Seahawks@Rams:
+    away: Seahawks
+    home: Rams
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Bears@Vikings:
+    away: Bears
+    home: Vikings
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Dolphins@Patriots:
+    away: Dolphins
+    home: Patriots
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Buccaneers@Saints:
+    away: Buccaneers
+    home: Saints
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Eagles@Giants:
+    away: Eagles
+    home: Giants
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Cowboys@Commanders:
+    away: Cowboys
+    home: Commanders
+    kickoff_time: null
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null

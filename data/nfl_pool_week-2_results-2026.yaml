@@ -1,131 +1,132 @@
 pool:
   season: 2026
   week: 2
-game_01:
-  away: Lions
-  home: Bills
-  kickoff_time: '2026-09-18T00:15:00Z'
-  status: final
-  away_score: 31
-  home_score: 41
-  winner: "Bills"
-game_02:
-  away: Panthers
-  home: Falcons
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 34
-  home_score: 3
-  winner: "Panthers"
-game_03:
-  away: Saints
-  home: Ravens
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 24
-  home_score: 17
-  winner: Saints
-game_04:
-  away: Vikings
-  home: Bears
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 9
-  home_score: 3
-  winner: Vikings
-game_05:
-  away: Bengals
-  home: Texans
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 20
-  home_score: 6
-  winner: Bengals
-game_06:
-  away: Steelers
-  home: Patriots
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 3
-  home_score: 20
-  winner: Patriots
-game_07:
-  away: Packers
-  home: Jets
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 20
-  home_score: 17
-  winner: Packers
-game_08:
-  away: Browns
-  home: Buccaneers
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 23
-  home_score: 19
-  winner: Browns
-game_09:
-  away: Eagles
-  home: Titans
-  kickoff_time: '2026-09-20T17:00:00Z'
-  status: final
-  away_score: 24
-  home_score: 20
-  winner: Eagles
-game_10:
-  away: Jaguars
-  home: Broncos
-  kickoff_time: '2026-09-20T20:05:00Z'
-  status: final
-  away_score: 13
-  home_score: 20
-  winner: Broncos
-game_11:
-  away: Raiders
-  home: Chargers
-  kickoff_time: '2026-09-20T20:05:00Z'
-  status: final
-  away_score: 26
-  home_score: 14
-  winner: Raiders
-game_12:
-  away: Seahawks
-  home: Cardinals
-  kickoff_time: '2026-09-20T20:25:00Z'
-  status: final
-  away_score: 31
-  home_score: 7
-  winner: Seahawks
-game_13:
-  away: Commanders
-  home: Cowboys
-  kickoff_time: '2026-09-20T20:25:00Z'
-  status: final
-  away_score: 20
-  home_score: 37
-  winner: Cowboys
-game_14:
-  away: Dolphins
-  home: 49ers
-  kickoff_time: '2026-09-20T20:25:00Z'
-  status: final
-  away_score: 13
-  home_score: 35
-  winner: 49ers
-game_15:
-  away: Colts
-  home: Chiefs
-  kickoff_time: '2026-09-21T00:20:00Z'
-  status: final
-  away_score: 30
-  home_score: 33
-  winner: Chiefs
-game_16:
-  away: Giants
-  home: Rams
-  kickoff_time: '2026-09-22T00:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  Lions@Bills:
+    away: Lions
+    home: Bills
+    kickoff_time: '2026-09-18T00:15:00Z'
+    status: final
+    away_score: 31
+    home_score: 41
+    winner: Bills
+  Panthers@Falcons:
+    away: Panthers
+    home: Falcons
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 34
+    home_score: 3
+    winner: Panthers
+  Saints@Ravens:
+    away: Saints
+    home: Ravens
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 24
+    home_score: 17
+    winner: Saints
+  Vikings@Bears:
+    away: Vikings
+    home: Bears
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 9
+    home_score: 3
+    winner: Vikings
+  Bengals@Texans:
+    away: Bengals
+    home: Texans
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 20
+    home_score: 6
+    winner: Bengals
+  Steelers@Patriots:
+    away: Steelers
+    home: Patriots
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 3
+    home_score: 20
+    winner: Patriots
+  Packers@Jets:
+    away: Packers
+    home: Jets
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 20
+    home_score: 17
+    winner: Packers
+  Browns@Buccaneers:
+    away: Browns
+    home: Buccaneers
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 23
+    home_score: 19
+    winner: Browns
+  Eagles@Titans:
+    away: Eagles
+    home: Titans
+    kickoff_time: '2026-09-20T17:00:00Z'
+    status: final
+    away_score: 24
+    home_score: 20
+    winner: Eagles
+  Jaguars@Broncos:
+    away: Jaguars
+    home: Broncos
+    kickoff_time: '2026-09-20T20:05:00Z'
+    status: final
+    away_score: 13
+    home_score: 20
+    winner: Broncos
+  Raiders@Chargers:
+    away: Raiders
+    home: Chargers
+    kickoff_time: '2026-09-20T20:05:00Z'
+    status: final
+    away_score: 26
+    home_score: 14
+    winner: Raiders
+  Seahawks@Cardinals:
+    away: Seahawks
+    home: Cardinals
+    kickoff_time: '2026-09-20T20:25:00Z'
+    status: final
+    away_score: 31
+    home_score: 7
+    winner: Seahawks
+  Commanders@Cowboys:
+    away: Commanders
+    home: Cowboys
+    kickoff_time: '2026-09-20T20:25:00Z'
+    status: final
+    away_score: 20
+    home_score: 37
+    winner: Cowboys
+  Dolphins@49ers:
+    away: Dolphins
+    home: 49ers
+    kickoff_time: '2026-09-20T20:25:00Z'
+    status: final
+    away_score: 13
+    home_score: 35
+    winner: 49ers
+  Colts@Chiefs:
+    away: Colts
+    home: Chiefs
+    kickoff_time: '2026-09-21T00:20:00Z'
+    status: final
+    away_score: 30
+    home_score: 33
+    winner: Chiefs
+  Giants@Rams:
+    away: Giants
+    home: Rams
+    kickoff_time: '2026-09-22T00:15:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null

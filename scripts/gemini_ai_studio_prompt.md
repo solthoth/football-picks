@@ -3,7 +3,7 @@
 Manual replacement for `scripts/fetch_week_results.py` — use this when you'd
 rather paste into [aistudio.google.com](https://aistudio.google.com) than run
 the API script. Same output schema either way, so results stay compatible
-with merging into the front-end by `game_id`.
+with merging into the front-end by game id (`away@home`, e.g. `Falcons@Packers`).
 
 ## Before you paste this
 
@@ -29,7 +29,7 @@ or after). Use exactly this structure, one entry per game `id` from the input,
 in the same order:
 
 ```yaml
-game_01:
+"Falcons@Packers":
   kickoff_time: <ISO 8601 UTC datetime, e.g. "2026-09-14T17:00:00Z", or null if unknown>
   status: <"scheduled" | "in_progress" | "final">
   away_score: <integer or null if the game has not started>
@@ -66,7 +66,7 @@ results:
   season: <season>
   fetched_at: <current UTC timestamp, e.g. "2026-09-14T02:15:00Z">
 games:
-  <paste Gemini's game_01..game_16 block here, indented one level>
+  <paste Gemini's per-game block here, indented one level>
 ```
 
 ## Re-running later in the week
@@ -82,8 +82,8 @@ slightly reformatted or missing value.
 Gemini's chat replies aren't validated the way the script would have
 validated them, so skim for these before saving:
 
-- Every `game_id` from the picks file is present, in the same count.
-- No unrecognized `game_id`s were invented.
+- Every game `id` from the picks file is present, in the same count.
+- No unrecognized game ids were invented.
 - Every `status` is exactly `scheduled`, `in_progress`, or `final` (nothing
   else, no typos like `"in progress"` or `"Final"`).
 - Every non-null `winner` exactly matches an `away`/`home` team name from the

@@ -1,7 +1,6 @@
 import { parse } from 'yaml'
 import type { Game, GameResult, GameStatus, Participant, Pool } from './types'
 
-const GAME_ID_PATTERN = /^game_\d+$/
 const DATE_SUFFIX_PATTERN = /-(\d{8})\.ya?ml$/
 const VALID_STATUSES: readonly GameStatus[] = ['scheduled', 'in_progress', 'final']
 
@@ -83,10 +82,11 @@ function parseGameResult(raw: unknown): GameResult | null {
 function parseResultsFile(raw: Record<string, unknown>, path: string): ParsedResultsFile {
   const { season, week } = parsePoolHeader(raw)
   const games: Record<string, GameResult> = {}
-  for (const [key, value] of Object.entries(raw)) {
-    if (!GAME_ID_PATTERN.test(key)) continue
-    const result = parseGameResult(value)
-    if (result) games[key] = result
+  if (isRecord(raw.games)) {
+    for (const [matchupId, value] of Object.entries(raw.games)) {
+      const result = parseGameResult(value)
+      if (result) games[matchupId] = result
+    }
   }
   return { season, week, path, games }
 }
