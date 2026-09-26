@@ -6,299 +6,299 @@ pool:
   extraction_note: Handwritten sheet transcribed from the supplied photo. X marks
     and filled-in marks are both treated as the participant's selected team.
 games:
-- id: game_01
+- id: Lions@Bills
   away: Lions
   home: Bills
-- id: game_02
+- id: Panthers@Falcons
   away: Panthers
   home: Falcons
-- id: game_03
+- id: Saints@Ravens
   away: Saints
   home: Ravens
-- id: game_04
+- id: Vikings@Bears
   away: Vikings
   home: Bears
-- id: game_05
+- id: Bengals@Texans
   away: Bengals
   home: Texans
-- id: game_06
+- id: Steelers@Patriots
   away: Steelers
   home: Patriots
-- id: game_07
+- id: Packers@Jets
   away: Packers
   home: Jets
-- id: game_08
+- id: Browns@Buccaneers
   away: Browns
   home: Buccaneers
-- id: game_09
+- id: Eagles@Titans
   away: Eagles
   home: Titans
-- id: game_10
+- id: Jaguars@Broncos
   away: Jaguars
   home: Broncos
-- id: game_11
+- id: Raiders@Chargers
   away: Raiders
   home: Chargers
-- id: game_12
+- id: Seahawks@Cardinals
   away: Seahawks
   home: Cardinals
-- id: game_13
+- id: Commanders@Cowboys
   away: Commanders
   home: Cowboys
-- id: game_14
+- id: Dolphins@49ers
   away: Dolphins
   home: 49ers
-- id: game_15
+- id: Colts@Chiefs
   away: Colts
   home: Chiefs
-- id: game_16
+- id: Giants@Rams
   away: Giants
   home: Rams
 participants:
 - name: Sumo
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Texans
-    game_06: Steelers
-    game_07: Packers
-    game_08: Buccaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Texans
+    Steelers@Patriots: Steelers
+    Packers@Jets: Packers
+    Browns@Buccaneers: Buccaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 40
 - name: Rusty
   picks:
-    game_01: Lions
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Vikings
-    game_05: Bengals
-    game_06: Patriots
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Broncos
-    game_11: Raiders
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Giants
+    Lions@Bills: Lions
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Vikings
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Raiders
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Giants
   tie_breaker_total_score: 40
 - name: Tere
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Bengals
-    game_06: Steelers
-    game_07: Jets
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Raiders
-    game_12: Cardinals
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Steelers
+    Packers@Jets: Jets
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Raiders
+    Seahawks@Cardinals: Cardinals
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 42
 - name: Austin
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Bangles
-    game_06: Steelers
-    game_07: Packers
-    game_08: Buccaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Bangles
+    Steelers@Patriots: Steelers
+    Packers@Jets: Packers
+    Browns@Buccaneers: Buccaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 42
 - name: Rene
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Bengals
-    game_06: Patriots
-    game_07: Packers
-    game_08: Buccaneers
-    game_09: Eagles
-    game_10: Broncos
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Buccaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 46
 - name: Gordo
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Bengals
-    game_06: Patriots
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 45
 - name: Adrianna
   picks:
-    game_01: Bills
-    game_02: Falcons
-    game_03: Ravens
-    game_04: Vikings
-    game_05: Bengals
-    game_06: Patriots
-    game_07: Packers
-    game_08: Buccaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Falcons
+    Saints@Ravens: Ravens
+    Vikings@Bears: Vikings
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Buccaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 49
 - name: Monica
   picks:
-    game_01: Bills
-    game_02: Falcons
-    game_03: Ravens
-    game_04: Vikings
-    game_05: Texans
-    game_06: Patriots
-    game_07: Packers
-    game_08: Browns
-    game_09: Titans
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Colts
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Falcons
+    Saints@Ravens: Ravens
+    Vikings@Bears: Vikings
+    Bengals@Texans: Texans
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Browns
+    Eagles@Titans: Titans
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Colts
+    Giants@Rams: Rams
   tie_breaker_total_score: 50
 - name: Kiko
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Texans
-    game_06: Patriots
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Jaguars
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Texans
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Jaguars
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 41
 - name: Pete
   picks:
-    game_01: Bills
-    game_02: Falcons
-    game_03: Jets
-    game_04: Steelers
-    game_05: Saints
-    game_06: Eagles
-    game_07: Bengals
-    game_08: Bears
-    game_09: Browns
-    game_10: Raiders
-    game_11: Broncos
-    game_12: Cowboys
-    game_13: Dolphins
-    game_14: Seahawks
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Falcons
+    Saints@Ravens: Jets
+    Vikings@Bears: Steelers
+    Bengals@Texans: Saints
+    Steelers@Patriots: Eagles
+    Packers@Jets: Bengals
+    Browns@Buccaneers: Bears
+    Eagles@Titans: Browns
+    Jaguars@Broncos: Raiders
+    Raiders@Chargers: Broncos
+    Seahawks@Cardinals: Cowboys
+    Commanders@Cowboys: Dolphins
+    Dolphins@49ers: Seahawks
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 42
 - name: Loui
   picks:
-    game_01: Bills
-    game_02: Falcons
-    game_03: Ravens
-    game_04: Vikings
-    game_05: Texans
-    game_06: Steelers
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Broncos
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Falcons
+    Saints@Ravens: Ravens
+    Vikings@Bears: Vikings
+    Bengals@Texans: Texans
+    Steelers@Patriots: Steelers
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 42
 - name: Jose
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Texans
-    game_06: Patriots
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Broncos
-    game_11: Chargers
-    game_12: Seahawks
-    game_13: Commanders
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Texans
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Chargers
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Commanders
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 48
 - name: Sergio
   picks:
-    game_01: Bills
-    game_02: Panthers
-    game_03: Ravens
-    game_04: Bears
-    game_05: Texans
-    game_06: Patriots
-    game_07: Packers
-    game_08: Bucaneers
-    game_09: Eagles
-    game_10: Broncos
-    game_11: Raiders
-    game_12: Seahawks
-    game_13: Cowboys
-    game_14: 49ers
-    game_15: Chiefs
-    game_16: Rams
+    Lions@Bills: Bills
+    Panthers@Falcons: Panthers
+    Saints@Ravens: Ravens
+    Vikings@Bears: Bears
+    Bengals@Texans: Texans
+    Steelers@Patriots: Patriots
+    Packers@Jets: Packers
+    Browns@Buccaneers: Bucaneers
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Raiders
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: 49ers
+    Colts@Chiefs: Chiefs
+    Giants@Rams: Rams
   tie_breaker_total_score: 46

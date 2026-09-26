@@ -51,12 +51,9 @@ Output:
     week, overwriting it in place on every run (no per-run timestamp -- the
     intent is to re-run this weekly and have it refresh the same files).
 
-    Note: this output's game_01..game_NN numbering is ordered by kickoff
-    time and is independent of any picks file's own numbering for that week
-    (a picks file's order comes from whatever a pool-sheet photo happened to
-    list). If you already have a hand-correlated results file for a week
-    (e.g. from the AI Studio workflow), don't assume this one's game_XX
-    ordering lines up with it.
+    Games are keyed by "<away>@<home>" (e.g. "Falcons@Packers"), ordered by
+    kickoff time. That id is stable across flex scheduling and identical in
+    picks files, so results merge into any pool by matchup.
 """
 
 from __future__ import annotations
@@ -182,20 +179,21 @@ def build_week_output(season: int, week: int, games: list[dict[str, Any]]) -> di
     # Late-season games sometimes have no kickoff time yet (date/time TBD
     # pending flex scheduling); sort those last rather than crashing.
     games_sorted = sorted(games, key=lambda g: g["time"] or "9999")
-    output: dict[str, Any] = {"pool": {"season": season, "week": week}}
+    results: dict[str, Any] = {}
 
-    for index, game in enumerate(games_sorted, start=1):
+    for game in games_sorted:
         status, away_score, home_score, winner = game_status_and_score(game)
-        output[f"game_{index:02d}"] = {
-            "away": nickname(game["awayTeam"]["fullName"]),
-            "home": nickname(game["homeTeam"]["fullName"]),
+        away, home = nickname(game["awayTeam"]["fullName"]), nickname(game["homeTeam"]["fullName"])
+        results[f"{away}@{home}"] = {
+            "away": away,
+            "home": home,
             "kickoff_time": game["time"],
             "status": status,
             "away_score": away_score,
             "home_score": home_score,
             "winner": winner,
         }
-    return output
+    return {"pool": {"season": season, "week": week}, "games": results}
 
 
 def parse_week_range(value: str) -> list[int]:

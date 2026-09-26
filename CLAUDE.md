@@ -42,7 +42,9 @@ Not enabled. See `README.md` if/when adding it.
 
 `data/*.yaml` is the app's entire dataset (no backend, no DB) — one picks
 file and one or more results files per season/week, loaded and merged into
-typed `Pool` records by `src/data/pools.ts`/`buildPools.ts`. `scripts/` is a
+typed `Pool` records by `src/data/pools.ts`/`buildPools.ts`. Games are
+identified everywhere by an `away@home` id (e.g. `Falcons@Packers`); results
+files hold a `games:` map keyed by that id, so results merge into any pool. `scripts/` is a
 **separate Python toolchain** (not part of the pnpm/TS build, not covered by
 `pnpm lint`/`typecheck`/`test`) for producing/fixing those files:
 
@@ -51,13 +53,12 @@ typed `Pool` records by `src/data/pools.ts`/`buildPools.ts`. `scripts/` is a
   (`.sops.yaml` has the recipient key); decrypting needs the matching age
   private key, or `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` env vars as a
   fallback. Full setup/usage is in the script's own module docstring.
-- `remap_picks_to_schedule.py` — renumbers a hand-transcribed picks file's
-  `game_XX` ids to match a schedule/results file's numbering (by team-name
-  matchup), so the two files agree on what each game id means.
+- `scaffold_picks.py` — writes a new week's picks-file scaffold from that
+  week's schedule/results file.
 - `gemini_ai_studio_prompt.md` — a prompt template for generating a results
   file via Google AI Studio instead of the NFL API script.
 
-Full usage details for all three are in `README.md`'s Scripts section — treat
+Full usage details for these are in `README.md`'s Scripts section — treat
 that as the source of truth, don't duplicate it here.
 
 `src/assets/team-logos/*.svg` are the 32 teams' logos (downloaded from the

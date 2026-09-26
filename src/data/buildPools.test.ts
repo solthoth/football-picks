@@ -7,22 +7,22 @@ pool:
   week: 1
   pot: 100
 games:
-  - id: game_01
+  - id: Patriots@Seahawks
     away: Patriots
     home: Seahawks
-  - id: game_02
+  - id: 49ers@Rams
     away: 49ers
     home: Rams
 participants:
   - name: Steve
     picks:
-      game_01: Seahawks
-      game_02: Rams
+      Patriots@Seahawks: Seahawks
+      49ers@Rams: Rams
     tie_breaker_total_score: 44
   - name: Greg
     picks:
-      game_01: Patriots
-      game_02: 49ers
+      Patriots@Seahawks: Patriots
+      49ers@Rams: 49ers
     tie_breaker_total_score: 40
 `
 
@@ -30,36 +30,38 @@ const RESULTS_WEEK_1_EARLY = `
 pool:
   season: 2026
   week: 1
-game_01:
-  kickoff_time: "2026-09-10T17:00:00Z"
-  status: "final"
-  away_score: 10
-  home_score: 13
-  winner: "Seahawks"
-game_02:
-  kickoff_time: null
-  status: "scheduled"
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  "Patriots@Seahawks":
+    kickoff_time: "2026-09-10T17:00:00Z"
+    status: "final"
+    away_score: 10
+    home_score: 13
+    winner: "Seahawks"
+  "49ers@Rams":
+    kickoff_time: null
+    status: "scheduled"
+    away_score: null
+    home_score: null
+    winner: null
 `
 
 const RESULTS_WEEK_1_LATER = `
 pool:
   season: 2026
   week: 1
-game_01:
-  kickoff_time: "2026-09-10T17:00:00Z"
-  status: "final"
-  away_score: 10
-  home_score: 13
-  winner: "Seahawks"
-game_02:
-  kickoff_time: "2026-09-11T17:00:00Z"
-  status: "final"
-  away_score: 27
-  home_score: 7
-  winner: "49ers"
+games:
+  "Patriots@Seahawks":
+    kickoff_time: "2026-09-10T17:00:00Z"
+    status: "final"
+    away_score: 10
+    home_score: 13
+    winner: "Seahawks"
+  "49ers@Rams":
+    kickoff_time: "2026-09-11T17:00:00Z"
+    status: "final"
+    away_score: 27
+    home_score: 7
+    winner: "49ers"
 `
 
 const PICKS_WEEK_2 = `
@@ -67,13 +69,13 @@ pool:
   season: 2026
   week: 2
 games:
-  - id: game_01
+  - id: Bears@Packers
     away: Bears
     home: Packers
 participants:
   - name: Steve
     picks:
-      game_01: Packers
+      Bears@Packers: Packers
     tie_breaker_total_score: 20
 `
 
@@ -89,7 +91,7 @@ describe('buildPools', () => {
     expect(pool.pot).toBe(100)
     expect(pool.games).toHaveLength(2)
     expect(pool.participants.map((p) => p.name)).toEqual(['Steve', 'Greg'])
-    expect(pool.results.game_01).toEqual({
+    expect(pool.results['Patriots@Seahawks']).toEqual({
       kickoffTime: '2026-09-10T17:00:00Z',
       status: 'final',
       awayScore: 10,
@@ -105,8 +107,8 @@ describe('buildPools', () => {
       'data/nfl_pool_week-1_results-20260911.yaml': RESULTS_WEEK_1_LATER,
     })
 
-    expect(pool.results.game_02?.status).toBe('final')
-    expect(pool.results.game_02?.winner).toBe('49ers')
+    expect(pool.results['49ers@Rams']?.status).toBe('final')
+    expect(pool.results['49ers@Rams']?.winner).toBe('49ers')
   })
 
   it('leaves results empty when no results file exists yet for a week', () => {
@@ -154,15 +156,16 @@ describe('buildPools', () => {
 pool:
   season: 2026
   week: 1
-game_01:
-  kickoff_time: null
-  status: "postponed"
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  "Patriots@Seahawks":
+    kickoff_time: null
+    status: "postponed"
+    away_score: null
+    home_score: null
+    winner: null
 `,
     })
 
-    expect(pool.results.game_01?.status).toBe('scheduled')
+    expect(pool.results['Patriots@Seahawks']?.status).toBe('scheduled')
   })
 })

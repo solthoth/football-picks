@@ -31,13 +31,11 @@ def load_yaml(path: Path) -> dict[str, Any]:
 
 
 def build_scaffold(season: int, week: int, pot: int, schedule_data: dict[str, Any]) -> dict[str, Any]:
-    schedule_games = {k: v for k, v in schedule_data.items() if k.startswith("game_")}
+    schedule_games = schedule_data.get("games")
     if not schedule_games:
-        raise ValueError("schedule file has no game_XX entries")
+        raise ValueError("schedule file has no games")
 
-    games = [
-        {"id": game_id, "away": entry["away"], "home": entry["home"]} for game_id, entry in sorted(schedule_games.items())
-    ]
+    games = [{"id": game_id, "away": entry["away"], "home": entry["home"]} for game_id, entry in schedule_games.items()]
 
     # Home team by default just to give the "Sample" participant syntactically
     # valid, non-blank picks to copy the shape of -- not a prediction.

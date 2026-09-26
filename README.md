@@ -94,17 +94,6 @@ Four ways to populate/fix up `data/*.yaml`, all under `scripts/`:
   age private key (ask whoever set up the repo), or you can skip SOPS entirely
   by exporting `NFL_API_CLIENT_KEY`/`NFL_API_CLIENT_SECRET` yourself. See the
   script's module docstring for the full setup and terms-of-service caveat.
-- [`remap_picks_to_schedule.py`](scripts/remap_picks_to_schedule.py) — a
-  picks file transcribed from a pool-sheet photo numbers its games in
-  whatever order the sheet happened to list them. This renumbers a picks
-  file's `game_XX` ids (and every participant's picks) to match a schedule/
-  results file's own numbering, by matching each game's away/home teams, so
-  the two files always agree on what `game_07` means:
-  ```bash
-  python scripts/remap_picks_to_schedule.py --picks data/nfl_pool_week-1_picks.yaml --dry-run
-  python scripts/remap_picks_to_schedule.py --picks data/nfl_pool_week-1_picks.yaml
-  ```
-  Refuses to write anything if a game can't be matched unambiguously.
 - [`scaffold_picks.py`](scripts/scaffold_picks.py) — writes a new week's
   picks-file scaffold from that week's schedule/results file: the `games`
   section pre-filled with that week's away/home teams, plus a `Sample`

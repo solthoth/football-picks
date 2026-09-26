@@ -1,123 +1,124 @@
 pool:
   season: 2026
   week: 5
-game_01:
-  away: Buccaneers
-  home: Cowboys
-  kickoff_time: '2026-10-09T00:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_02:
-  away: Eagles
-  home: Jaguars
-  kickoff_time: '2026-10-11T13:30:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_03:
-  away: Bengals
-  home: Dolphins
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_04:
-  away: Raiders
-  home: Patriots
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_05:
-  away: Vikings
-  home: Saints
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_06:
-  away: Browns
-  home: Jets
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_07:
-  away: Colts
-  home: Steelers
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_08:
-  away: Texans
-  home: Titans
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_09:
-  away: Giants
-  home: Commanders
-  kickoff_time: '2026-10-11T17:00:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_10:
-  away: Broncos
-  home: Chargers
-  kickoff_time: '2026-10-11T20:05:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_11:
-  away: Lions
-  home: Cardinals
-  kickoff_time: '2026-10-11T20:25:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_12:
-  away: Bears
-  home: Packers
-  kickoff_time: '2026-10-11T20:25:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_13:
-  away: 49ers
-  home: Seahawks
-  kickoff_time: '2026-10-11T20:25:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_14:
-  away: Ravens
-  home: Falcons
-  kickoff_time: '2026-10-12T00:20:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
-game_15:
-  away: Bills
-  home: Rams
-  kickoff_time: '2026-10-13T00:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
+games:
+  Buccaneers@Cowboys:
+    away: Buccaneers
+    home: Cowboys
+    kickoff_time: '2026-10-09T00:15:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Eagles@Jaguars:
+    away: Eagles
+    home: Jaguars
+    kickoff_time: '2026-10-11T13:30:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Bengals@Dolphins:
+    away: Bengals
+    home: Dolphins
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Raiders@Patriots:
+    away: Raiders
+    home: Patriots
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Vikings@Saints:
+    away: Vikings
+    home: Saints
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Browns@Jets:
+    away: Browns
+    home: Jets
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Colts@Steelers:
+    away: Colts
+    home: Steelers
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Texans@Titans:
+    away: Texans
+    home: Titans
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Giants@Commanders:
+    away: Giants
+    home: Commanders
+    kickoff_time: '2026-10-11T17:00:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Broncos@Chargers:
+    away: Broncos
+    home: Chargers
+    kickoff_time: '2026-10-11T20:05:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Lions@Cardinals:
+    away: Lions
+    home: Cardinals
+    kickoff_time: '2026-10-11T20:25:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Bears@Packers:
+    away: Bears
+    home: Packers
+    kickoff_time: '2026-10-11T20:25:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  49ers@Seahawks:
+    away: 49ers
+    home: Seahawks
+    kickoff_time: '2026-10-11T20:25:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Ravens@Falcons:
+    away: Ravens
+    home: Falcons
+    kickoff_time: '2026-10-12T00:20:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
+  Bills@Rams:
+    away: Bills
+    home: Rams
+    kickoff_time: '2026-10-13T00:15:00Z'
+    status: scheduled
+    away_score: null
+    home_score: null
+    winner: null
