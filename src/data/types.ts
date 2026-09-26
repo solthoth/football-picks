@@ -27,4 +27,6 @@ export interface Pool {
   games: Game[]
   participants: Participant[]
   results: Record<string, GameResult>
+  /** ISO time the published (live) results were last refreshed; unset when only bundled data is in use. */
+  resultsUpdatedAt?: string
 }

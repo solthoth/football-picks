@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { ParticipantList } from '../components/ParticipantList'
 import { pools } from '../data/pools'
+import { useLivePool } from '../data/useLivePool'
 import { NotFoundPool } from './NotFoundPool'
 
 export function ParticipantListPage() {
@@ -8,7 +9,7 @@ export function ParticipantListPage() {
   const { season, week } = useParams()
   const seasonNumber = Number(season)
   const weekNumber = Number(week)
-  const pool = pools.find((p) => p.season === seasonNumber && p.week === weekNumber)
+  const pool = useLivePool(pools.find((p) => p.season === seasonNumber && p.week === weekNumber))
 
   if (!pool) return <NotFoundPool />
 

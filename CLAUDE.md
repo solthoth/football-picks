@@ -44,7 +44,12 @@ Not enabled. See `README.md` if/when adding it.
 file and one or more results files per season/week, loaded and merged into
 typed `Pool` records by `src/data/pools.ts`/`buildPools.ts`. Games are
 identified everywhere by an `away@home` id (e.g. `Falcons@Packers`); results
-files hold a `games:` map keyed by that id, so results merge into any pool. `scripts/` is a
+files hold a `games:` map keyed by that id, so results merge into any pool. At runtime the site also overlays live
+scores published to blob storage (`VITE_SCORES_BASE_URL`, set per environment
+in the deploy workflows; `.env.development` points `pnpm dev` at dev):
+`src/data/useLivePool.ts` fetches/polls `<season>/week-<N>.json`, and
+`liveScores.ts` merges it over the bundled results, falling back to them on
+any failure. Picks always come from the bundled YAML. `scripts/` is a
 **separate Python toolchain** (not part of the pnpm/TS build, not covered by
 `pnpm lint`/`typecheck`/`test`) for producing/fixing those files:
 
