@@ -17,6 +17,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import type { SxProps, Theme } from '@mui/material/styles'
+import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
@@ -38,6 +39,7 @@ function rankAvatarSx(rank: number): SxProps<Theme> {
 export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
   const { winnerNames } = determineWeekWinner(pool)
+  const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -51,6 +53,11 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
         Season {pool.season} &middot; Week {pool.week}
       </Typography>
       <Typography color="textSecondary">Select a participant to see their picks.</Typography>
+      {scoresAsOf && (
+        <Typography variant="caption" color="textSecondary" component="p">
+          {scoresAsOf}
+        </Typography>
+      )}
 
       {isMobile ? (
         <Stack spacing={1.5} sx={{ mt: 2 }}>

@@ -4,7 +4,7 @@ import type { Game, GameResult, GameStatus, Participant, Pool } from './types'
 const DATE_SUFFIX_PATTERN = /-(\d{8})\.ya?ml$/
 const VALID_STATUSES: readonly GameStatus[] = ['scheduled', 'in_progress', 'final']
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
@@ -67,7 +67,7 @@ function parsePicksFile(raw: Record<string, unknown>): ParsedPicksFile {
   return { season, week, pot, games: parseGames(raw.games), participants: parseParticipants(raw.participants) }
 }
 
-function parseGameResult(raw: unknown): GameResult | null {
+export function parseGameResult(raw: unknown): GameResult | null {
   if (!isRecord(raw)) return null
   const status = VALID_STATUSES.includes(raw.status as GameStatus) ? (raw.status as GameStatus) : 'scheduled'
   return {
