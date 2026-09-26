@@ -70,7 +70,7 @@ Add a new week by dropping in a new picks file; update scores by refreshing
 
 ### Scripts
 
-Three ways to populate/fix up `data/*.yaml`, all under `scripts/`:
+Four ways to populate/fix up `data/*.yaml`, all under `scripts/`:
 
 - [`gemini_ai_studio_prompt.md`](scripts/gemini_ai_studio_prompt.md) — a
   prompt template for [Google AI Studio](https://aistudio.google.com/): paste
@@ -105,6 +105,20 @@ Three ways to populate/fix up `data/*.yaml`, all under `scripts/`:
   python scripts/remap_picks_to_schedule.py --picks data/nfl_pool_week-1_picks.yaml
   ```
   Refuses to write anything if a game can't be matched unambiguously.
+- [`scaffold_picks.py`](scripts/scaffold_picks.py) — writes a new week's
+  picks-file scaffold from that week's schedule/results file: the `games`
+  section pre-filled with that week's away/home teams, plus a `Sample`
+  participant showing the picks format to duplicate once you know who's
+  playing the pool that week:
+  ```bash
+  python scripts/scaffold_picks.py --season 2026 --week 3 --pot 180
+  ```
+  Or via the `Makefile`, which also fetches the week's schedule first:
+  ```bash
+  make scaffold-picks WEEK=3 POT=180              # SEASON defaults to the current year
+  make scaffold-picks WEEK=3 POT=180 SEASON=2026 FORCE=1   # overwrite an existing picks file
+  ```
+  Refuses to overwrite an existing picks file unless `--force`/`FORCE=1` is given.
 
 ### Team logos
 

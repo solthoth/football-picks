@@ -5,10 +5,10 @@ game_01:
   away: Falcons
   home: Packers
   kickoff_time: '2026-09-25T00:15:00Z'
-  status: scheduled
-  away_score: null
-  home_score: null
-  winner: null
+  status: final
+  away_score: 35
+  home_score: 14
+  winner: Falcons
 game_02:
   away: Chargers
   home: Bills
