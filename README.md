@@ -104,7 +104,7 @@ Four ways to populate/fix up `data/*.yaml`, all under `scripts/`:
   | `make venv` | one-time: `.venv` + `scripts/requirements.txt` (Azure SDK) |
   | `make publish-scores` | publish the active week to **dev** |
   | `make publish-scores ENV=prod` | same, to **prod** (always explicit) |
-  | `make publish-scores GATE=1 [ENV=prod]` | what cron runs: skips the NFL API unless a game is live, within 10 min of kickoff, or the published copy is 12h stale |
+  | `make publish-scores GATE=1 [ENV=prod]` | what cron runs: skips the NFL API unless a game is live, within 10 min of kickoff, or the published copy is missing or 12h stale (so ~2 NFL calls/day even when nothing is playing; none once the week is final) |
   | `make publish-scores WEEKS=3 [ENV=prod]` | force one week (or `1-4`) regardless of gating |
   | `make backfill-scores [ENV=prod]` | one-time bootstrap: publish weeks 1-18 |
   | `make test-scripts` | unit tests for the gating logic |

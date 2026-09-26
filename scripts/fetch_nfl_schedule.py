@@ -47,9 +47,19 @@ Usage:
     python scripts/fetch_nfl_schedule.py --season 2026 --weeks 1-4
 
     # Publish to Azure Blob Storage instead of writing local files (dev by
-    # default; prod only with --env prod). --gate makes it cron-friendly:
-    # it exits without touching the NFL API unless a game is live or about
-    # to kick off. --weeks active = earliest week not yet fully final.
+    # default; prod only with --env prod). --weeks active = earliest week
+    # not yet fully final.
+    #
+    # --gate makes it cron-friendly. Per week, it reads what is already
+    # published and only calls the NFL API when one of these is true:
+    #   - nothing is published for the week yet
+    #   - a game is in progress
+    #   - a not-final game kicks off within 10 minutes (or already has)
+    #   - the published copy is over 12 hours old and the week isn't fully
+    #     final (a refresh to pick up flex-schedule changes; expect about
+    #     two NFL calls a day even when nothing is playing)
+    # Once every game in the week is final it never calls the API again for
+    # that week. Otherwise it exits after a cheap blob read, without NFL auth.
     python scripts/fetch_nfl_schedule.py --season 2026 --weeks active --upload --gate
     python scripts/fetch_nfl_schedule.py --season 2026 --weeks active --upload --gate --env prod
 
@@ -232,7 +242,7 @@ def main() -> None:
     parser.add_argument(
         "--gate",
         action="store_true",
-        help="With --upload: skip weeks with nothing live or about to start (no NFL API call)",
+        help="With --upload: skip the NFL API call unless a game is live/about to start, or the published copy is stale or missing",
     )
     args = parser.parse_args()
 
