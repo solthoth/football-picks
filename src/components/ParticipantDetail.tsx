@@ -62,6 +62,60 @@ function OutcomeIcon({ correct, fontSize = 'small' }: { correct: boolean | null;
   return <AccessTimeIcon color="disabled" fontSize={fontSize} />
 }
 
+interface MobileScoreRowProps {
+  status: GameStatus | 'unknown'
+  awayScore: number | null
+  homeScore: number | null
+}
+
+function MobileScoreRow({ status, awayScore, homeScore }: MobileScoreRowProps) {
+  if (status === 'scheduled' || status === 'unknown') {
+    return (
+      <Box sx={{ mt: 1.5, mx: -2, mb: -2, px: 2, py: 1.25, borderTop: 1, borderColor: 'divider', textAlign: 'center' }}>
+        <Typography variant="body2" color="textSecondary">
+          {status === 'scheduled' ? 'Not started' : 'No result yet'}
+        </Typography>
+      </Box>
+    )
+  }
+
+  const inProgress = status === 'in_progress'
+
+  return (
+    <Box
+      sx={(theme) => ({
+        mt: 1.5,
+        mx: -2,
+        mb: -2,
+        px: 2,
+        py: 1.25,
+        borderTop: 1,
+        borderColor: inProgress ? alpha(theme.palette.warning.main, 0.5) : 'divider',
+        bgcolor: inProgress ? alpha(theme.palette.warning.main, 0.18) : 'transparent',
+      })}
+    >
+      <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Typography
+          sx={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: inProgress ? 'warning.dark' : 'text.primary' }}
+        >
+          {awayScore ?? '–'}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ fontWeight: 700, letterSpacing: '0.06em', color: inProgress ? 'warning.dark' : 'text.secondary' }}
+        >
+          {inProgress ? 'LIVE' : 'FINAL'}
+        </Typography>
+        <Typography
+          sx={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: inProgress ? 'warning.dark' : 'text.primary' }}
+        >
+          {homeScore ?? '–'}
+        </Typography>
+      </Stack>
+    </Box>
+  )
+}
+
 type TileColor = 'success' | 'error' | 'grey' | 'primary'
 
 interface SummaryTileProps {
@@ -194,7 +248,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
               <Card
                 key={outcome.gameId}
                 variant="outlined"
-                sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2 }}
+                sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2, overflow: 'hidden' }}
               >
                 <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5 }}>
                   <TeamLogo team={outcome.away} size={24} />
@@ -222,9 +276,11 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                   </Stack>
                 </Stack>
 
-                <Typography variant="body2" color="textSecondary" sx={{ mt: 1.5 }}>
-                  {statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}
-                </Typography>
+                <MobileScoreRow
+                  status={outcome.status}
+                  awayScore={result?.awayScore ?? null}
+                  homeScore={result?.homeScore ?? null}
+                />
               </Card>
             )
           })}
