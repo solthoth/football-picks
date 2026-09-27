@@ -179,7 +179,9 @@ def fetch_week_games(token: str, season: int, week: int) -> list[dict[str, Any]]
     return body if isinstance(body, list) else list(body.values())
 
 
-def game_status_and_score(game: dict[str, Any]) -> tuple[str, int | None, int | None, str | None]:
+def game_status_and_score(
+    game: dict[str, Any], now: datetime | None = None
+) -> tuple[str, int | None, int | None, str | None]:
     summary = game.get("summary")
     if not summary:
         return "scheduled", None, None, None
@@ -188,16 +190,25 @@ def game_status_and_score(game: dict[str, Any]) -> tuple[str, int | None, int | 
     home_total = summary["homeTeam"]["score"]["total"]
 
     # Overtime games report phase "FINAL_OVERTIME" rather than plain "FINAL".
-    if not (summary.get("phase") or "").startswith("FINAL"):
-        return "in_progress", away_total, home_total, None
+    if (summary.get("phase") or "").startswith("FINAL"):
+        if away_total > home_total:
+            winner = nickname(game["awayTeam"]["fullName"])
+        elif home_total > away_total:
+            winner = nickname(game["homeTeam"]["fullName"])
+        else:
+            winner = None
+        return "final", away_total, home_total, winner
 
-    if away_total > home_total:
-        winner = nickname(game["awayTeam"]["fullName"])
-    elif home_total > away_total:
-        winner = nickname(game["homeTeam"]["fullName"])
-    else:
-        winner = None
-    return "final", away_total, home_total, winner
+    # The API attaches a summary (0-0, with an empty/pregame phase) well
+    # before kickoff, so a non-final phase alone doesn't mean the game has
+    # started -- only trust "in_progress" once kickoff has actually passed.
+    kickoff = game.get("time")
+    if kickoff:
+        kickoff_at = datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+        if (now or datetime.now(timezone.utc)) < kickoff_at:
+            return "scheduled", None, None, None
+
+    return "in_progress", away_total, home_total, None
 
 
 def build_week_output(season: int, week: int, games: list[dict[str, Any]]) -> dict[str, Any]:
