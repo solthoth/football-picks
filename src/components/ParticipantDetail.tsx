@@ -21,6 +21,7 @@ import type { ReactNode } from 'react'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
 import { WinnerCelebration } from './WinnerCelebration'
@@ -177,6 +178,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
   const participant = pool.participants.find((p) => p.name === participantName)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}/participant/${encodeURIComponent(participantName)}`
 
   if (!participant) {
     return (
@@ -199,9 +201,16 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
     <Container component="main" maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       <WinnerCelebration participantName={participant.name} isWinner={isWinner} />
 
-      <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
-        Back to participants
-      </Button>
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
+          Back to participants
+        </Button>
+        <ShareButton
+          url={shareUrl}
+          title={`${participant.name}'s picks`}
+          text={`${participant.name}'s picks for Season ${pool.season}, Week ${pool.week}`}
+        />
+      </Stack>
 
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
         <Typography variant="h3" component="h1" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
