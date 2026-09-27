@@ -157,6 +157,13 @@ nickname strings used in `data/*.yaml` (see `src/data/teamLogos.ts`). Team
 names/logos are the teams' registered trademarks — fine to keep in a private,
 non-commercial pool like this one, but don't repurpose them commercially.
 
+### Favicon
+
+`public/favicon.svg` is the 🏈 emoji from [Twemoji](https://github.com/twitter/twemoji)
+(`assets/svg/1f3c8.svg`), the same graphic favicon.io's
+[emoji favicon generator](https://favicon.io/emoji-favicons/american-football/)
+uses. Twemoji is licensed [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 24+
