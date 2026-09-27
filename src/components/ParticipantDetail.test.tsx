@@ -75,6 +75,18 @@ describe('ParticipantDetail', () => {
   })
 })
 
+describe('ParticipantDetail sharing', () => {
+  it('shares a deep link to this participant (see ShareButton.test.tsx for share/clipboard behavior)', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: /share/i }))
+
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/season/2026/week/1/participant/Steve`)
+  })
+})
+
 describe('ParticipantDetail mobile layout', () => {
   afterEach(() => {
     mockMatchMediaMatches(false)

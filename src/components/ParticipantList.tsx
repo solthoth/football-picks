@@ -21,6 +21,7 @@ import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { ShareButton } from './ShareButton'
 import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantListProps {
@@ -42,12 +43,20 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
   const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}`
 
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
-      <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
-        Change season/week
-      </Button>
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
+          Change season/week
+        </Button>
+        <ShareButton
+          url={shareUrl}
+          title={`Season ${pool.season} Week ${pool.week} standings`}
+          text={`See the Season ${pool.season}, Week ${pool.week} standings`}
+        />
+      </Stack>
 
       <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
         Season {pool.season} &middot; Week {pool.week}
