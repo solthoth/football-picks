@@ -1,12 +1,12 @@
-import Container from '@mui/material/Container'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import { Link as RouterLink } from 'react-router-dom'
+import { CenteredCard } from '../components/CenteredCard'
 
 export function NotFound() {
   return (
-    <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <CenteredCard>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800 }}>
         Page not found
       </Typography>
       <Typography color="textSecondary" gutterBottom>
@@ -15,6 +15,6 @@ export function NotFound() {
       <Link component={RouterLink} to="/">
         Go to Football Picks
       </Link>
-    </Container>
+    </CenteredCard>
   )
 }

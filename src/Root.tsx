@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useMemo } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
+import { AmbientBackground } from './components/AmbientBackground.tsx'
 
 export function Root() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -12,6 +13,7 @@ export function Root() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <AmbientBackground />
       <BrowserRouter>
         <App />
       </BrowserRouter>

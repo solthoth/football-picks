@@ -7,6 +7,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Container from '@mui/material/Container'
+import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import { alpha, useTheme } from '@mui/material/styles'
 import Table from '@mui/material/Table'
@@ -21,6 +22,7 @@ import type { ReactNode } from 'react'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { CenteredCard } from './CenteredCard'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
@@ -182,12 +184,12 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
 
   if (!participant) {
     return (
-      <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
-        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ mb: 1, ml: -1 }}>
+      <CenteredCard>
+        <Typography gutterBottom>Couldn't find {participantName} in this week's pool.</Typography>
+        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack}>
           Back
         </Button>
-        <Typography>Couldn't find {participantName} in this week's pool.</Typography>
-      </Container>
+      </CenteredCard>
     )
   }
 
@@ -201,148 +203,150 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
     <Container component="main" maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       <WinnerCelebration participantName={participant.name} isWinner={isWinner} />
 
-      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-          Back to participants
-        </Button>
-        <ShareButton
-          url={shareUrl}
-          title={`${participant.name}'s picks`}
-          text={`${participant.name}'s picks for Season ${pool.season}, Week ${pool.week}`}
-        />
-      </Stack>
-
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-        <Typography variant="h3" component="h1" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
-          {participant.name}
-        </Typography>
-        {isWinner && <WinnerBadge />}
-      </Stack>
-      <Typography color="textSecondary" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-        Season {pool.season} &middot; Week {pool.week}
-      </Typography>
-
-      <Box
-        component="dl"
-        role="group"
-        aria-label="Pick summary"
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${participant.tieBreakerTotalScore !== null ? 4 : 3}, 1fr)` },
-          gap: { xs: 1.5, md: 2 },
-          m: 0,
-          mt: 3,
-        }}
-      >
-        <SummaryTile label="Correct" value={summary.correct} icon={<CheckCircleIcon />} color="success" caption={gamesCaption} />
-        <SummaryTile label="Incorrect" value={summary.incorrect} icon={<CancelIcon />} color="error" caption={gamesCaption} />
-        <SummaryTile label="Pending" value={summary.pending} icon={<AccessTimeIcon />} color="grey" caption={gamesCaption} />
-        {participant.tieBreakerTotalScore !== null && (
-          <SummaryTile
-            label="Tiebreaker guess"
-            value={participant.tieBreakerTotalScore}
-            icon={<SportsFootballIcon />}
-            color="primary"
-            caption="combined score"
+      <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
+        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
+            Back to participants
+          </Button>
+          <ShareButton
+            url={shareUrl}
+            title={`${participant.name}'s picks`}
+            text={`${participant.name}'s picks for Season ${pool.season}, Week ${pool.week}`}
           />
-        )}
-      </Box>
-
-      {isMobile ? (
-        <Stack spacing={1.5} sx={{ mt: 3 }}>
-          {outcomes.map((outcome) => {
-            const result = pool.results[outcome.gameId]
-            const color = outcomeColor(outcome.correct)
-            return (
-              <Card
-                key={outcome.gameId}
-                variant="outlined"
-                sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2, overflow: 'hidden' }}
-              >
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5 }}>
-                  <TeamLogo team={outcome.away} size={24} />
-                  <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>
-                    {outcome.away} @ {outcome.home}
-                  </Typography>
-                  <TeamLogo team={outcome.home} size={24} />
-                </Stack>
-
-                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                  <TeamLogo team={outcome.pickedTeam} size={56} />
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="overline" color="textSecondary" sx={{ lineHeight: 1.4, display: 'block' }}>
-                      Pick
-                    </Typography>
-                    <Typography component="p" noWrap sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 }}>
-                      {outcome.pickedTeam ?? '—'}
-                    </Typography>
-                  </Box>
-                  <Stack sx={{ alignItems: 'center', flexShrink: 0, minWidth: 72 }}>
-                    <OutcomeIcon correct={outcome.correct} fontSize="large" />
-                    <Typography variant="body2" color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, mt: 0.25 }}>
-                      {correctLabel(outcome.correct)}
-                    </Typography>
-                  </Stack>
-                </Stack>
-
-                <MobileScoreRow
-                  status={outcome.status}
-                  awayScore={result?.awayScore ?? null}
-                  homeScore={result?.homeScore ?? null}
-                />
-              </Card>
-            )
-          })}
         </Stack>
-      ) : (
-        <TableContainer sx={{ mt: 4 }}>
-          <Table sx={{ '& .MuiTableCell-root': { fontSize: '1.125rem', py: 2, px: 2.5 } }}>
-            <TableHead>
-              <TableRow sx={{ '& .MuiTableCell-root': { fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.secondary' } }}>
-                <TableCell>Matchup</TableCell>
-                <TableCell sx={{ bgcolor: 'action.hover' }}>Pick</TableCell>
-                <TableCell>Result</TableCell>
-                <TableCell>Outcome</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {outcomes.map((outcome) => {
-                const result = pool.results[outcome.gameId]
-                return (
-                  <TableRow key={outcome.gameId} hover>
-                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
-                        <TeamLogo team={outcome.away} size={36} />
-                        <Typography component="span" color="textSecondary" sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
-                          {outcome.away} @ {outcome.home}
-                        </Typography>
-                        <TeamLogo team={outcome.home} size={36} />
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ bgcolor: 'action.hover' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <TeamLogo team={outcome.pickedTeam} size={48} />
-                        <Typography component="span" sx={{ fontWeight: 700, fontSize: '1.375rem' }}>
-                          {outcome.pickedTeam ?? '—'}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <OutcomeIcon correct={outcome.correct} fontSize="medium" />
-                        <Typography color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, fontSize: 'inherit' }}>
-                          {correctLabel(outcome.correct)}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+          <Typography variant="h3" component="h1" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
+            {participant.name}
+          </Typography>
+          {isWinner && <WinnerBadge />}
+        </Stack>
+        <Typography color="textSecondary" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+          Season {pool.season} &middot; Week {pool.week}
+        </Typography>
+
+        <Box
+          component="dl"
+          role="group"
+          aria-label="Pick summary"
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${participant.tieBreakerTotalScore !== null ? 4 : 3}, 1fr)` },
+            gap: { xs: 1.5, md: 2 },
+            m: 0,
+            mt: 3,
+          }}
+        >
+          <SummaryTile label="Correct" value={summary.correct} icon={<CheckCircleIcon />} color="success" caption={gamesCaption} />
+          <SummaryTile label="Incorrect" value={summary.incorrect} icon={<CancelIcon />} color="error" caption={gamesCaption} />
+          <SummaryTile label="Pending" value={summary.pending} icon={<AccessTimeIcon />} color="grey" caption={gamesCaption} />
+          {participant.tieBreakerTotalScore !== null && (
+            <SummaryTile
+              label="Tiebreaker guess"
+              value={participant.tieBreakerTotalScore}
+              icon={<SportsFootballIcon />}
+              color="primary"
+              caption="combined score"
+            />
+          )}
+        </Box>
+
+        {isMobile ? (
+          <Stack spacing={1.5} sx={{ mt: 3 }}>
+            {outcomes.map((outcome) => {
+              const result = pool.results[outcome.gameId]
+              const color = outcomeColor(outcome.correct)
+              return (
+                <Card
+                  key={outcome.gameId}
+                  variant="outlined"
+                  sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2, overflow: 'hidden' }}
+                >
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5 }}>
+                    <TeamLogo team={outcome.away} size={24} />
+                    <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>
+                      {outcome.away} @ {outcome.home}
+                    </Typography>
+                    <TeamLogo team={outcome.home} size={24} />
+                  </Stack>
+
+                  <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                    <TeamLogo team={outcome.pickedTeam} size={56} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="overline" color="textSecondary" sx={{ lineHeight: 1.4, display: 'block' }}>
+                        Pick
+                      </Typography>
+                      <Typography component="p" noWrap sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 }}>
+                        {outcome.pickedTeam ?? '—'}
+                      </Typography>
+                    </Box>
+                    <Stack sx={{ alignItems: 'center', flexShrink: 0, minWidth: 72 }}>
+                      <OutcomeIcon correct={outcome.correct} fontSize="large" />
+                      <Typography variant="body2" color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, mt: 0.25 }}>
+                        {correctLabel(outcome.correct)}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+
+                  <MobileScoreRow
+                    status={outcome.status}
+                    awayScore={result?.awayScore ?? null}
+                    homeScore={result?.homeScore ?? null}
+                  />
+                </Card>
+              )
+            })}
+          </Stack>
+        ) : (
+          <TableContainer sx={{ mt: 4 }}>
+            <Table sx={{ '& .MuiTableCell-root': { fontSize: '1.125rem', py: 2, px: 2.5 } }}>
+              <TableHead>
+                <TableRow sx={{ '& .MuiTableCell-root': { fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.secondary' } }}>
+                  <TableCell>Matchup</TableCell>
+                  <TableCell sx={{ bgcolor: 'action.hover' }}>Pick</TableCell>
+                  <TableCell>Result</TableCell>
+                  <TableCell>Outcome</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {outcomes.map((outcome) => {
+                  const result = pool.results[outcome.gameId]
+                  return (
+                    <TableRow key={outcome.gameId} hover>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
+                          <TeamLogo team={outcome.away} size={36} />
+                          <Typography component="span" color="textSecondary" sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
+                            {outcome.away} @ {outcome.home}
+                          </Typography>
+                          <TeamLogo team={outcome.home} size={36} />
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ bgcolor: 'action.hover' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <TeamLogo team={outcome.pickedTeam} size={48} />
+                          <Typography component="span" sx={{ fontWeight: 700, fontSize: '1.375rem' }}>
+                            {outcome.pickedTeam ?? '—'}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <OutcomeIcon correct={outcome.correct} fontSize="medium" />
+                          <Typography color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, fontSize: 'inherit' }}>
+                            {correctLabel(outcome.correct)}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
     </Container>
   )
 }
