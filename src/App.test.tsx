@@ -50,7 +50,7 @@ describe('App routing', () => {
     const user = userEvent.setup()
     renderApp('/')
 
-    await user.click(screen.getByRole('button', { name: /view week/i }))
+    await user.click(screen.getByRole('option', { name: 'Week 1' }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1')
     expect(screen.getByRole('heading', { name: /season 2026.*week 1/i })).toBeInTheDocument()
 
