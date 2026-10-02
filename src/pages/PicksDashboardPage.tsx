@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { ParticipantList } from '../components/ParticipantList'
+import { PicksDashboard } from '../components/PicksDashboard'
 import { pools } from '../data/pools'
 import { useLivePool } from '../data/useLivePool'
 import { NotFoundPool } from './NotFoundPool'
 
-export function ParticipantListPage() {
+export function PicksDashboardPage() {
   const navigate = useNavigate()
   const { season, week } = useParams()
   const seasonNumber = Number(season)
@@ -13,14 +13,5 @@ export function ParticipantListPage() {
 
   if (!pool) return <NotFoundPool />
 
-  return (
-    <ParticipantList
-      pool={pool}
-      onSelect={(participant) =>
-        navigate(`/season/${seasonNumber}/week/${weekNumber}/participant/${encodeURIComponent(participant)}`)
-      }
-      onBack={() => navigate('/')}
-      onOpenDashboard={() => navigate(`/season/${seasonNumber}/week/${weekNumber}/dashboard`)}
-    />
-  )
+  return <PicksDashboard pool={pool} onBack={() => navigate(`/season/${seasonNumber}/week/${weekNumber}`)} />
 }
