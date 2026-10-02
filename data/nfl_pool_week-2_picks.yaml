@@ -83,7 +83,7 @@ participants:
     Bengals@Texans: Bengals
     Steelers@Patriots: Patriots
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Broncos
     Raiders@Chargers: Raiders
@@ -102,7 +102,7 @@ participants:
     Bengals@Texans: Bengals
     Steelers@Patriots: Steelers
     Packers@Jets: Jets
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Jaguars
     Raiders@Chargers: Raiders
@@ -118,7 +118,7 @@ participants:
     Panthers@Falcons: Panthers
     Saints@Ravens: Ravens
     Vikings@Bears: Bears
-    Bengals@Texans: Bangles
+    Bengals@Texans: Bengals
     Steelers@Patriots: Steelers
     Packers@Jets: Packers
     Browns@Buccaneers: Buccaneers
@@ -159,7 +159,7 @@ participants:
     Bengals@Texans: Bengals
     Steelers@Patriots: Patriots
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Jaguars
     Raiders@Chargers: Chargers
@@ -216,7 +216,7 @@ participants:
     Bengals@Texans: Texans
     Steelers@Patriots: Patriots
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Jaguars
     Raiders@Chargers: Chargers
@@ -230,18 +230,18 @@ participants:
   picks:
     Lions@Bills: Bills
     Panthers@Falcons: Falcons
-    Saints@Ravens: Jets
-    Vikings@Bears: Steelers
-    Bengals@Texans: Saints
-    Steelers@Patriots: Eagles
-    Packers@Jets: Bengals
-    Browns@Buccaneers: Bears
-    Eagles@Titans: Browns
-    Jaguars@Broncos: Raiders
-    Raiders@Chargers: Broncos
-    Seahawks@Cardinals: Cowboys
-    Commanders@Cowboys: Dolphins
-    Dolphins@49ers: Seahawks
+    Saints@Ravens: Saints
+    Vikings@Bears: Bears
+    Bengals@Texans: Bengals
+    Steelers@Patriots: Steelers
+    Packers@Jets: Jets
+    Browns@Buccaneers: Browns
+    Eagles@Titans: Eagles
+    Jaguars@Broncos: Broncos
+    Raiders@Chargers: Raiders
+    Seahawks@Cardinals: Seahawks
+    Commanders@Cowboys: Cowboys
+    Dolphins@49ers: Dolphins
     Colts@Chiefs: Chiefs
     Giants@Rams: Rams
   tie_breaker_total_score: 42
@@ -254,7 +254,7 @@ participants:
     Bengals@Texans: Texans
     Steelers@Patriots: Steelers
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Broncos
     Raiders@Chargers: Chargers
@@ -273,7 +273,7 @@ participants:
     Bengals@Texans: Texans
     Steelers@Patriots: Patriots
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Broncos
     Raiders@Chargers: Chargers
@@ -292,7 +292,7 @@ participants:
     Bengals@Texans: Texans
     Steelers@Patriots: Patriots
     Packers@Jets: Packers
-    Browns@Buccaneers: Bucaneers
+    Browns@Buccaneers: Buccaneers
     Eagles@Titans: Eagles
     Jaguars@Broncos: Broncos
     Raiders@Chargers: Raiders
