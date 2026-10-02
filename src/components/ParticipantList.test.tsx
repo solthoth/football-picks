@@ -37,12 +37,12 @@ const poolWithWinner: Pool = {
 
 describe('ParticipantList', () => {
   it('shows the season and week', () => {
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
     expect(screen.getByRole('heading', { name: /season 2026.*week 1/i })).toBeInTheDocument()
   })
 
   it('lists participants ranked by correct picks', () => {
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
     const rows = screen.getAllByRole('row').slice(1) // skip header row
     expect(rows[0]).toHaveTextContent('Steve')
     expect(rows[1]).toHaveTextContent('Greg')
@@ -51,7 +51,7 @@ describe('ParticipantList', () => {
   it('calls onSelect when the row is clicked', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     await user.click(screen.getByText('Greg').closest('tr') as HTMLElement)
 
@@ -61,7 +61,7 @@ describe('ParticipantList', () => {
   it('calls onSelect when any cell in the row is clicked, not just the name', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     const row = screen.getByText('Greg').closest('tr') as HTMLElement
     await user.click(within(row).getByText(/pending/i))
@@ -72,7 +72,7 @@ describe('ParticipantList', () => {
   it('activates the row via the keyboard', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     const row = screen.getByText('Greg').closest('tr') as HTMLElement
     row.focus()
@@ -84,18 +84,28 @@ describe('ParticipantList', () => {
   it('calls onBack when the back button is clicked', async () => {
     const user = userEvent.setup()
     const onBack = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={onBack} />)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={onBack} onOpenDashboard={vi.fn()} />)
 
     await user.click(screen.getByRole('button', { name: /change season\/week/i }))
 
     expect(onBack).toHaveBeenCalled()
   })
 
+  it('offers a button to the pick dashboard that calls onOpenDashboard', async () => {
+    const user = userEvent.setup()
+    const onOpenDashboard = vi.fn()
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={onOpenDashboard} />)
+
+    await user.click(screen.getByRole('button', { name: /see how the pool picked/i }))
+
+    expect(onOpenDashboard).toHaveBeenCalledTimes(1)
+  })
+
   it('shares a deep link to the week (see ShareButton.test.tsx for share/clipboard behavior)', async () => {
     const user = userEvent.setup()
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
 
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
     await user.click(screen.getByRole('button', { name: /share/i }))
 
     expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/season/2026/week/1`)
@@ -104,7 +114,7 @@ describe('ParticipantList', () => {
 
 describe('ParticipantList week winner badge', () => {
   it("shows a winner badge next to the week's winner only", () => {
-    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     const steveRow = screen.getByText('Steve').closest('tr') as HTMLElement
     const gregRow = screen.getByText('Greg').closest('tr') as HTMLElement
@@ -121,7 +131,7 @@ describe('ParticipantList week winner badge', () => {
         game_01: { ...poolWithWinner.results.game_01, status: 'in_progress', winner: null },
       },
     }
-    render(<ParticipantList pool={poolPending} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={poolPending} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
   })
@@ -134,7 +144,7 @@ describe('ParticipantList mobile layout', () => {
 
   it('renders participants as cards instead of a table below the sm breakpoint', () => {
     mockMatchMediaMatches(true)
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getByText('Steve')).toBeInTheDocument()
@@ -145,7 +155,7 @@ describe('ParticipantList mobile layout', () => {
     mockMatchMediaMatches(true)
     const user = userEvent.setup()
     const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} />)
+    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     await user.click(screen.getByText('Greg'))
 
@@ -154,7 +164,7 @@ describe('ParticipantList mobile layout', () => {
 
   it('still shows the winner badge on the mobile card layout', () => {
     mockMatchMediaMatches(true)
-    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} />)
+    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
 
     expect(screen.getByText(/week winner/i)).toBeInTheDocument()
   })

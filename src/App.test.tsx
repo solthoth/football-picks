@@ -84,6 +84,31 @@ describe('App routing', () => {
     expect(screen.getByRole('heading', { name: /football picks/i })).toBeInTheDocument()
   })
 
+  it('navigates from the standings to the pick dashboard and back', async () => {
+    const user = userEvent.setup()
+    renderApp('/season/2026/week/1')
+
+    await user.click(screen.getByRole('button', { name: /see how the pool picked/i }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/dashboard')
+    expect(screen.getByRole('heading', { level: 2, name: 'Patriots at Seahawks' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /back to standings/i }))
+    expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1')
+    expect(screen.getByRole('button', { name: /see how the pool picked/i })).toBeInTheDocument()
+  })
+
+  it('renders a deep-linked pick dashboard directly, as a bookmark would', () => {
+    renderApp('/season/2026/week/1/dashboard')
+
+    expect(screen.getByRole('heading', { level: 1, name: /season 2026.*week 1/i })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /week summary/i })).toBeInTheDocument()
+  })
+
+  it('shows the not-found fallback for a dashboard of a season/week that does not exist', () => {
+    renderApp('/season/1999/week/1/dashboard')
+    expect(screen.getByText(/isn't available/i)).toBeInTheDocument()
+  })
+
   it('shows a not-found fallback for a season/week that does not exist', () => {
     renderApp('/season/1999/week/1')
     expect(screen.getByText(/isn't available/i)).toBeInTheDocument()

@@ -1,4 +1,5 @@
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import BarChartIcon from '@mui/icons-material/BarChart'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -29,6 +30,7 @@ interface ParticipantListProps {
   pool: Pool
   onSelect: (participantName: string) => void
   onBack: () => void
+  onOpenDashboard: () => void
 }
 
 function rankAvatarSx(rank: number): SxProps<Theme> {
@@ -38,7 +40,7 @@ function rankAvatarSx(rank: number): SxProps<Theme> {
   return { bgcolor: 'grey.300', color: 'common.black' }
 }
 
-export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps) {
+export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
   const { winnerNames } = determineWeekWinner(pool)
   const scoresAsOf = scoresAsOfLabel(pool)
@@ -69,6 +71,15 @@ export function ParticipantList({ pool, onSelect, onBack }: ParticipantListProps
             {scoresAsOf}
           </Typography>
         )}
+        <Button
+          variant="outlined"
+          size="large"
+          startIcon={<BarChartIcon />}
+          onClick={onOpenDashboard}
+          sx={{ mt: 2, width: { xs: '100%', sm: 'auto' } }}
+        >
+          See how the pool picked
+        </Button>
 
         {isMobile ? (
           <Stack spacing={1.5} sx={{ mt: 2 }}>
