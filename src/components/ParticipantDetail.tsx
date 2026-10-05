@@ -18,10 +18,11 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { CardOverlayButton } from './CardOverlayButton'
 import { CenteredCard } from './CenteredCard'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
@@ -32,6 +33,10 @@ interface ParticipantDetailProps {
   pool: Pool
   participantName: string
   onBack: () => void
+  /** When set, each game (mobile card / desktop row) opens the who-picked-what view for that game. */
+  onSelectGame?: (gameId: string) => void
+  /** Label for the back button; defaults to the standings. */
+  backLabel?: string
 }
 
 function statusLabel(status: GameStatus | 'unknown', awayScore: number | null, homeScore: number | null): string {
@@ -176,7 +181,7 @@ function SummaryTile({ label, value, icon, color, caption }: SummaryTileProps) {
   )
 }
 
-export function ParticipantDetail({ pool, participantName, onBack }: ParticipantDetailProps) {
+export function ParticipantDetail({ pool, participantName, onBack, onSelectGame, backLabel = 'Back to participants' }: ParticipantDetailProps) {
   const participant = pool.participants.find((p) => p.name === participantName)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -206,7 +211,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-            Back to participants
+            {backLabel}
           </Button>
           <ShareButton
             url={shareUrl}
@@ -260,7 +265,7 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                 <Card
                   key={outcome.gameId}
                   variant="outlined"
-                  sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2, overflow: 'hidden' }}
+                  sx={{ borderLeftWidth: 6, borderLeftColor: `${color}.main`, p: 2, overflow: 'hidden', position: 'relative' }}
                 >
                   <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5 }}>
                     <TeamLogo team={outcome.away} size={24} />
@@ -293,6 +298,12 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                     awayScore={result?.awayScore ?? null}
                     homeScore={result?.homeScore ?? null}
                   />
+                  {onSelectGame && (
+                    <CardOverlayButton
+                      label={`See who picked ${outcome.away} at ${outcome.home}`}
+                      onClick={() => onSelectGame(outcome.gameId)}
+                    />
+                  )}
                 </Card>
               )
             })}
@@ -312,7 +323,21 @@ export function ParticipantDetail({ pool, participantName, onBack }: Participant
                 {outcomes.map((outcome) => {
                   const result = pool.results[outcome.gameId]
                   return (
-                    <TableRow key={outcome.gameId} hover>
+                    <TableRow
+                      key={outcome.gameId}
+                      hover
+                      {...(onSelectGame && {
+                        onClick: () => onSelectGame(outcome.gameId),
+                        tabIndex: 0,
+                        onKeyDown: (e: KeyboardEvent<HTMLTableRowElement>) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onSelectGame(outcome.gameId)
+                          }
+                        },
+                        sx: { cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: -2 } },
+                      })}
+                    >
                       <TableCell sx={{ whiteSpace: 'nowrap' }}>
                         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
                           <TeamLogo team={outcome.away} size={36} />

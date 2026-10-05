@@ -1,34 +1,35 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ParticipantDetail } from '../components/ParticipantDetail'
+import { GamePicks } from '../components/GamePicks'
 import { pools } from '../data/pools'
 import { useLivePool } from '../data/useLivePool'
 import { goBack, readBackLabel } from './backNavigation'
 import type { BackState } from './backNavigation'
 import { NotFoundPool } from './NotFoundPool'
 
-export function ParticipantDetailPage() {
+export function GamePicksPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { season, week, participant } = useParams()
+  const { season, week, gameId } = useParams()
   const seasonNumber = Number(season)
   const weekNumber = Number(week)
   const pool = useLivePool(pools.find((p) => p.season === seasonNumber && p.week === weekNumber))
-
   const backLabel = readBackLabel(location.state)
+  const weekPath = `/season/${seasonNumber}/week/${weekNumber}`
 
-  if (!pool || !participant) return <NotFoundPool />
+  if (!pool || !gameId) return <NotFoundPool />
 
-  const participantName = decodeURIComponent(participant)
+  const game = pool.games.find((g) => g.id === gameId)
+  const matchup = game ? `${game.away} @ ${game.home}` : 'game'
 
   return (
-    <ParticipantDetail
+    <GamePicks
       pool={pool}
-      participantName={participantName}
+      gameId={gameId}
       backLabel={backLabel}
-      onBack={() => goBack(navigate, backLabel, `/season/${seasonNumber}/week/${weekNumber}`)}
-      onSelectGame={(gameId) => {
-        const state: BackState = { backLabel: `Back to ${participantName}` }
-        navigate(`/season/${seasonNumber}/week/${weekNumber}/game/${encodeURIComponent(gameId)}`, { state })
+      onBack={() => goBack(navigate, backLabel, `${weekPath}/dashboard`)}
+      onSelectParticipant={(participant) => {
+        const state: BackState = { backLabel: `Back to ${matchup}` }
+        navigate(`${weekPath}/participant/${encodeURIComponent(participant)}`, { state })
       }}
     />
   )

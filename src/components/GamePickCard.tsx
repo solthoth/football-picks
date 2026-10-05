@@ -1,5 +1,6 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import BoltIcon from '@mui/icons-material/Bolt'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -10,11 +11,14 @@ import type { Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useId } from 'react'
 import type { GameDistribution, Side } from '../domain/pickDistribution'
+import { CardOverlayButton } from './CardOverlayButton'
 import { PickSplitBar } from './PickSplitBar'
 import { TeamLogo } from './TeamLogo'
 
 interface GamePickCardProps {
   game: GameDistribution
+  /** When set, the whole card is a button that opens the who-picked-what view for this game. */
+  onSelect?: (gameId: string) => void
 }
 
 function formatKickoff(kickoffTime: string | null): string | null {
@@ -130,7 +134,7 @@ function Percent({ pct, count, picked, emphasized, align }: PercentProps) {
   )
 }
 
-export function GamePickCard({ game }: GamePickCardProps) {
+export function GamePickCard({ game, onSelect }: GamePickCardProps) {
   const headingId = useId()
   const kickoff = formatKickoff(game.kickoffTime)
   const status = statusText(game)
@@ -153,6 +157,7 @@ export function GamePickCard({ game }: GamePickCardProps) {
       aria-labelledby={headingId}
       sx={(theme) => ({
         p: { xs: 2, md: 2.5 },
+        position: 'relative',
         ...(live && { bgcolor: alpha(theme.palette.warning.main, 0.12), borderColor: alpha(theme.palette.warning.main, 0.5) }),
       })}
     >
@@ -235,6 +240,18 @@ export function GamePickCard({ game }: GamePickCardProps) {
             </Stack>
           )}
         </Stack>
+      )}
+
+      {onSelect && (
+        <>
+          <Stack direction="row" spacing={0.25} sx={{ mt: 1.5, alignItems: 'center', justifyContent: 'flex-end', color: 'primary.main' }}>
+            <Typography variant="caption" aria-hidden sx={{ fontWeight: 700 }}>
+              See who picked each team
+            </Typography>
+            <ChevronRightIcon aria-hidden fontSize="small" />
+          </Stack>
+          <CardOverlayButton label={`See who picked ${game.away} at ${game.home}`} onClick={() => onSelect(game.gameId)} />
+        </>
       )}
     </Card>
   )
