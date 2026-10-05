@@ -114,3 +114,47 @@ describe('ParticipantDetail mobile layout', () => {
     expect(onBack).toHaveBeenCalled()
   })
 })
+
+describe('ParticipantDetail game selection', () => {
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it('opens a game when its table row is clicked or activated with the keyboard', async () => {
+    const user = userEvent.setup()
+    const onSelectGame = vi.fn()
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} onSelectGame={onSelectGame} />)
+
+    const rows = screen.getAllByRole('row').slice(1)
+    await user.click(rows[0])
+    expect(onSelectGame).toHaveBeenLastCalledWith('game_01')
+
+    rows[1].focus()
+    await user.keyboard('{Enter}')
+    expect(onSelectGame).toHaveBeenLastCalledWith('game_02')
+  })
+
+  it('opens a game when its card is tapped on mobile', async () => {
+    mockMatchMediaMatches(true)
+    const user = userEvent.setup()
+    const onSelectGame = vi.fn()
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} onSelectGame={onSelectGame} />)
+
+    await user.click(screen.getByRole('button', { name: 'See who picked 49ers at Rams' }))
+
+    expect(onSelectGame).toHaveBeenCalledWith('game_02')
+  })
+
+  it('does not make games clickable without onSelectGame', () => {
+    mockMatchMediaMatches(true)
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+
+    expect(screen.queryByRole('button', { name: /see who picked/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a custom back label', () => {
+    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} backLabel="Back to Patriots @ Seahawks" />)
+
+    expect(screen.getByRole('button', { name: 'Back to Patriots @ Seahawks' })).toBeInTheDocument()
+  })
+})

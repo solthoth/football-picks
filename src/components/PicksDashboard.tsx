@@ -18,11 +18,12 @@ import { ShareButton } from './ShareButton'
 interface PicksDashboardProps {
   pool: Pool
   onBack: () => void
+  onSelectGame?: (gameId: string) => void
 }
 
 type SortMode = 'schedule' | 'divided'
 
-export function PicksDashboard({ pool, onBack }: PicksDashboardProps) {
+export function PicksDashboard({ pool, onBack, onSelectGame }: PicksDashboardProps) {
   const [sort, setSort] = useState<SortMode>('schedule')
   const distribution = useMemo(() => computePickDistribution(pool), [pool])
   const scoresAsOf = scoresAsOfLabel(pool)
@@ -105,7 +106,7 @@ export function PicksDashboard({ pool, onBack }: PicksDashboardProps) {
             >
               {games.map((game) => (
                 <Box component="li" key={game.gameId} sx={{ minWidth: 0 }}>
-                  <GamePickCard game={game} />
+                  <GamePickCard game={game} onSelect={onSelectGame} />
                 </Box>
               ))}
             </Box>

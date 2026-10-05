@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import type { GameDistribution } from '../domain/pickDistribution'
 import { GamePickCard } from './GamePickCard'
 import { PickSplitBar } from './PickSplitBar'
@@ -199,5 +200,23 @@ describe('GamePickCard', () => {
 
     expect(screen.queryByText(/FINAL|LIVE/)).not.toBeInTheDocument()
     expect(screen.queryByText(/crowd was|upset/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('GamePickCard selection', () => {
+  it('is not a button unless onSelect is given', () => {
+    render(<GamePickCard game={game()} />)
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('opens the game by id when the card is clicked', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<GamePickCard game={game()} onSelect={onSelect} />)
+
+    await user.click(screen.getByRole('button', { name: 'See who picked Falcons at Packers' }))
+
+    expect(onSelect).toHaveBeenCalledWith('Falcons@Packers')
   })
 })

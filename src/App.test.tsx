@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -102,6 +102,51 @@ describe('App routing', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /season 2026.*week 1/i })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: /week summary/i })).toBeInTheDocument()
+  })
+
+  it('walks dashboard -> game -> participant, then back through each screen', async () => {
+    const user = userEvent.setup()
+    renderApp('/season/2026/week/1/dashboard')
+
+    await user.click(screen.getByRole('button', { name: 'See who picked Patriots at Seahawks' }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
+    expect(screen.getByRole('heading', { level: 1, name: 'Patriots @ Seahawks' })).toBeInTheDocument()
+    expect(within(screen.getByTestId('pickers-away')).getByRole('button', { name: 'Greg' })).toBeInTheDocument()
+    expect(within(screen.getByTestId('pickers-home')).getByRole('button', { name: /^Steve/ })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^Steve/ }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Steve')
+
+    await user.click(screen.getByRole('button', { name: 'Back to Patriots @ Seahawks' }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
+
+    await user.click(screen.getByRole('button', { name: 'Back to dashboard' }))
+    expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/dashboard')
+  })
+
+  it('opens a game from a participant page and returns to that participant', async () => {
+    const user = userEvent.setup()
+    renderApp('/season/2026/week/1/participant/Steve')
+
+    await user.click(screen.getAllByRole('row')[1])
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
+
+    await user.click(screen.getByRole('button', { name: 'Back to Steve' }))
+    expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/participant/Steve')
+  })
+
+  it('renders a deep-linked game page, with back falling through to the dashboard', async () => {
+    const user = userEvent.setup()
+    renderApp('/season/2026/week/1/game/game_01')
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Patriots @ Seahawks' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Back to dashboard' }))
+    expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/dashboard')
+  })
+
+  it('shows a fallback for a game that does not exist in the week', () => {
+    renderApp('/season/2026/week/1/game/nope')
+    expect(screen.getByText(/couldn't find that game/i)).toBeInTheDocument()
   })
 
   it('shows the not-found fallback for a dashboard of a season/week that does not exist', () => {

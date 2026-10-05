@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { GamePicksPage } from './pages/GamePicksPage'
 import { NotFound } from './pages/NotFound'
 import { ParticipantDetailPage } from './pages/ParticipantDetailPage'
 import { ParticipantListPage } from './pages/ParticipantListPage'
@@ -11,6 +12,7 @@ function App() {
       <Route path="/" element={<SeasonWeekSelectPage />} />
       <Route path="/season/:season/week/:week" element={<ParticipantListPage />} />
       <Route path="/season/:season/week/:week/dashboard" element={<PicksDashboardPage />} />
+      <Route path="/season/:season/week/:week/game/:gameId" element={<GamePicksPage />} />
       <Route path="/season/:season/week/:week/participant/:participant" element={<ParticipantDetailPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
