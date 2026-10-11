@@ -47,6 +47,17 @@ describe('ParticipantDetail', () => {
     expect(rows[2]).toHaveTextContent('Pending')
   })
 
+  it('labels a pick on a tied final game as a tie rather than pending', () => {
+    const tiedPool: Pool = {
+      ...pool,
+      results: { ...pool.results, game_03: { kickoffTime: null, status: 'final', awayScore: 20, homeScore: 20, winner: null } },
+    }
+    render(<ParticipantDetail pool={tiedPool} participantName="Steve" onBack={vi.fn()} />)
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(rows[2]).toHaveTextContent('Tie')
+    expect(rows[2]).not.toHaveTextContent('Pending')
+  })
+
   it('shows a fallback and lets the user go back when the participant is not found', async () => {
     const user = userEvent.setup()
     const onBack = vi.fn()

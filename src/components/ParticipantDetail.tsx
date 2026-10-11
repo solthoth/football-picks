@@ -2,6 +2,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import DragHandleIcon from '@mui/icons-material/DragHandle'
 import SportsFootballIcon from '@mui/icons-material/SportsFootball'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -21,6 +22,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import type { KeyboardEvent, ReactNode } from 'react'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
+import type { PickOutcome } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { CardOverlayButton } from './CardOverlayButton'
 import { CenteredCard } from './CenteredCard'
@@ -52,21 +54,25 @@ function statusLabel(status: GameStatus | 'unknown', awayScore: number | null, h
   }
 }
 
-function correctLabel(correct: boolean | null): string {
+type OutcomeFields = Pick<PickOutcome, 'correct' | 'tied'>
+
+function correctLabel({ correct, tied }: OutcomeFields): string {
   if (correct === true) return 'Correct'
   if (correct === false) return 'Incorrect'
+  if (tied) return 'Tie'
   return 'Pending'
 }
 
-function outcomeColor(correct: boolean | null): 'success' | 'error' | 'textSecondary' {
+function outcomeColor({ correct }: OutcomeFields): 'success' | 'error' | 'textSecondary' {
   if (correct === true) return 'success'
   if (correct === false) return 'error'
   return 'textSecondary'
 }
 
-function OutcomeIcon({ correct, fontSize = 'small' }: { correct: boolean | null; fontSize?: 'small' | 'medium' | 'large' | 'inherit' }) {
+function OutcomeIcon({ correct, tied, fontSize = 'small' }: OutcomeFields & { fontSize?: 'small' | 'medium' | 'large' | 'inherit' }) {
   if (correct === true) return <CheckCircleIcon color="success" fontSize={fontSize} />
   if (correct === false) return <CancelIcon color="error" fontSize={fontSize} />
+  if (tied) return <DragHandleIcon color="disabled" fontSize={fontSize} />
   return <AccessTimeIcon color="disabled" fontSize={fontSize} />
 }
 
@@ -260,7 +266,7 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
           <Stack spacing={1.5} sx={{ mt: 3 }}>
             {outcomes.map((outcome) => {
               const result = pool.results[outcome.gameId]
-              const color = outcomeColor(outcome.correct)
+              const color = outcomeColor(outcome)
               return (
                 <Card
                   key={outcome.gameId}
@@ -286,9 +292,9 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
                       </Typography>
                     </Box>
                     <Stack sx={{ alignItems: 'center', flexShrink: 0, minWidth: 72 }}>
-                      <OutcomeIcon correct={outcome.correct} fontSize="large" />
-                      <Typography variant="body2" color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, mt: 0.25 }}>
-                        {correctLabel(outcome.correct)}
+                      <OutcomeIcon correct={outcome.correct} tied={outcome.tied} fontSize="large" />
+                      <Typography variant="body2" color={outcomeColor(outcome)} sx={{ fontWeight: 700, mt: 0.25 }}>
+                        {correctLabel(outcome)}
                       </Typography>
                     </Stack>
                   </Stack>
@@ -358,9 +364,9 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
                       <TableCell>{statusLabel(outcome.status, result?.awayScore ?? null, result?.homeScore ?? null)}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <OutcomeIcon correct={outcome.correct} fontSize="medium" />
-                          <Typography color={outcomeColor(outcome.correct)} sx={{ fontWeight: 700, fontSize: 'inherit' }}>
-                            {correctLabel(outcome.correct)}
+                          <OutcomeIcon correct={outcome.correct} tied={outcome.tied} fontSize="medium" />
+                          <Typography color={outcomeColor(outcome)} sx={{ fontWeight: 700, fontSize: 'inherit' }}>
+                            {correctLabel(outcome)}
                           </Typography>
                         </Box>
                       </TableCell>
