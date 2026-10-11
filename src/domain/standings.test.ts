@@ -60,6 +60,15 @@ describe('summarizeOutcomes', () => {
     const summary = summarizeOutcomes('Steve', outcomes)
     expect(summary).toEqual({ name: 'Steve', correct: 1, incorrect: 1, pending: 1, totalGames: 3 })
   })
+
+  it('does not count tied games as pending', () => {
+    const tiedPool = {
+      ...pool,
+      results: { ...pool.results, game_03: { kickoffTime: null, status: 'final' as const, awayScore: 20, homeScore: 20, winner: null } },
+    }
+    const summary = summarizeOutcomes('Steve', getPickOutcomes(tiedPool, tiedPool.participants[0]))
+    expect(summary).toMatchObject({ correct: 1, incorrect: 1, pending: 0, totalGames: 3 })
+  })
 })
 
 describe('buildLeaderboard', () => {

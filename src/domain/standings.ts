@@ -44,7 +44,7 @@ export function summarizeOutcomes(name: string, outcomes: PickOutcome[]): Partic
   for (const outcome of outcomes) {
     if (outcome.correct === true) correct += 1
     else if (outcome.correct === false) incorrect += 1
-    else pending += 1
+    else if (!outcome.tied) pending += 1
   }
 
   return { name, correct, incorrect, pending, totalGames: outcomes.length }
