@@ -9,6 +9,8 @@ export interface PickOutcome {
   actualWinner: string | null
   /** true/false once the game is final and has a winner; null while undecided. */
   correct: boolean | null
+  /** true once the game is final with level scores (no winner, so picks are neither right nor wrong). */
+  tied: boolean
 }
 
 export function getPickOutcomes(pool: Pool, participant: Participant): PickOutcome[] {
@@ -19,7 +21,10 @@ export function getPickOutcomes(pool: Pool, participant: Participant): PickOutco
     const actualWinner = result?.winner ?? null
     const correct = status === 'final' && actualWinner !== null ? pickedTeam === actualWinner : null
 
-    return { gameId: game.id, away: game.away, home: game.home, pickedTeam, status, actualWinner, correct }
+    const tied =
+      status === 'final' && actualWinner === null && result?.awayScore != null && result.awayScore === result.homeScore
+
+    return { gameId: game.id, away: game.away, home: game.home, pickedTeam, status, actualWinner, correct, tied }
   })
 }
 
