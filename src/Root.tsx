@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import { AmbientBackground } from './components/AmbientBackground.tsx'
+import { PullToRefresh } from './components/PullToRefresh.tsx'
 
 export function Root() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -14,6 +15,7 @@ export function Root() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AmbientBackground />
+      <PullToRefresh />
       <BrowserRouter>
         <App />
       </BrowserRouter>
