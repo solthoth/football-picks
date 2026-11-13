@@ -175,6 +175,35 @@ describe('App routing', () => {
   })
 })
 
+describe('App season standings', () => {
+  it('shows the season standings at /season/:season, with its own document title', () => {
+    renderApp('/season/2026')
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Season 2026' })).toBeInTheDocument()
+    expect(screen.getByRole('table', { name: 'Season standings' })).toBeInTheDocument()
+    expect(document.title).toBe('Season 2026 standings · Football Picks')
+  })
+
+  it('is reachable from the home page and leads on to each week', async () => {
+    const user = userEvent.setup()
+    renderApp('/')
+
+    await user.click(screen.getByRole('link', { name: /season 2026 standings/i }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026')
+
+    await user.click(screen.getByRole('link', { name: /Week 1/ }))
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1')
+  })
+
+  it('says so, and leads to the latest week, for a season that does not exist', () => {
+    renderApp('/season/1999')
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Season not found' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Go to the latest week' })).toHaveAttribute('href', '/season/2026/week/1')
+    expect(document.title).toBe('Season not found · Football Picks')
+  })
+})
+
 describe('App document titles', () => {
   beforeEach(() => {
     document.title = ''

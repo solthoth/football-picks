@@ -6,6 +6,7 @@ import { NotFound } from './pages/NotFound'
 import { ParticipantDetailPage } from './pages/ParticipantDetailPage'
 import { ParticipantListPage } from './pages/ParticipantListPage'
 import { PicksDashboardPage } from './pages/PicksDashboardPage'
+import { SeasonStandingsPage } from './pages/SeasonStandingsPage'
 import { SeasonWeekSelectPage } from './pages/SeasonWeekSelectPage'
 
 /** Notes which week is open (on any of its screens) so the home page can reopen on it. */
@@ -24,6 +25,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<SeasonWeekSelectPage />} />
+      <Route path="/season/:season" element={<SeasonStandingsPage />} />
       <Route path="/season/:season/week/:week" element={<ParticipantListPage />} />
       <Route path="/season/:season/week/:week/dashboard" element={<PicksDashboardPage />} />
       <Route path="/season/:season/week/:week/game/:gameId" element={<GamePicksPage />} />

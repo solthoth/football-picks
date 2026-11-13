@@ -1,5 +1,4 @@
 import BarChartIcon from '@mui/icons-material/BarChart'
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -18,13 +17,13 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import type { SxProps, Theme } from '@mui/material/styles'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { PageHeader } from './PageHeader'
+import { RankAvatar } from './RankAvatar'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { WeekPager } from './WeekPager'
 import { WinnerBadge } from './WinnerBadge'
@@ -33,25 +32,6 @@ interface ParticipantListProps {
   pool: Pool
   /** Every week in this pool's season; when given, links to the neighbouring weeks are shown. */
   weeks?: number[]
-}
-
-function rankAvatarSx(rank: number | null): SxProps<Theme> {
-  if (rank === 1) return { bgcolor: 'warning.main', color: 'warning.contrastText' }
-  if (rank === 2) return { bgcolor: 'grey.400', color: 'common.black' }
-  if (rank === 3) return { bgcolor: '#cd7f32', color: 'common.black' }
-  return { bgcolor: 'grey.300', color: 'common.black' }
-}
-
-function RankAvatar({ rank, size, fontSize }: { rank: number | null; size: number; fontSize: number }) {
-  const sx = { width: size, height: size, fontSize, fontWeight: 700, flexShrink: 0, ...rankAvatarSx(rank) }
-  if (rank === null) {
-    return (
-      <Avatar role="img" aria-label="Not ranked yet" sx={sx}>
-        &ndash;
-      </Avatar>
-    )
-  }
-  return <Avatar sx={sx}>{rank}</Avatar>
 }
 
 export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
