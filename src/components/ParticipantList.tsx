@@ -24,9 +24,8 @@ import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
-import { BackLink } from './BackLink'
+import { PageHeader } from './PageHeader'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
-import { ShareButton } from './ShareButton'
 import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantListProps {
@@ -67,14 +66,10 @@ export function ParticipantList({ pool }: ParticipantListProps) {
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
-        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <BackLink to="/" label="Change season/week" sx={{ ml: -1 }} />
-          <ShareButton
-            url={shareUrl}
-            title={`Season ${pool.season} Week ${pool.week} standings`}
-            text={`See the Season ${pool.season}, Week ${pool.week} standings`}
-          />
-        </Stack>
+        <PageHeader
+          back={{ to: '/', label: 'Change season/week' }}
+          share={{ url: shareUrl, title: `Season ${pool.season} Week ${pool.week} standings`, text: `See the Season ${pool.season}, Week ${pool.week} standings` }}
+        />
 
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
           <SeasonWeekLabel season={pool.season} week={pool.week} />

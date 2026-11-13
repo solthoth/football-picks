@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
-import Stack from '@mui/material/Stack'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
@@ -9,12 +8,11 @@ import { useMemo, useState } from 'react'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { computePickDistribution, sortByDivided } from '../domain/pickDistribution'
-import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { GamePickCard } from './GamePickCard'
 import { PickSummaryStrip } from './PickSummaryStrip'
+import { PageHeader } from './PageHeader'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
-import { ShareButton } from './ShareButton'
 
 interface PicksDashboardProps {
   pool: Pool
@@ -38,14 +36,10 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
-        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <BackLink to={weekPath} label="Back to standings" sx={{ ml: -1 }} />
-          <ShareButton
-            url={shareUrl}
-            title={`Season ${pool.season} Week ${pool.week} pick split`}
-            text={`See how the pool picked in Season ${pool.season}, Week ${pool.week}`}
-          />
-        </Stack>
+        <PageHeader
+          back={{ to: weekPath, label: 'Back to standings' }}
+          share={{ url: shareUrl, title: `Season ${pool.season} Week ${pool.week} pick split`, text: `See how the pool picked in Season ${pool.season}, Week ${pool.week}` }}
+        />
 
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
           <SeasonWeekLabel season={pool.season} week={pool.week} />
