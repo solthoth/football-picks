@@ -42,6 +42,18 @@ describe('ParticipantDetail', () => {
     expect(within(tile as HTMLElement).getByText('44')).toBeInTheDocument()
   })
 
+  it('drops the Pending tile once nothing is pending, and keeps the others', () => {
+    const finalPool: Pool = {
+      ...pool,
+      results: { ...pool.results, game_03: { kickoffTime: null, status: 'final', awayScore: 17, homeScore: 24, winner: 'Steelers' } },
+    }
+    renderWithRouter(<ParticipantDetail pool={finalPool} participantName="Steve" />)
+
+    const summary = within(screen.getByRole('group', { name: /pick summary/i }))
+    expect(summary.queryByText('Pending')).not.toBeInTheDocument()
+    for (const label of ['Correct', 'Incorrect', 'Tiebreaker guess']) expect(summary.getByText(label)).toBeInTheDocument()
+  })
+
   it('labels each pick as correct, incorrect, or pending', () => {
     renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     const rows = screen.getAllByRole('row').slice(1)
