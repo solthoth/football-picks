@@ -41,4 +41,10 @@ describe('ShareButton', () => {
     expect(share).toHaveBeenCalledWith({ title: 'Foo', text: 'Check out Foo', url: 'https://example.com/foo' })
     expect(writeText).not.toHaveBeenCalled()
   })
+
+  it('is never squeezed or wrapped by a long neighbour in the header row', () => {
+    render(<ShareButton url="https://example.com/foo" title="Foo" text="Check out Foo" />)
+
+    expect(screen.getByRole('button', { name: /share/i })).toHaveStyle({ flexShrink: '0', whiteSpace: 'nowrap' })
+  })
 })

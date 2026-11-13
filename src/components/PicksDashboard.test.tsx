@@ -42,6 +42,13 @@ describe('PicksDashboard', () => {
     expectCardOrder(['Falcons at Packers', 'Colts at Commanders', 'Chiefs at Raiders'])
   })
 
+  it('keeps "Week 4" together in the heading so the number cannot wrap onto its own line', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />)
+
+    const heading = screen.getByRole('heading', { level: 1 })
+    expect(within(heading).getByText('Week 4')).toHaveStyle({ whiteSpace: 'nowrap' })
+  })
+
   it('links back to the standings', () => {
     renderWithRouter(<PicksDashboard pool={pool()} />)
 

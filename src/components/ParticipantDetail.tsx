@@ -29,6 +29,7 @@ import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
 import { CenteredCard } from './CenteredCard'
+import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
@@ -243,7 +244,7 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
           {isWinner && <WinnerBadge />}
         </Stack>
         <Typography color="textSecondary" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-          Season {pool.season} &middot; Week {pool.week}
+          <SeasonWeekLabel season={pool.season} week={pool.week} />
         </Typography>
 
         <Box

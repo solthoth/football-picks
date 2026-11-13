@@ -43,6 +43,13 @@ describe('ParticipantList', () => {
     expect(screen.getByRole('heading', { name: /season 2026.*week 1/i })).toBeInTheDocument()
   })
 
+  it('keeps "Week 1" together in the heading so the number cannot wrap onto its own line', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    const heading = screen.getByRole('heading', { name: /season 2026.*week 1/i })
+    expect(within(heading).getByText('Week 1')).toHaveStyle({ whiteSpace: 'nowrap' })
+  })
+
   it('lists participants ranked by correct picks', () => {
     renderWithRouter(<ParticipantList pool={pool} />)
     const rows = screen.getAllByRole('row').slice(1) // skip header row

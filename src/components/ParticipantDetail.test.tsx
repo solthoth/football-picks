@@ -75,6 +75,12 @@ describe('ParticipantDetail', () => {
     expect(screen.getByText('Week Winner')).toBeInTheDocument()
   })
 
+  it('keeps "Week 1" together in the subtitle so the number cannot wrap onto its own line', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByText('Week 1')).toHaveStyle({ whiteSpace: 'nowrap' })
+  })
+
   it('announces a winner by name and week, not as "you"', () => {
     renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
 
