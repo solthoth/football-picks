@@ -18,12 +18,12 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { PageHeader } from './PageHeader'
 import { RankAvatar } from './RankAvatar'
+import { ScoresAsOf } from './ScoresAsOf'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { WeekPager } from './WeekPager'
 import { WinnerBadge } from './WinnerBadge'
@@ -43,7 +43,6 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
   const unranked = leaderboard.every((entry) => entry.rank === null)
   // Once every pick is decided a Pending column would just say "0 pending" on every row.
   const anyPending = leaderboard.some((entry) => entry.pending > 0)
-  const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const shareUrl = `${window.location.origin}${weekPath}`
@@ -60,11 +59,7 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
           <SeasonWeekLabel season={pool.season} week={pool.week} />
         </Typography>
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>Select a participant to see their picks.</Typography>
-        {scoresAsOf && (
-          <Typography variant="caption" color="textSecondary" component="p">
-            {scoresAsOf}
-          </Typography>
-        )}
+        <ScoresAsOf pool={pool} />
         {unranked && (
           <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
             Rankings start once the first game is final.

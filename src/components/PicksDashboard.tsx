@@ -6,13 +6,13 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { computePickDistribution, sortByDivided } from '../domain/pickDistribution'
 import type { BackState } from './backNavigation'
 import { GamePickCard } from './GamePickCard'
 import { PickSummaryStrip } from './PickSummaryStrip'
 import { PageHeader } from './PageHeader'
+import { ScoresAsOf } from './ScoresAsOf'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 
 interface PicksDashboardProps {
@@ -26,7 +26,6 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const sort: SortMode = searchParams.get('sort') === 'divided' ? 'divided' : 'schedule'
   const distribution = useMemo(() => computePickDistribution(pool), [pool])
-  const scoresAsOf = scoresAsOfLabel(pool)
   const weekPath = `/season/${pool.season}/week/${pool.week}`
   const shareUrl = `${window.location.origin}${weekPath}/dashboard${sort === 'divided' ? '?sort=divided' : ''}`
   const backToDashboard: BackState = { backLabel: 'Back to dashboard' }
@@ -50,11 +49,7 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
           How the pool picked every game.
         </Typography>
-        {scoresAsOf && (
-          <Typography variant="caption" color="textSecondary" component="p">
-            {scoresAsOf}
-          </Typography>
-        )}
+        <ScoresAsOf pool={pool} />
 
         {!hasGames ? (
           <Typography color="textSecondary" sx={{ mt: 3 }}>
