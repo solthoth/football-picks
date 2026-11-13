@@ -10,6 +10,23 @@
     />
     <!-- Matches the same-origin policy Azure Static Web Apps already sends as a header. -->
     <meta name="referrer" content="same-origin" />
+    <!--
+      Link previews (chat apps, social sites). The site is one static page behind client-side routing, so these
+      are the same for every route. There is deliberately no og:url or canonical link: a fixed one would make
+      every shared deep link point at a single page. Crawlers need an absolute https image URL.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Football Picks" />
+    <meta property="og:title" content="Football Picks" />
+    <meta
+      property="og:description"
+      content="Weekly NFL pick'em pool: see everyone's picks, live scores and who's winning."
+    />
+    <meta property="og:image" content="https://football-picks.solthoth.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Football Picks: a football on a blue background" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>Football Picks</title>
   </head>
   <body>
