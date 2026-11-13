@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 
 interface WinnerCelebrationProps {
   participantName: string
+  /** The week being viewed, named in the banner. */
+  week: number
   isWinner: boolean
 }
 
@@ -18,8 +20,12 @@ function fireConfetti() {
   })
 }
 
-/** Pops up a "Congratulations" banner and fires a confetti burst once per winning participant page load. */
-export function WinnerCelebration({ participantName, isWinner }: WinnerCelebrationProps) {
+/**
+ * Pops up a banner naming the week's winner and fires a confetti burst on every load of a winning
+ * participant's page. The wording is third person because the page is viewed by the whole pool,
+ * not just the winner.
+ */
+export function WinnerCelebration({ participantName, week, isWinner }: WinnerCelebrationProps) {
   const [open, setOpen] = useState(false)
 
   // Open the banner the first time a given participant is shown as a winner,
@@ -46,7 +52,7 @@ export function WinnerCelebration({ participantName, isWinner }: WinnerCelebrati
       slots={{ transition: Fade }}
     >
       <Alert severity="success" variant="filled" icon={<EmojiEventsIcon />} onClose={() => setOpen(false)} sx={{ fontWeight: 600 }}>
-        Congratulations, {participantName}! You're a Week Winner!
+        {participantName} won Week {week}!
       </Alert>
     </Snackbar>
   )

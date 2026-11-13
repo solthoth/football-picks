@@ -12,32 +12,47 @@ describe('WinnerCelebration', () => {
     mockMatchMediaMatches(false)
   })
 
-  it('shows a congratulations banner for a winner', () => {
-    render(<WinnerCelebration participantName="Monica" isWinner={true} />)
-    expect(screen.getByText(/congratulations, monica/i)).toBeInTheDocument()
+  it('announces the winner and the week in the third person', () => {
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+    expect(screen.getByText('Monica won Week 9!')).toBeInTheDocument()
+  })
+
+  it("does not address whoever is looking at the page as if they were the winner", () => {
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+    expect(screen.queryByText(/congratulations|you're|you are/i)).not.toBeInTheDocument()
   })
 
   it('shows no banner for a non-winner', () => {
-    render(<WinnerCelebration participantName="Greg" isWinner={false} />)
-    expect(screen.queryByText(/congratulations/i)).not.toBeInTheDocument()
+    render(<WinnerCelebration participantName="Greg" week={9} isWinner={false} />)
+    expect(screen.queryByText(/won week/i)).not.toBeInTheDocument()
   })
 
   it('fires a confetti burst for a winner', async () => {
-    render(<WinnerCelebration participantName="Monica" isWinner={true} />)
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+    await waitFor(() => expect(confettiMock).toHaveBeenCalled())
+  })
+
+  it('fires confetti on every load of a winner page, not just the first (existing behaviour, deliberately kept)', async () => {
+    const first = render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+    await waitFor(() => expect(confettiMock).toHaveBeenCalled())
+    first.unmount()
+    confettiMock.mockClear()
+
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
     await waitFor(() => expect(confettiMock).toHaveBeenCalled())
   })
 
   it('does not fire confetti for a non-winner', async () => {
-    render(<WinnerCelebration participantName="Greg" isWinner={false} />)
+    render(<WinnerCelebration participantName="Greg" week={9} isWinner={false} />)
     await new Promise((resolve) => setTimeout(resolve, 10))
     expect(confettiMock).not.toHaveBeenCalled()
   })
 
   it('respects prefers-reduced-motion and skips confetti', () => {
     mockMatchMediaMatches(true)
-    render(<WinnerCelebration participantName="Monica" isWinner={true} />)
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
     expect(confettiMock).not.toHaveBeenCalled()
     // The banner itself is not a motion effect, so it still shows.
-    expect(screen.getByText(/congratulations, monica/i)).toBeInTheDocument()
+    expect(screen.getByText('Monica won Week 9!')).toBeInTheDocument()
   })
 })
