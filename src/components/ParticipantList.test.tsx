@@ -169,3 +169,50 @@ describe('ParticipantList mobile layout', () => {
     expect(screen.getByText(/week winner/i)).toBeInTheDocument()
   })
 })
+
+
+describe('ParticipantList before any game is decided', () => {
+  const poolNotStarted: Pool = {
+    ...pool,
+    results: {
+      game_01: { kickoffTime: null, status: 'scheduled', awayScore: null, homeScore: null, winner: null },
+    },
+  }
+
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it.each([
+    ['desktop table', false],
+    ['mobile cards', true],
+  ])('does not hand out rank 1 to everyone in the %s', (_layout, mobile) => {
+    mockMatchMediaMatches(mobile)
+    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+
+    expect(screen.queryByText('1')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('img', { name: 'Not ranked yet' })).toHaveLength(2)
+  })
+
+  it('explains why there is no ranking yet', () => {
+    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+
+    expect(screen.getByText(/rankings start once the first game is final/i)).toBeInTheDocument()
+  })
+
+  it('lists players alphabetically while unranked', () => {
+    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(rows[0]).toHaveTextContent('Greg')
+    expect(rows[1]).toHaveTextContent('Steve')
+  })
+
+  it('shows ranks and no explanation once a game is decided', () => {
+    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Not ranked yet' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/rankings start once/i)).not.toBeInTheDocument()
+  })
+})
