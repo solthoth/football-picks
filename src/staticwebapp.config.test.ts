@@ -36,3 +36,22 @@ describe('staticwebapp.config.json', () => {
     expect(assets?.headers['cache-control']).toBe('public, max-age=31536000, immutable')
   })
 })
+
+describe('staticwebapp.config.json share preview image', () => {
+  const route = config.routes.find((r) => r.route === '/og-image.png')
+
+  it('lets other sites embed the preview image, overriding the global same-origin resource policy', () => {
+    // Without this a global Cross-Origin-Resource-Policy: same-origin tells browsers not to load it anywhere else.
+    expect(config.globalHeaders['Cross-Origin-Resource-Policy']).toBe('same-origin')
+    expect(route?.headers['Cross-Origin-Resource-Policy']).toBe('cross-origin')
+  })
+
+  it('gives the image a day-long cache instead of the platform default of 30 seconds', () => {
+    expect(route?.headers['cache-control']).toBe('public, max-age=86400')
+  })
+
+  it('is served as a file, never rewritten to the app shell', () => {
+    expect(config.navigationFallback.exclude).toContain('/og-image.png')
+  })
+})
+
