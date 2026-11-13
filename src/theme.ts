@@ -4,8 +4,16 @@ import type { Theme } from '@mui/material/styles'
 export type ThemeMode = 'light' | 'dark'
 export type AccentColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 
+/** Minimum height of a tappable control, in px (WCAG 2.5.5 / Apple HIG). */
+const TOUCH_TARGET_PX = 44
+
 export function createAppTheme(mode: ThemeMode): Theme {
   return createTheme({
+    components: {
+      // MUI's default buttons are 30-42px tall, which is hard to hit on a phone.
+      MuiButton: { styleOverrides: { root: { minHeight: TOUCH_TARGET_PX } } },
+      MuiToggleButton: { styleOverrides: { root: { minHeight: TOUCH_TARGET_PX } } },
+    },
     palette: {
       mode,
       // MUI's default threshold of 3 puts white text on the orange `warning` (3.1:1) and on dark-mode `error` (3.7:1).

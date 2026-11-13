@@ -83,10 +83,10 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
                 }}
                 aria-label="Sort games"
               >
-                <ToggleButton value="schedule" sx={{ minHeight: 40 }}>
+                <ToggleButton value="schedule">
                   Schedule
                 </ToggleButton>
-                <ToggleButton value="divided" sx={{ minHeight: 40 }}>
+                <ToggleButton value="divided">
                   Most divided
                 </ToggleButton>
               </ToggleButtonGroup>

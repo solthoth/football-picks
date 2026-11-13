@@ -10,7 +10,7 @@ export function NotFoundPool() {
   return (
     <CenteredCard>
       <Typography gutterBottom>That season/week isn't available.</Typography>
-      <Link component={RouterLink} to="/">
+      <Link component={RouterLink} to="/" sx={{ display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
         Start over
       </Link>
     </CenteredCard>

@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { BackLink } from './BackLink'
 
@@ -42,6 +43,12 @@ describe('BackLink', () => {
     await user.keyboard('{/Control}')
 
     expect(screen.getByTestId('location')).toHaveTextContent('/game')
+  })
+
+  it('is a comfortable touch target', () => {
+    renderWithRouter(<BackLink to="/g" label="Back" />)
+
+    expect(guaranteedHeightPx(screen.getByRole('link', { name: 'Back' }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
   })
 
   it('keeps a long label on one line, truncating with an ellipsis rather than wrapping to a second line', () => {

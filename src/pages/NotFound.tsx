@@ -15,7 +15,7 @@ export function NotFound() {
       <Typography color="textSecondary" gutterBottom>
         That page doesn't exist.
       </Typography>
-      <Link component={RouterLink} to="/">
+      <Link component={RouterLink} to="/" sx={{ display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
         Go to Football Picks
       </Link>
     </CenteredCard>
