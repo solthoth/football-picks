@@ -36,6 +36,14 @@ describe('GamePicks', () => {
     expect(screen.getByText(/Season 2026/)).toBeInTheDocument()
   })
 
+  it('has a subtitle that is only the season and week, with no instruction mixed in', () => {
+    renderPicks()
+
+    const subtitle = screen.getByText('Week 4').parentElement as HTMLElement
+    expect(subtitle).toHaveTextContent(/^Season 2026 · Week 4$/)
+    expect(screen.queryByText(/select a participant/i)).not.toBeInTheDocument()
+  })
+
   it('groups participants under the team they picked, sorted by name', () => {
     renderPicks()
 

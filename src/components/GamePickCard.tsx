@@ -28,7 +28,8 @@ function formatKickoff(kickoffTime: string | null): string | null {
   if (!kickoffTime) return null
   const date = new Date(kickoffTime)
   if (Number.isNaN(date.getTime())) return null
-  return new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' }).format(date)
+  // Shown in the viewer's own timezone, so name it: a pool spread across zones should not have to guess.
+  return new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(date)
 }
 
 function statusText(game: GameDistribution): string | null {
