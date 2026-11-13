@@ -18,6 +18,8 @@ import { CenteredCard } from './CenteredCard'
 interface SeasonWeekSelectProps {
   pools: Pool[]
   onSelect: (season: number, week: number) => void
+  /** The week to open on (e.g. the one the visitor just came from). Ignored unless it is in `pools`; defaults to the latest week. */
+  initial?: { season: number; week: number }
 }
 
 function EmptyState() {
@@ -31,14 +33,15 @@ function EmptyState() {
   )
 }
 
-export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
+export function SeasonWeekSelect({ pools, onSelect, initial }: SeasonWeekSelectProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const seasons = useMemo(() => [...new Set(pools.map((p) => p.season))].sort((a, b) => b - a), [pools])
-  const [season, setSeason] = useState<number | undefined>(seasons[0])
+  const initialPool = initial && pools.find((p) => p.season === initial.season && p.week === initial.week)
+  const [season, setSeason] = useState<number | undefined>(initialPool?.season ?? seasons[0])
 
   const weeks = useMemo(() => weeksForSeason(pools, season), [pools, season])
-  const [week, setWeek] = useState<number | undefined>(weeks[weeks.length - 1])
+  const [week, setWeek] = useState<number | undefined>(initialPool?.week ?? weeks[weeks.length - 1])
 
   const itemRefs = useRef(new Map<number, HTMLDivElement>())
 

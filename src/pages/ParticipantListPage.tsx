@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { ParticipantList } from '../components/ParticipantList'
 import { pools } from '../data/pools'
 import { useLivePool } from '../data/useLivePool'
+import { weeksForSeason } from '../data/weeks'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { NotFoundPool } from './NotFoundPool'
 
@@ -15,5 +16,5 @@ export function ParticipantListPage() {
 
   if (!pool) return <NotFoundPool />
 
-  return <ParticipantList pool={pool} />
+  return <ParticipantList pool={pool} weeks={weeksForSeason(pools, pool.season)} />
 }
