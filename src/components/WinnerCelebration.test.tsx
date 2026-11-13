@@ -42,6 +42,32 @@ describe('WinnerCelebration', () => {
     await waitFor(() => expect(confettiMock).toHaveBeenCalled())
   })
 
+  it('fires both bursts when the page stays open', async () => {
+    render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+
+    await waitFor(() => expect(confettiMock).toHaveBeenCalledTimes(2))
+  })
+
+  it('cancels the pending second burst when the page is left, so nothing fires on the next screen', async () => {
+    const { unmount } = render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+    await waitFor(() => expect(confettiMock).toHaveBeenCalledTimes(1))
+
+    unmount()
+    confettiMock.mockClear()
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
+    expect(confettiMock).not.toHaveBeenCalled()
+  })
+
+  it('fires nothing if the page is left before the confetti library has loaded', async () => {
+    const { unmount } = render(<WinnerCelebration participantName="Monica" week={9} isWinner={true} />)
+
+    unmount()
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
+    expect(confettiMock).not.toHaveBeenCalled()
+  })
+
   it('does not fire confetti for a non-winner', async () => {
     render(<WinnerCelebration participantName="Greg" week={9} isWinner={false} />)
     await new Promise((resolve) => setTimeout(resolve, 10))
