@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
+import { renderWithTheme } from '../testUtils/renderWithTheme'
 import { ShareButton } from './ShareButton'
 
 describe('ShareButton', () => {
@@ -46,5 +48,11 @@ describe('ShareButton', () => {
     render(<ShareButton url="https://example.com/foo" title="Foo" text="Check out Foo" />)
 
     expect(screen.getByRole('button', { name: /share/i })).toHaveStyle({ flexShrink: '0', whiteSpace: 'nowrap' })
+  })
+
+  it('is a comfortable touch target', () => {
+    renderWithTheme(<ShareButton url="https://example.com/foo" title="Foo" text="Check out Foo" />)
+
+    expect(guaranteedHeightPx(screen.getByRole('button', { name: /share/i }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
   })
 })

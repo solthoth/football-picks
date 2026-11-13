@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
+import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { PicksDashboard } from './PicksDashboard'
 
@@ -47,6 +48,14 @@ describe('PicksDashboard', () => {
 
     const heading = screen.getByRole('heading', { level: 1 })
     expect(within(heading).getByText('Week 4')).toHaveStyle({ whiteSpace: 'nowrap' })
+  })
+
+  it('makes the sort toggle buttons comfortable touch targets', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />)
+
+    for (const name of ['Schedule', 'Most divided']) {
+      expect(guaranteedHeightPx(screen.getByRole('button', { name }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+    }
   })
 
   it('links back to the standings', () => {

@@ -156,7 +156,7 @@ export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
                   onClick={() => handleSeasonSelect(s)}
                   color={s === season ? 'primary' : 'default'}
                   variant={s === season ? 'filled' : 'outlined'}
-                  sx={{ height: 40, px: 0.5, fontSize: '0.95rem', fontWeight: 700 }}
+                  sx={{ height: 44, px: 0.5, fontSize: '0.95rem', fontWeight: 700 }}
                 />
               ))}
             </Stack>

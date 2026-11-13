@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
 import { fontSizePx, textContrast } from '../testUtils/contrast'
+import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
 import { renderWithTheme } from '../testUtils/renderWithTheme'
 import { SeasonWeekSelect } from './SeasonWeekSelect'
 
@@ -112,6 +113,16 @@ describe('SeasonWeekSelect week tile text', () => {
       const caption = within(screen.getByRole('option', { name: `Week ${week}` })).getByText('Week')
       expect(textContrast(caption, surface), `Week ${week} caption`).toBeGreaterThanOrEqual(4.5)
       expect(fontSizePx(caption), `Week ${week} caption size`).toBeGreaterThanOrEqual(12)
+    }
+  })
+})
+
+describe('SeasonWeekSelect touch targets', () => {
+  it('makes the season chips comfortable touch targets', () => {
+    renderWithTheme(<SeasonWeekSelect pools={multiSeasonPools} onSelect={vi.fn()} />)
+
+    for (const season of ['2026', '2025']) {
+      expect(guaranteedHeightPx(screen.getByRole('button', { name: season }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
     }
   })
 })

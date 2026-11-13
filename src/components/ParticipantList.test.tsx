@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { textContrast } from '../testUtils/contrast'
+import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantList } from './ParticipantList'
 
@@ -105,6 +106,14 @@ describe('ParticipantList', () => {
     renderWithRouter(<ParticipantList pool={pool} />)
 
     expect(screen.getByRole('link', { name: /change season\/week/i })).toHaveAttribute('href', '/')
+  })
+
+  it('makes the header links comfortable touch targets', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    for (const name of [/change season\/week/i, /see how the pool picked/i]) {
+      expect(guaranteedHeightPx(screen.getByRole('link', { name }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+    }
   })
 
   it('links to the pick dashboard', () => {
