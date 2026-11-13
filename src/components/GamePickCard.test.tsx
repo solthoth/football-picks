@@ -295,3 +295,31 @@ describe('GamePickCard team names', () => {
   })
 })
 
+describe('GamePickCard colour key', () => {
+  const background = (element: HTMLElement) => getComputedStyle(element).backgroundColor
+
+  it('marks each team with the colour of its side of the split bar, so the bar needs no separate legend', () => {
+    render(<GamePickCard game={game()} />)
+
+    const awayDot = screen.getByTestId('team-dot-away')
+    const homeDot = screen.getByTestId('team-dot-home')
+    expect(background(awayDot)).toBe(background(screen.getByTestId('split-segment-away')))
+    expect(background(homeDot)).toBe(background(screen.getByTestId('split-segment-home')))
+    expect(background(awayDot)).not.toBe(background(homeDot))
+  })
+
+  it('keeps the dots to sighted users, since the bar already has a full text equivalent', () => {
+    render(<GamePickCard game={game()} />)
+
+    expect(screen.getByTestId('team-dot-away')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByTestId('team-dot-home')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('sits inside the team cell next to the name', () => {
+    render(<GamePickCard game={game()} />)
+
+    expect(within(screen.getByTestId('team-away')).getByTestId('team-dot-away')).toBeInTheDocument()
+    expect(within(screen.getByTestId('team-home')).getByTestId('team-dot-home')).toBeInTheDocument()
+  })
+})
+

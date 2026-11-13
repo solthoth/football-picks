@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import type { Side } from '../domain/pickDistribution'
+import { SIDE_COLOR } from './sideColors'
 
 interface PickSplitBarProps {
   away: string
@@ -16,7 +17,7 @@ interface PickSplitBarProps {
 interface SegmentProps {
   side: Side
   pct: number
-  color: 'primary.main' | 'secondary.main'
+  color: (typeof SIDE_COLOR)[Side]
   dimmed: boolean
 }
 
@@ -59,8 +60,8 @@ export function PickSplitBar({ away, home, awayCount, homeCount, picked, awayPct
       aria-valuetext={`${away} ${awayCount} of ${picked} (${awayPct}%), ${home} ${homeCount} of ${picked} (${homePct}%)`}
       sx={{ display: 'flex', gap: '2px', height: 12, borderRadius: 6, overflow: 'hidden', bgcolor: 'action.hover' }}
     >
-      <Segment side="away" pct={awayPct} color="primary.main" dimmed={winnerSide === 'home'} />
-      <Segment side="home" pct={homePct} color="secondary.main" dimmed={winnerSide === 'away'} />
+      <Segment side="away" pct={awayPct} color={SIDE_COLOR.away} dimmed={winnerSide === 'home'} />
+      <Segment side="home" pct={homePct} color={SIDE_COLOR.home} dimmed={winnerSide === 'away'} />
     </Box>
   )
 }

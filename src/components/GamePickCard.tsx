@@ -14,6 +14,7 @@ import { accentTextColor } from '../theme'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
 import { PickSplitBar } from './PickSplitBar'
+import { SIDE_COLOR } from './sideColors'
 import { TeamLogo } from './TeamLogo'
 
 interface GamePickCardProps {
@@ -95,21 +96,30 @@ function TeamCell({ side, team, isWinner }: TeamCellProps) {
           )}
         </Box>
         <Box component="span" sx={{ display: 'block', minWidth: 0 }}>
-          {/* Wraps (and, for a name wider than its cell, breaks) rather than truncating "Commanders" to "Comma…". */}
-          <Typography
-            component="span"
-            sx={{
-              display: 'block',
-              fontWeight: 700,
-              fontSize: { xs: '0.9375rem', sm: '1.125rem' },
-              lineHeight: 1.2,
-              minWidth: 0,
-              overflowWrap: 'anywhere',
-              hyphens: 'auto',
-            }}
-          >
-            {team}
-          </Typography>
+          <Box component="span" sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, flexDirection: isHome ? 'row-reverse' : 'row' }}>
+            {/* The colour of this team's side of the split bar below, so the bar needs no separate legend. */}
+            <Box
+              component="span"
+              data-testid={`team-dot-${side}`}
+              aria-hidden
+              sx={{ flexShrink: 0, width: 10, height: 10, mt: 0.5, borderRadius: '50%', bgcolor: SIDE_COLOR[side] }}
+            />
+            {/* Wraps (and, for a name wider than its cell, breaks) rather than truncating "Commanders" to "Comma…". */}
+            <Typography
+              component="span"
+              sx={{
+                display: 'block',
+                fontWeight: 700,
+                fontSize: { xs: '0.9375rem', sm: '1.125rem' },
+                lineHeight: 1.2,
+                minWidth: 0,
+                overflowWrap: 'anywhere',
+                hyphens: 'auto',
+              }}
+            >
+              {team}
+            </Typography>
+          </Box>
           <Typography variant="caption" color="textSecondary" component="span" sx={{ display: 'block' }}>
             {isHome ? 'Home' : 'Away'}
           </Typography>
