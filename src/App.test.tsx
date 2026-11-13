@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from './data/types'
 
 const { pools } = vi.hoisted(() => {
@@ -169,5 +169,44 @@ describe('App routing', () => {
     renderApp('/this/route/does/not/exist')
     expect(screen.getByRole('heading', { name: /page not found/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /football picks/i })).toHaveAttribute('href', '/')
+  })
+})
+
+describe('App document titles', () => {
+  beforeEach(() => {
+    document.title = ''
+  })
+
+  it.each([
+    ['/', 'Football Picks'],
+    ['/season/2026/week/1', 'Week 1 standings (2026) · Football Picks'],
+    ['/season/2026/week/1/dashboard', 'Week 1 pick split (2026) · Football Picks'],
+    ['/season/2026/week/1/game/game_01', 'Patriots @ Seahawks · Week 1 (2026) · Football Picks'],
+    ['/season/2026/week/1/participant/Steve', 'Steve · Week 1 (2026) · Football Picks'],
+  ])('titles %s as "%s"', (path, title) => {
+    renderApp(path)
+    expect(document.title).toBe(title)
+  })
+
+  it.each([
+    ['/season/1999/week/1', 'Week not found · Football Picks'],
+    ['/season/1999/week/1/dashboard', 'Week not found · Football Picks'],
+    ['/season/2026/week/1/game/nope', 'Game not found · Football Picks'],
+    ['/season/2026/week/1/participant/Nobody', 'Player not found · Football Picks'],
+    ['/this/route/does/not/exist', 'Page not found · Football Picks'],
+  ])('titles the missing page %s as "%s"', (path, title) => {
+    renderApp(path)
+    expect(document.title).toBe(title)
+  })
+
+  it('updates the title as the user navigates between screens', async () => {
+    const user = userEvent.setup()
+    renderApp('/')
+
+    await user.click(screen.getByRole('option', { name: 'Week 1' }))
+    expect(document.title).toBe('Week 1 standings (2026) · Football Picks')
+
+    await user.click(screen.getByText('Steve').closest('tr') as HTMLElement)
+    expect(document.title).toBe('Steve · Week 1 (2026) · Football Picks')
   })
 })

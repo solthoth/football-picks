@@ -2,8 +2,11 @@ import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import { Link as RouterLink } from 'react-router-dom'
 import { CenteredCard } from '../components/CenteredCard'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 export function NotFound() {
+  useDocumentTitle('Page not found')
+
   return (
     <CenteredCard>
       <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800 }}>
