@@ -23,6 +23,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import type { PickOutcome } from '../domain/standings'
+import { accentTextColor } from '../theme'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
@@ -82,6 +83,8 @@ interface MobileScoreRowProps {
   homeScore: number | null
 }
 
+const scoreSx = { fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums' } as const
+
 function MobileScoreRow({ status, awayScore, homeScore }: MobileScoreRowProps) {
   if (status === 'scheduled' || status === 'unknown') {
     return (
@@ -110,18 +113,18 @@ function MobileScoreRow({ status, awayScore, homeScore }: MobileScoreRowProps) {
     >
       <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', justifyContent: 'center' }}>
         <Typography
-          sx={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: inProgress ? 'warning.dark' : 'text.primary' }}
+          sx={(theme) => ({ ...scoreSx, color: inProgress ? accentTextColor(theme, 'warning') : theme.palette.text.primary })}
         >
           {awayScore ?? '–'}
         </Typography>
         <Typography
           variant="caption"
-          sx={{ fontWeight: 700, letterSpacing: '0.06em', color: inProgress ? 'warning.dark' : 'text.secondary' }}
+          sx={(theme) => ({ fontWeight: 700, letterSpacing: '0.06em', color: inProgress ? accentTextColor(theme, 'warning') : theme.palette.text.secondary })}
         >
           {inProgress ? 'LIVE' : 'FINAL'}
         </Typography>
         <Typography
-          sx={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: inProgress ? 'warning.dark' : 'text.primary' }}
+          sx={(theme) => ({ ...scoreSx, color: inProgress ? accentTextColor(theme, 'warning') : theme.palette.text.primary })}
         >
           {homeScore ?? '–'}
         </Typography>
@@ -167,7 +170,13 @@ function SummaryTile({ label, value, icon, color, caption }: SummaryTileProps) {
         {icon}
         <Typography
           component="dt"
-          sx={{ fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'inherit', fontSize: { xs: '0.75rem', md: '0.875rem' } }}
+          sx={(theme) => ({
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: color === 'grey' ? theme.palette.text.secondary : accentTextColor(theme, color),
+            fontSize: { xs: '0.75rem', md: '0.875rem' },
+          })}
         >
           {label}
         </Typography>

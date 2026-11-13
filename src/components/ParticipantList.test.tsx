@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
+import { textContrast } from '../testUtils/contrast'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantList } from './ParticipantList'
 
@@ -219,5 +220,42 @@ describe('ParticipantList before any game is decided', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: 'Not ranked yet' })).not.toBeInTheDocument()
     expect(screen.queryByText(/rankings start once/i)).not.toBeInTheDocument()
+  })
+})
+
+
+describe('ParticipantList rank avatar contrast', () => {
+  // Three decided games give ranks 1, 2, 3 and 4 (the last two share a score of zero but rank 3 and 3).
+  const rankedPool: Pool = {
+    season: 2026,
+    week: 1,
+    games: [
+      { id: 'g1', away: 'A1', home: 'H1' },
+      { id: 'g2', away: 'A2', home: 'H2' },
+      { id: 'g3', away: 'A3', home: 'H3' },
+    ],
+    participants: [
+      { name: 'Gold', picks: { g1: 'A1', g2: 'A2', g3: 'A3' }, tieBreakerTotalScore: 1 },
+      { name: 'Silver', picks: { g1: 'A1', g2: 'A2', g3: 'H3' }, tieBreakerTotalScore: 1 },
+      { name: 'Bronze', picks: { g1: 'A1', g2: 'H2', g3: 'H3' }, tieBreakerTotalScore: 1 },
+      { name: 'Fourth', picks: { g1: 'H1', g2: 'H2', g3: 'H3' }, tieBreakerTotalScore: 1 },
+    ],
+    results: {
+      g1: { kickoffTime: null, status: 'final', awayScore: 7, homeScore: 0, winner: 'A1' },
+      g2: { kickoffTime: null, status: 'final', awayScore: 7, homeScore: 0, winner: 'A2' },
+      g3: { kickoffTime: null, status: 'final', awayScore: 7, homeScore: 0, winner: 'A3' },
+    },
+  }
+
+  it.each([
+    ['light', '#ffffff'],
+    ['dark', '#121212'],
+  ] as const)('keeps every rank number readable (WCAG AA) in %s mode', (mode, surface) => {
+    renderWithRouter(<ParticipantList pool={rankedPool} />, { mode })
+
+    for (const rank of ['1', '2', '3', '4']) {
+      const avatar = screen.getByText(rank)
+      expect(textContrast(avatar, surface), `rank ${rank} avatar`).toBeGreaterThanOrEqual(4.5)
+    }
   })
 })

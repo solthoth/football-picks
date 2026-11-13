@@ -35,7 +35,7 @@ interface ParticipantListProps {
 function rankAvatarSx(rank: number | null): SxProps<Theme> {
   if (rank === 1) return { bgcolor: 'warning.main', color: 'warning.contrastText' }
   if (rank === 2) return { bgcolor: 'grey.400', color: 'common.black' }
-  if (rank === 3) return { bgcolor: '#cd7f32', color: 'common.white' }
+  if (rank === 3) return { bgcolor: '#cd7f32', color: 'common.black' }
   return { bgcolor: 'grey.300', color: 'common.black' }
 }
 

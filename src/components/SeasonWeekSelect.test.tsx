@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
+import { fontSizePx, textContrast } from '../testUtils/contrast'
+import { renderWithTheme } from '../testUtils/renderWithTheme'
 import { SeasonWeekSelect } from './SeasonWeekSelect'
 
 function pool(season: number, week: number): Pool {
@@ -95,5 +97,21 @@ describe('SeasonWeekSelect', () => {
     await user.keyboard(' ')
 
     expect(onSelect).toHaveBeenCalledWith(2026, 3)
+  })
+})
+
+
+describe('SeasonWeekSelect week tile text', () => {
+  it.each([
+    ['light', '#ffffff'],
+    ['dark', '#121212'],
+  ] as const)('keeps the "Week" caption readable (AA) and at least 12px on every tile in %s mode', (mode, surface) => {
+    renderWithTheme(<SeasonWeekSelect pools={singleSeasonPools} onSelect={vi.fn()} />, mode)
+
+    for (const week of [1, 2, 3]) {
+      const caption = within(screen.getByRole('option', { name: `Week ${week}` })).getByText('Week')
+      expect(textContrast(caption, surface), `Week ${week} caption`).toBeGreaterThanOrEqual(4.5)
+      expect(fontSizePx(caption), `Week ${week} caption size`).toBeGreaterThanOrEqual(12)
+    }
   })
 })

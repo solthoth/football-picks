@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
+import { textContrast } from '../testUtils/contrast'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantDetail } from './ParticipantDetail'
@@ -182,5 +183,40 @@ describe('ParticipantDetail game selection', () => {
     await user.click(screen.getByRole('link', { name: 'Back to Patriots @ Seahawks' }))
 
     expect(screen.getByTestId('location')).toHaveTextContent('/game')
+  })
+})
+
+
+describe('ParticipantDetail text contrast', () => {
+  const livePool: Pool = {
+    ...pool,
+    results: { ...pool.results, game_03: { kickoffTime: null, status: 'in_progress', awayScore: 3, homeScore: 0, winner: null } },
+  }
+
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it.each([
+    ['light', '#ffffff'],
+    ['dark', '#121212'],
+  ] as const)('keeps the summary tile labels readable (WCAG AA) in %s mode', (mode, surface) => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />, { mode })
+
+    const summary = within(screen.getByRole('group', { name: /pick summary/i }))
+    for (const label of ['Correct', 'Incorrect', 'Pending', 'Tiebreaker guess']) {
+      expect(textContrast(summary.getByText(label), surface), `${label} label`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it.each([
+    ['light', '#ffffff'],
+    ['dark', '#121212'],
+  ] as const)('keeps the LIVE label and score readable on a mobile live-game card in %s mode', (mode, surface) => {
+    mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantDetail pool={livePool} participantName="Steve" />, { mode })
+
+    expect(textContrast(screen.getByText('LIVE'), surface), 'LIVE label').toBeGreaterThanOrEqual(4.5)
+    expect(textContrast(screen.getByText('3'), surface), 'live score').toBeGreaterThanOrEqual(4.5)
   })
 })
