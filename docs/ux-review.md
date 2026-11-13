@@ -10,9 +10,12 @@ Reviewed 2026-11-12 against `main` (`5bf44a9`), running locally with live scores
 | 2 | Every page has the same title | ✅ Done |
 | 3 | Navigation is buttons, not links | ✅ Done |
 | 4 | Orange accents fail contrast in light mode | ✅ Done |
-| 5–22 | Everything else | Open |
+| 10 | Mobile tap targets under 44 px | ✅ Done |
+| 11 | Winner banner addressed to the wrong person | ✅ Done (confetti unchanged by decision) |
+| 18 | Titles wrap awkwardly on phones | ✅ Done |
+| 5–9, 12–17, 19–23 | Everything else | Open |
 
-Findings 1–4 were implemented test-first (red, then green) on branch `feat/ux-quick-wins-1-4`. Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
+Findings 1–4 (branch `feat/ux-quick-wins-1-4`) and 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
 
 ## How it was reviewed
 
@@ -170,12 +173,18 @@ The Week 10 dashboard is 4.7 screens tall and a participant page is 3.5. The bac
 
 - Set a 44 px minimum height on these. Share is the furthest off.
 
+> **Status: ✅ Done.** The app theme now gives every `Button` and `ToggleButton` a 44 px minimum height, so existing and future buttons get it without per-call styling (Share, the back buttons, the sort toggle and "See how the pool picked" are all covered). The season chips (40 px) and the two not-found links get 44 px explicitly. The sort toggle's own inline 40 px, which would have overridden the theme, was removed.
+>
+> A browser audit of 122 controls across 12 routes at 390 px finds none under 44 × 44. *Not covered:* the transient winner banner's close "×", which auto-dismisses after 2.5 seconds. The rule applies at every width rather than only on touch screens, so desktop buttons are slightly taller too.
+
 **11. The winner celebration is addressed to the wrong person and repeats** (both)
 
 The banner says "Congratulations, Jose! You're a Week Winner!" to whoever opens Jose's page, and the confetti fires on every load. See [desktop-winner-w9.png](ux-review/desktop-winner-w9.png).
 
 - Reword to third person: "Jose won Week 9!".
 - Fire confetti once per week per browser (remember it in `localStorage`).
+
+> **Status: ✅ Done for the wording; the confetti suggestion was deliberately not taken.** The banner now reads "Jose won Week 9!" (it needed the week, so `WinnerCelebration` takes a new `week` prop). Confetti still fires on every load of a winner's page, by the owner's decision, and a test now pins that existing behaviour so it cannot change by accident.
 
 **12. The tiebreaker guess is shown without the answer** (both)
 
@@ -206,6 +215,10 @@ The toggle is local state. Put it in the URL (`?sort=divided`) so it survives re
 **18. Titles wrap awkwardly on phones** (mobile)
 "Season 2026 · Week 10" breaks as "Week / 10", leaving the number alone on a line. Keep "Week 10" together with a non-breaking space. At 320 px the uppercase back button also wraps to two lines.
 
+> **Status: ✅ Done.** A new `SeasonWeekLabel` keeps "Season 2026" and "Week 10" each on one line, so a narrow screen now breaks as "Season 2026 ·" / "Week 10". It uses `white-space: nowrap` rather than non-breaking spaces, so the text still copies, searches and reads as plain "Season 2026 · Week 10". It is used by the standings, dashboard and participant headings and the game subtitle.
+>
+> The back button now stays on one line and truncates with an ellipsis when space is short, so long labels such as "Back to Packers @ Patriots" no longer push the header taller. At 320 px a label that needs more room than is left beside Share is shortened ("CHANGE SEASO…"); that is a deliberate trade for a steady header, and the full label is still what assistive technology reads. Verified in a browser at 320, 360 and 390 px.
+
 **19. The game page subtitle runs two ideas together** (both)
 "Season 2026 · Week 10 · Select a participant to see their picks." mixes context with an instruction. Split the instruction onto its own line or drop it; the chevrons already signal that rows are tappable. See [desktop-game-w9-final.png](ux-review/desktop-game-w9-final.png).
 
@@ -218,9 +231,12 @@ Scores poll every 60 seconds and pull-to-refresh is touch-only. A small refresh 
 **22. Shared links have no preview** (both)
 There are no Open Graph tags, so a link pasted into a group chat shows a bare URL. Sharing is a primary action here; a static `og:title`, `og:description` and `og:image` would cover every route.
 
+**23. Pick names are cut to a letter or two at 320 px** (mobile)
+On the participant page at 320 px the pick name gets only 47 px of room beside the 56 px team logo and the 72 px outcome column, but needs 89-100 px, so names show as "Ja…", "Be…" and "Br…". See [mobile-320-participant.png](ux-review/mobile-320-participant.png). Found while verifying finding 18. Let the name wrap or shrink, or give the logo and outcome column less room on very narrow screens.
+
 ## Suggested order of work
 
-1. **Quick wins (small, low risk):** ~~1, 2, 4~~ (done), 10, 11, 18.
+1. **Quick wins (small, low risk):** ~~1, 2, 4, 10, 11, 18~~ (all done).
 2. **Navigation and structure:** ~~3~~ (done), 6, 8, 9, 13.
 3. **Feature work:** findings 5, 12, 22.
 4. **Polish:** the remaining low-severity items.
