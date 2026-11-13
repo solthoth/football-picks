@@ -76,10 +76,10 @@ describe('App routing', () => {
     const user = userEvent.setup()
     renderApp('/season/2026/week/1/participant/Steve')
 
-    await user.click(screen.getByRole('button', { name: /back to participants/i }))
+    await user.click(screen.getByRole('link', { name: /back to participants/i }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1')
 
-    await user.click(screen.getByRole('button', { name: /change season\/week/i }))
+    await user.click(screen.getByRole('link', { name: /change season\/week/i }))
     expect(screen.getByTestId('location')).toHaveTextContent('/')
     expect(screen.getByRole('heading', { name: /football picks/i })).toBeInTheDocument()
   })
@@ -88,13 +88,13 @@ describe('App routing', () => {
     const user = userEvent.setup()
     renderApp('/season/2026/week/1')
 
-    await user.click(screen.getByRole('button', { name: /see how the pool picked/i }))
+    await user.click(screen.getByRole('link', { name: /see how the pool picked/i }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/dashboard')
     expect(screen.getByRole('heading', { level: 2, name: 'Patriots at Seahawks' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /back to standings/i }))
+    await user.click(screen.getByRole('link', { name: /back to standings/i }))
     expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1')
-    expect(screen.getByRole('button', { name: /see how the pool picked/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /see how the pool picked/i })).toBeInTheDocument()
   })
 
   it('renders a deep-linked pick dashboard directly, as a bookmark would', () => {
@@ -108,19 +108,19 @@ describe('App routing', () => {
     const user = userEvent.setup()
     renderApp('/season/2026/week/1/dashboard')
 
-    await user.click(screen.getByRole('button', { name: 'See who picked Patriots at Seahawks' }))
+    await user.click(screen.getByRole('link', { name: 'See who picked Patriots at Seahawks' }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
     expect(screen.getByRole('heading', { level: 1, name: 'Patriots @ Seahawks' })).toBeInTheDocument()
-    expect(within(screen.getByTestId('pickers-away')).getByRole('button', { name: 'Greg' })).toBeInTheDocument()
-    expect(within(screen.getByTestId('pickers-home')).getByRole('button', { name: /^Steve/ })).toBeInTheDocument()
+    expect(within(screen.getByTestId('pickers-away')).getByRole('link', { name: 'Greg' })).toBeInTheDocument()
+    expect(within(screen.getByTestId('pickers-home')).getByRole('link', { name: /^Steve/ })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^Steve/ }))
+    await user.click(screen.getByRole('link', { name: /^Steve/ }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Steve')
 
-    await user.click(screen.getByRole('button', { name: 'Back to Patriots @ Seahawks' }))
+    await user.click(screen.getByRole('link', { name: 'Back to Patriots @ Seahawks' }))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
 
-    await user.click(screen.getByRole('button', { name: 'Back to dashboard' }))
+    await user.click(screen.getByRole('link', { name: 'Back to dashboard' }))
     expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/dashboard')
   })
 
@@ -131,7 +131,7 @@ describe('App routing', () => {
     await user.click(screen.getAllByRole('row')[1])
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_01')
 
-    await user.click(screen.getByRole('button', { name: 'Back to Steve' }))
+    await user.click(screen.getByRole('link', { name: 'Back to Steve' }))
     expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/participant/Steve')
   })
 
@@ -140,7 +140,7 @@ describe('App routing', () => {
     renderApp('/season/2026/week/1/game/game_01')
 
     expect(screen.getByRole('heading', { level: 1, name: 'Patriots @ Seahawks' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Back to dashboard' }))
+    await user.click(screen.getByRole('link', { name: 'Back to dashboard' }))
     expect(screen.getByTestId('location').textContent).toBe('/season/2026/week/1/dashboard')
   })
 

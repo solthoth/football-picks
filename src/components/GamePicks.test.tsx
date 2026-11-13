@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
+import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { GamePicks } from './GamePicks'
 
 const GAME_ID = 'Steelers@Browns'
@@ -22,11 +23,8 @@ function pool(overrides: Partial<Pool> = {}): Pool {
   }
 }
 
-function renderPicks(p: Pool = pool(), extra: Partial<Parameters<typeof GamePicks>[0]> = {}) {
-  const onBack = vi.fn()
-  const onSelectParticipant = vi.fn()
-  render(<GamePicks pool={p} gameId={GAME_ID} onBack={onBack} onSelectParticipant={onSelectParticipant} {...extra} />)
-  return { onBack, onSelectParticipant }
+function renderPicks(p: Pool = pool(), extra: Partial<Parameters<typeof GamePicks>[0]> = {}, router = {}) {
+  return renderWithRouter(<GamePicks pool={p} gameId={GAME_ID} {...extra} />, router)
 }
 
 describe('GamePicks', () => {
@@ -43,9 +41,9 @@ describe('GamePicks', () => {
     const away = within(screen.getByTestId('pickers-away'))
     const home = within(screen.getByTestId('pickers-home'))
     expect(away.getByRole('heading', { name: 'Picked Steelers' })).toBeInTheDocument()
-    expect(away.getAllByRole('button').map((b) => b.textContent)).toEqual(['Bob', 'Zed'])
+    expect(away.getAllByRole('link').map((b) => b.textContent)).toEqual(['Bob', 'Zed'])
     expect(home.getByRole('heading', { name: 'Picked Browns' })).toBeInTheDocument()
-    expect(home.getAllByRole('button').map((b) => b.textContent)).toEqual(['Amy'])
+    expect(home.getAllByRole('link').map((b) => b.textContent)).toEqual(['Amy'])
   })
 
   it('lists participants without a pick separately, outside both groups', () => {
@@ -61,13 +59,22 @@ describe('GamePicks', () => {
     expect(within(screen.getByTestId('pickers-home')).getByText('Nobody picked the Browns.')).toBeInTheDocument()
   })
 
-  it('opens a participant when their name is selected', async () => {
+  it('links each participant to their picks', () => {
+    renderPicks()
+
+    expect(within(screen.getByTestId('pickers-home')).getByRole('link', { name: 'Amy' })).toHaveAttribute(
+      'href',
+      '/season/2026/week/4/participant/Amy',
+    )
+  })
+
+  it('tells the participant page to offer a way back to this game', async () => {
     const user = userEvent.setup()
-    const { onSelectParticipant } = renderPicks()
+    renderPicks()
 
-    await user.click(within(screen.getByTestId('pickers-home')).getByRole('button', { name: 'Amy' }))
+    await user.click(within(screen.getByTestId('pickers-home')).getByRole('link', { name: 'Amy' }))
 
-    expect(onSelectParticipant).toHaveBeenCalledWith('Amy')
+    expect(screen.getByTestId('location-state')).toHaveTextContent('{"backLabel":"Back to Steelers @ Browns"}')
   })
 
   it('marks the winning and losing groups once the game is final', () => {
@@ -85,22 +92,25 @@ describe('GamePicks', () => {
     expect(screen.queryByText(/Won|Lost/)).not.toBeInTheDocument()
   })
 
-  it('uses a custom back label and calls onBack', async () => {
-    const user = userEvent.setup()
-    const { onBack } = renderPicks(pool(), { backLabel: 'Back to Kiko' })
+  it('links back to the dashboard by default', () => {
+    renderPicks()
 
-    await user.click(screen.getByRole('button', { name: 'Back to Kiko' }))
-
-    expect(onBack).toHaveBeenCalled()
+    expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/season/2026/week/4/dashboard')
   })
 
-  it('shows a fallback with a way back for a game that is not in the pool', async () => {
+  it('uses a custom back label and returns to the previous screen', async () => {
     const user = userEvent.setup()
-    const onBack = vi.fn()
-    render(<GamePicks pool={pool()} gameId="Jets@Bills" onBack={onBack} onSelectParticipant={vi.fn()} />)
+    renderPicks(pool(), { backLabel: 'Back to Kiko' }, { initialEntries: ['/kiko', '/game'], initialIndex: 1 })
+
+    await user.click(screen.getByRole('link', { name: 'Back to Kiko' }))
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/kiko')
+  })
+
+  it('shows a fallback with a way back for a game that is not in the pool', () => {
+    renderWithRouter(<GamePicks pool={pool()} gameId="Jets@Bills" />)
 
     expect(screen.getByText(/couldn't find that game/i)).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /back to dashboard/i }))
-    expect(onBack).toHaveBeenCalled()
+    expect(screen.getByRole('link', { name: /back to dashboard/i })).toHaveAttribute('href', '/season/2026/week/4/dashboard')
   })
 })

@@ -1,8 +1,9 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
+import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantDetail } from './ParticipantDetail'
 
 const pool: Pool = {
@@ -23,7 +24,7 @@ const pool: Pool = {
 
 describe('ParticipantDetail', () => {
   it('shows a summary of correct/incorrect/pending picks', () => {
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     const summary = screen.getByRole('group', { name: /pick summary/i })
     for (const label of ['Correct', 'Incorrect', 'Pending']) {
       const tile = within(summary).getByText(label).parentElement?.parentElement
@@ -33,14 +34,14 @@ describe('ParticipantDetail', () => {
   })
 
   it('shows the tiebreaker guess', () => {
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     const tile = screen.getByText('Tiebreaker guess').parentElement?.parentElement
     expect(tile).toHaveTextContent('combined score')
     expect(within(tile as HTMLElement).getByText('44')).toBeInTheDocument()
   })
 
   it('labels each pick as correct, incorrect, or pending', () => {
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     const rows = screen.getAllByRole('row').slice(1)
     expect(rows[0]).toHaveTextContent('Correct')
     expect(rows[1]).toHaveTextContent('Incorrect')
@@ -52,27 +53,24 @@ describe('ParticipantDetail', () => {
       ...pool,
       results: { ...pool.results, game_03: { kickoffTime: null, status: 'final', awayScore: 20, homeScore: 20, winner: null } },
     }
-    render(<ParticipantDetail pool={tiedPool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={tiedPool} participantName="Steve" />)
     const rows = screen.getAllByRole('row').slice(1)
     expect(rows[2]).toHaveTextContent('Tie')
     expect(rows[2]).not.toHaveTextContent('Pending')
   })
 
-  it('shows a fallback and lets the user go back when the participant is not found', async () => {
-    const user = userEvent.setup()
-    const onBack = vi.fn()
-    render(<ParticipantDetail pool={pool} participantName="Nobody" onBack={onBack} />)
+  it('shows a fallback with a link back to the standings when the participant is not found', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Nobody" />)
 
     expect(screen.getByText(/couldn't find nobody/i)).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /back/i }))
-    expect(onBack).toHaveBeenCalled()
+    expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute('href', '/season/2026/week/1')
   })
 
   it("shows a winner badge next to the participant's name once the week is decided", () => {
     // Sole participant, and both non-tiebreaker games (game_01, game_02) are
     // already final -> Steve is the winner regardless of game_03 (the
     // tiebreaker/"Monday" game, still scheduled) since there's no one to tie with.
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     expect(screen.getByText('Week Winner')).toBeInTheDocument()
   })
 
@@ -81,7 +79,7 @@ describe('ParticipantDetail', () => {
       ...pool,
       results: { ...pool.results, game_01: { ...pool.results.game_01, status: 'in_progress', winner: null } },
     }
-    render(<ParticipantDetail pool={pendingPool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pendingPool} participantName="Steve" />)
     expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
   })
 })
@@ -91,7 +89,7 @@ describe('ParticipantDetail sharing', () => {
     const user = userEvent.setup()
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
 
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     await user.click(screen.getByRole('button', { name: /share/i }))
 
     expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/season/2026/week/1/participant/Steve`)
@@ -105,7 +103,7 @@ describe('ParticipantDetail mobile layout', () => {
 
   it('renders picks as cards instead of a table below the sm breakpoint', () => {
     mockMatchMediaMatches(true)
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getByText('Patriots @ Seahawks')).toBeInTheDocument()
@@ -113,16 +111,12 @@ describe('ParticipantDetail mobile layout', () => {
     expect(screen.getByText('Falcons @ Steelers')).toBeInTheDocument()
   })
 
-  it('still shows the winner badge and lets the user navigate back on mobile', async () => {
+  it('still shows the winner badge and a link back to the participants on mobile', () => {
     mockMatchMediaMatches(true)
-    const user = userEvent.setup()
-    const onBack = vi.fn()
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={onBack} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
 
     expect(screen.getByText('Week Winner')).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /back to participants/i }))
-    expect(onBack).toHaveBeenCalled()
+    expect(screen.getByRole('link', { name: /back to participants/i })).toHaveAttribute('href', '/season/2026/week/1')
   })
 })
 
@@ -131,41 +125,62 @@ describe('ParticipantDetail game selection', () => {
     mockMatchMediaMatches(false)
   })
 
-  it('opens a game when its table row is clicked or activated with the keyboard', async () => {
+  it('links each game to its who-picked-what page from the matchup cell', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByRole('link', { name: /Patriots @ Seahawks/ })).toHaveAttribute('href', '/season/2026/week/1/game/game_01')
+  })
+
+  it('opens a game when its table row is clicked anywhere, navigating once and offering a way back', async () => {
     const user = userEvent.setup()
-    const onSelectGame = vi.fn()
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} onSelectGame={onSelectGame} />)
+    const { visited } = renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />, { initialEntries: ['/steve'] })
 
-    const rows = screen.getAllByRole('row').slice(1)
-    await user.click(rows[0])
-    expect(onSelectGame).toHaveBeenLastCalledWith('game_01')
+    await user.click(screen.getAllByRole('row').slice(1)[0])
 
-    rows[1].focus()
+    expect(visited).toEqual(['/steve', '/season/2026/week/1/game/game_01'])
+    expect(screen.getByTestId('location-state')).toHaveTextContent('{"backLabel":"Back to Steve"}')
+  })
+
+  it('opens a game from the keyboard through the matchup link', async () => {
+    const user = userEvent.setup()
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    screen.getByRole('link', { name: /49ers @ Rams/ }).focus()
     await user.keyboard('{Enter}')
-    expect(onSelectGame).toHaveBeenLastCalledWith('game_02')
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/game/game_02')
   })
 
-  it('opens a game when its card is tapped on mobile', async () => {
+  it('does not make table rows focusable (the matchup link is the keyboard stop)', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    for (const row of screen.getAllByRole('row').slice(1)) {
+      expect(row).not.toHaveAttribute('tabindex')
+    }
+  })
+
+  it('makes each game card a link on mobile', () => {
     mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByRole('link', { name: 'See who picked 49ers at Rams' })).toHaveAttribute('href', '/season/2026/week/1/game/game_02')
+  })
+
+  it('links back to the participants by default', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByRole('link', { name: 'Back to participants' })).toHaveAttribute('href', '/season/2026/week/1')
+  })
+
+  it('shows a custom back label and returns to the previous screen', async () => {
     const user = userEvent.setup()
-    const onSelectGame = vi.fn()
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} onSelectGame={onSelectGame} />)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" backLabel="Back to Patriots @ Seahawks" />, {
+      initialEntries: ['/game', '/steve'],
+      initialIndex: 1,
+    })
 
-    await user.click(screen.getByRole('button', { name: 'See who picked 49ers at Rams' }))
+    await user.click(screen.getByRole('link', { name: 'Back to Patriots @ Seahawks' }))
 
-    expect(onSelectGame).toHaveBeenCalledWith('game_02')
-  })
-
-  it('does not make games clickable without onSelectGame', () => {
-    mockMatchMediaMatches(true)
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} />)
-
-    expect(screen.queryByRole('button', { name: /see who picked/i })).not.toBeInTheDocument()
-  })
-
-  it('shows a custom back label', () => {
-    render(<ParticipantDetail pool={pool} participantName="Steve" onBack={vi.fn()} backLabel="Back to Patriots @ Seahawks" />)
-
-    expect(screen.getByRole('button', { name: 'Back to Patriots @ Seahawks' })).toBeInTheDocument()
+    expect(screen.getByTestId('location')).toHaveTextContent('/game')
   })
 })

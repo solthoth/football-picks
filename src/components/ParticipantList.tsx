@@ -1,4 +1,3 @@
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import BarChartIcon from '@mui/icons-material/BarChart'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -7,6 +6,7 @@ import Card from '@mui/material/Card'
 import CardActionArea from '@mui/material/CardActionArea'
 import Chip from '@mui/material/Chip'
 import Container from '@mui/material/Container'
+import MuiLink from '@mui/material/Link'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
@@ -19,18 +19,17 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import type { SxProps, Theme } from '@mui/material/styles'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { BackLink } from './BackLink'
 import { ShareButton } from './ShareButton'
 import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantListProps {
   pool: Pool
-  onSelect: (participantName: string) => void
-  onBack: () => void
-  onOpenDashboard: () => void
 }
 
 function rankAvatarSx(rank: number | null): SxProps<Theme> {
@@ -52,22 +51,23 @@ function RankAvatar({ rank, size, fontSize }: { rank: number | null; size: numbe
   return <Avatar sx={sx}>{rank}</Avatar>
 }
 
-export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: ParticipantListProps) {
+export function ParticipantList({ pool }: ParticipantListProps) {
+  const navigate = useNavigate()
+  const weekPath = `/season/${pool.season}/week/${pool.week}`
+  const participantPath = (name: string) => `${weekPath}/participant/${encodeURIComponent(name)}`
   const leaderboard = buildLeaderboard(pool)
   const { winnerNames } = determineWeekWinner(pool)
   const unranked = leaderboard.every((entry) => entry.rank === null)
   const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}`
+  const shareUrl = `${window.location.origin}${weekPath}`
 
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-            Change season/week
-          </Button>
+          <BackLink to="/" label="Change season/week" sx={{ ml: -1 }} />
           <ShareButton
             url={shareUrl}
             title={`Season ${pool.season} Week ${pool.week} standings`}
@@ -93,7 +93,8 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
           variant="outlined"
           size="large"
           startIcon={<BarChartIcon />}
-          onClick={onOpenDashboard}
+          component={RouterLink}
+          to={`${weekPath}/dashboard`}
           sx={{ mt: 2, width: { xs: '100%', sm: 'auto' } }}
         >
           See how the pool picked
@@ -104,7 +105,8 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
             {leaderboard.map((entry) => (
               <Card key={entry.name} variant="outlined">
                 <CardActionArea
-                  onClick={() => onSelect(entry.name)}
+                  component={RouterLink}
+                  to={participantPath(entry.name)}
                   sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 2, minHeight: 68 }}
                 >
                   <RankAvatar rank={entry.rank} size={40} fontSize={18} />
@@ -135,22 +137,26 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
                   <TableRow
                     key={entry.name}
                     hover
-                    onClick={() => onSelect(entry.name)}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        onSelect(entry.name)
-                      }
+                    // Convenience only: the name link is the real, focusable target.
+                    onClick={(event) => {
+                      if ((event.target as HTMLElement).closest('a')) return
+                      navigate(participantPath(entry.name))
                     }}
-                    sx={{ cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: -2 } }}
+                    sx={{ cursor: 'pointer' }}
                   >
                     <TableCell>
                       <RankAvatar rank={entry.rank} size={44} fontSize={20} />
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                        <Typography sx={{ fontWeight: 700, color: 'primary.main', fontSize: 'inherit' }}>{entry.name}</Typography>
+                        <MuiLink
+                          component={RouterLink}
+                          to={participantPath(entry.name)}
+                          underline="hover"
+                          sx={{ fontWeight: 700, fontSize: 'inherit', '&:focus-visible': { outline: '2px solid', outlineOffset: 2 } }}
+                        >
+                          {entry.name}
+                        </MuiLink>
                         {winnerNames.includes(entry.name) && <WinnerBadge />}
                       </Stack>
                     </TableCell>

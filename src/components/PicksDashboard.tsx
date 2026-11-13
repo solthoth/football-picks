@@ -1,6 +1,4 @@
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
@@ -11,23 +9,25 @@ import { useMemo, useState } from 'react'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { computePickDistribution, sortByDivided } from '../domain/pickDistribution'
+import { BackLink } from './BackLink'
+import type { BackState } from './backNavigation'
 import { GamePickCard } from './GamePickCard'
 import { PickSummaryStrip } from './PickSummaryStrip'
 import { ShareButton } from './ShareButton'
 
 interface PicksDashboardProps {
   pool: Pool
-  onBack: () => void
-  onSelectGame?: (gameId: string) => void
 }
 
 type SortMode = 'schedule' | 'divided'
 
-export function PicksDashboard({ pool, onBack, onSelectGame }: PicksDashboardProps) {
+export function PicksDashboard({ pool }: PicksDashboardProps) {
   const [sort, setSort] = useState<SortMode>('schedule')
   const distribution = useMemo(() => computePickDistribution(pool), [pool])
   const scoresAsOf = scoresAsOfLabel(pool)
-  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}/dashboard`
+  const weekPath = `/season/${pool.season}/week/${pool.week}`
+  const shareUrl = `${window.location.origin}${weekPath}/dashboard`
+  const backToDashboard: BackState = { backLabel: 'Back to dashboard' }
 
   const hasGames = distribution.games.length > 0
   const hasParticipants = distribution.participantCount > 0
@@ -38,9 +38,7 @@ export function PicksDashboard({ pool, onBack, onSelectGame }: PicksDashboardPro
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-            Back to standings
-          </Button>
+          <BackLink to={weekPath} label="Back to standings" sx={{ ml: -1 }} />
           <ShareButton
             url={shareUrl}
             title={`Season ${pool.season} Week ${pool.week} pick split`}
@@ -106,7 +104,7 @@ export function PicksDashboard({ pool, onBack, onSelectGame }: PicksDashboardPro
             >
               {games.map((game) => (
                 <Box component="li" key={game.gameId} sx={{ minWidth: 0 }}>
-                  <GamePickCard game={game} onSelect={onSelectGame} />
+                  <GamePickCard game={game} to={`${weekPath}/game/${encodeURIComponent(game.gameId)}`} linkState={backToDashboard} />
                 </Box>
               ))}
             </Box>

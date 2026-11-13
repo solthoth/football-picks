@@ -1,8 +1,9 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
+import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantList } from './ParticipantList'
 
 const pool: Pool = {
@@ -37,75 +38,78 @@ const poolWithWinner: Pool = {
 
 describe('ParticipantList', () => {
   it('shows the season and week', () => {
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
     expect(screen.getByRole('heading', { name: /season 2026.*week 1/i })).toBeInTheDocument()
   })
 
   it('lists participants ranked by correct picks', () => {
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
     const rows = screen.getAllByRole('row').slice(1) // skip header row
     expect(rows[0]).toHaveTextContent('Steve')
     expect(rows[1]).toHaveTextContent('Greg')
   })
 
-  it('calls onSelect when the row is clicked', async () => {
-    const user = userEvent.setup()
-    const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+  it('links each participant name to their picks, encoding awkward names', () => {
+    const spaced: Pool = { ...pool, participants: [{ name: 'Mary Jo', picks: { game_01: 'Seahawks' }, tieBreakerTotalScore: 1 }] }
+    renderWithRouter(<ParticipantList pool={spaced} />)
 
-    await user.click(screen.getByText('Greg').closest('tr') as HTMLElement)
-
-    expect(onSelect).toHaveBeenCalledWith('Greg')
+    expect(screen.getByRole('link', { name: 'Mary Jo' })).toHaveAttribute('href', '/season/2026/week/1/participant/Mary%20Jo')
   })
 
-  it('calls onSelect when any cell in the row is clicked, not just the name', async () => {
+  it('opens the participant when the row is clicked anywhere, navigating exactly once', async () => {
     const user = userEvent.setup()
-    const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    const { visited } = renderWithRouter(<ParticipantList pool={pool} />, { initialEntries: ['/week'] })
 
     const row = screen.getByText('Greg').closest('tr') as HTMLElement
     await user.click(within(row).getByText(/pending/i))
 
-    expect(onSelect).toHaveBeenCalledWith('Greg')
+    expect(visited).toEqual(['/week', '/season/2026/week/1/participant/Greg'])
   })
 
-  it('activates the row via the keyboard', async () => {
+  it('navigates once, not twice, when the name link itself is clicked', async () => {
     const user = userEvent.setup()
-    const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    const { visited } = renderWithRouter(<ParticipantList pool={pool} />, { initialEntries: ['/week'] })
 
-    const row = screen.getByText('Greg').closest('tr') as HTMLElement
-    row.focus()
+    await user.click(screen.getByRole('link', { name: 'Greg' }))
+
+    expect(visited).toEqual(['/week', '/season/2026/week/1/participant/Greg'])
+  })
+
+  it('opens a participant from the keyboard through the name link', async () => {
+    const user = userEvent.setup()
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    screen.getByRole('link', { name: 'Greg' }).focus()
     await user.keyboard('{Enter}')
 
-    expect(onSelect).toHaveBeenCalledWith('Greg')
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Greg')
   })
 
-  it('calls onBack when the back button is clicked', async () => {
-    const user = userEvent.setup()
-    const onBack = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={onBack} onOpenDashboard={vi.fn()} />)
+  it('makes the link, not the whole row, the keyboard stop (rows are not focusable)', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
 
-    await user.click(screen.getByRole('button', { name: /change season\/week/i }))
-
-    expect(onBack).toHaveBeenCalled()
+    for (const row of screen.getAllByRole('row').slice(1)) {
+      expect(row).not.toHaveAttribute('tabindex')
+    }
   })
 
-  it('offers a button to the pick dashboard that calls onOpenDashboard', async () => {
-    const user = userEvent.setup()
-    const onOpenDashboard = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={onOpenDashboard} />)
+  it('links back to the season/week picker', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
 
-    await user.click(screen.getByRole('button', { name: /see how the pool picked/i }))
+    expect(screen.getByRole('link', { name: /change season\/week/i })).toHaveAttribute('href', '/')
+  })
 
-    expect(onOpenDashboard).toHaveBeenCalledTimes(1)
+  it('links to the pick dashboard', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    expect(screen.getByRole('link', { name: /see how the pool picked/i })).toHaveAttribute('href', '/season/2026/week/1/dashboard')
   })
 
   it('shares a deep link to the week (see ShareButton.test.tsx for share/clipboard behavior)', async () => {
     const user = userEvent.setup()
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
 
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
     await user.click(screen.getByRole('button', { name: /share/i }))
 
     expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/season/2026/week/1`)
@@ -114,7 +118,7 @@ describe('ParticipantList', () => {
 
 describe('ParticipantList week winner badge', () => {
   it("shows a winner badge next to the week's winner only", () => {
-    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolWithWinner} />)
 
     const steveRow = screen.getByText('Steve').closest('tr') as HTMLElement
     const gregRow = screen.getByText('Greg').closest('tr') as HTMLElement
@@ -131,7 +135,7 @@ describe('ParticipantList week winner badge', () => {
         game_01: { ...poolWithWinner.results.game_01, status: 'in_progress', winner: null },
       },
     }
-    render(<ParticipantList pool={poolPending} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolPending} />)
 
     expect(screen.queryByText(/week winner/i)).not.toBeInTheDocument()
   })
@@ -144,27 +148,28 @@ describe('ParticipantList mobile layout', () => {
 
   it('renders participants as cards instead of a table below the sm breakpoint', () => {
     mockMatchMediaMatches(true)
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getByText('Steve')).toBeInTheDocument()
     expect(screen.getByText('Greg')).toBeInTheDocument()
   })
 
-  it('still calls onSelect when a participant card is tapped', async () => {
+  it('makes each participant card a link to their picks', async () => {
     mockMatchMediaMatches(true)
     const user = userEvent.setup()
-    const onSelect = vi.fn()
-    render(<ParticipantList pool={pool} onSelect={onSelect} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    const card = screen.getByRole('link', { name: /Greg/ })
+    expect(card).toHaveAttribute('href', '/season/2026/week/1/participant/Greg')
 
     await user.click(screen.getByText('Greg'))
-
-    expect(onSelect).toHaveBeenCalledWith('Greg')
+    expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Greg')
   })
 
   it('still shows the winner badge on the mobile card layout', () => {
     mockMatchMediaMatches(true)
-    render(<ParticipantList pool={poolWithWinner} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolWithWinner} />)
 
     expect(screen.getByText(/week winner/i)).toBeInTheDocument()
   })
@@ -188,20 +193,20 @@ describe('ParticipantList before any game is decided', () => {
     ['mobile cards', true],
   ])('does not hand out rank 1 to everyone in the %s', (_layout, mobile) => {
     mockMatchMediaMatches(mobile)
-    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolNotStarted} />)
 
     expect(screen.queryByText('1')).not.toBeInTheDocument()
     expect(screen.getAllByRole('img', { name: 'Not ranked yet' })).toHaveLength(2)
   })
 
   it('explains why there is no ranking yet', () => {
-    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolNotStarted} />)
 
     expect(screen.getByText(/rankings start once the first game is final/i)).toBeInTheDocument()
   })
 
   it('lists players alphabetically while unranked', () => {
-    render(<ParticipantList pool={poolNotStarted} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={poolNotStarted} />)
 
     const rows = screen.getAllByRole('row').slice(1)
     expect(rows[0]).toHaveTextContent('Greg')
@@ -209,7 +214,7 @@ describe('ParticipantList before any game is decided', () => {
   })
 
   it('shows ranks and no explanation once a game is decided', () => {
-    render(<ParticipantList pool={pool} onSelect={vi.fn()} onBack={vi.fn()} onOpenDashboard={vi.fn()} />)
+    renderWithRouter(<ParticipantList pool={pool} />)
 
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: 'Not ranked yet' })).not.toBeInTheDocument()
