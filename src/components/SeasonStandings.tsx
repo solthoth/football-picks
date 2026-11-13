@@ -104,7 +104,7 @@ export function SeasonStandings({ season, standings, loading = false, failedWeek
               <Card key={entry.name} variant="outlined" sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 2, minHeight: 68 }}>
                 <RankAvatar rank={entry.rank} size={40} fontSize={18} />
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography noWrap sx={{ fontWeight: 700, fontSize: '1.25rem' }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: { xs: '1.125rem', sm: '1.25rem' }, overflowWrap: 'anywhere' }}>
                     {entry.name}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">

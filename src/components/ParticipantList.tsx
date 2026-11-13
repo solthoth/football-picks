@@ -87,16 +87,21 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
                 <CardActionArea
                   component={RouterLink}
                   to={participantPath(entry.name)}
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 2, minHeight: 68 }}
+                  sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1.5, rowGap: 0.5, p: 2, minHeight: 68 }}
                 >
                   <RankAvatar rank={entry.rank} size={40} fontSize={18} />
-                  <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography noWrap sx={{ fontWeight: 700, fontSize: '1.25rem' }}>
+                  <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: { xs: '1.125rem', sm: '1.25rem' }, overflowWrap: 'anywhere' }}>
                       {entry.name}
                     </Typography>
-                    {winnerNames.includes(entry.name) && <WinnerBadge />}
                   </Box>
                   <Chip label={`${entry.correct} / ${entry.totalGames}`} sx={{ flexShrink: 0, fontWeight: 700, fontSize: '1rem', height: 32 }} />
+                  {winnerNames.includes(entry.name) && (
+                    // A full-width row of its own (indented past the avatar) so the badge never squeezes the name.
+                    <Box sx={{ flexBasis: '100%', pl: '52px' }}>
+                      <WinnerBadge />
+                    </Box>
+                  )}
                 </CardActionArea>
               </Card>
             ))}

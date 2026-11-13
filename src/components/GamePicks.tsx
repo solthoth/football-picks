@@ -63,7 +63,7 @@ function PickerGroup({ side, team, names, won, winnerNames, weekPath, matchup }:
       <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', p: 2 }}>
         <TeamLogo team={team} size={40} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography id={headingId} variant="h6" component="h2" noWrap sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+          <Typography id={headingId} variant="h6" component="h2" sx={{ fontWeight: 700, lineHeight: 1.2, overflowWrap: 'anywhere' }}>
             Picked {team}
           </Typography>
           <Typography variant="caption" color="textSecondary">

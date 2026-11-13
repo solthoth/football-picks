@@ -5,6 +5,7 @@ import type { Pool } from '../data/types'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { textContrast } from '../testUtils/contrast'
 import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
+import { expectNotTruncated } from '../testUtils/truncation'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantList } from './ParticipantList'
 
@@ -202,6 +203,18 @@ describe('ParticipantList mobile layout', () => {
 
     await user.click(screen.getByText('Greg'))
     expect(screen.getByTestId('location')).toHaveTextContent('/season/2026/week/1/participant/Greg')
+  })
+
+  it("never squeezes a winner's name out with their badge: the badge gets a full-width row of its own", () => {
+    mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantList pool={poolWithWinner} />)
+
+    const name = screen.getByText('Steve')
+    const badge = screen.getByText('Week Winner')
+    expectNotTruncated(name)
+    expect(name.parentElement).not.toContainElement(badge)
+    expect(badge.closest('a')).toBe(name.closest('a')) // still part of the same tappable card
+    expect(badge.closest('.MuiChip-root')?.parentElement).toHaveStyle({ flexBasis: '100%' })
   })
 
   it('still shows the winner badge on the mobile card layout', () => {

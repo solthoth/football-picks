@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
 import { textContrast } from '../testUtils/contrast'
+import { expectNotTruncated } from '../testUtils/truncation'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { ParticipantDetail } from './ParticipantDetail'
@@ -74,6 +75,14 @@ describe('ParticipantDetail', () => {
     // tiebreaker/"Monday" game, still scheduled) since there's no one to tie with.
     renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
     expect(screen.getByText('Week Winner')).toBeInTheDocument()
+  })
+
+  it('lets the picked team wrap on a narrow phone instead of cutting it to a letter or two', () => {
+    mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expectNotTruncated(screen.getByText('Rams'))
+    expect(screen.getByText('Rams')).toHaveStyle({ overflowWrap: 'anywhere' })
   })
 
   it('keeps "Week 1" together in the subtitle so the number cannot wrap onto its own line', () => {

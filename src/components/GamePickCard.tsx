@@ -60,32 +60,61 @@ interface TeamCellProps {
 
 function TeamCell({ side, team, isWinner }: TeamCellProps) {
   const isHome = side === 'home'
+  const edge = isHome ? 'flex-end' : 'flex-start'
   return (
-    <Stack
-      component="span"
-      direction={isHome ? 'row-reverse' : 'row'}
-      spacing={1.25}
-      data-testid={`team-${side}`}
-      sx={{ alignItems: 'center', minWidth: 0, textAlign: isHome ? 'right' : 'left' }}
-    >
-      <Box component="span" aria-hidden sx={{ display: 'flex', '& img': { width: { xs: 40, md: 48 }, height: { xs: 40, md: 48 } } }}>
-        <TeamLogo team={team} size={48} />
-      </Box>
-      <Box component="span" sx={{ display: 'block', minWidth: 0 }}>
-        <Stack component="span" direction={isHome ? 'row-reverse' : 'row'} spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
-          <Typography component="span" noWrap sx={{ fontWeight: 700, fontSize: '1.125rem', minWidth: 0 }}>
+    // The cell is a size container: when it is too narrow for the logo beside the name (about 134px, i.e. a
+    // phone narrower than ~390px) the logo stacks above the name instead, so a name like "Commanders" is
+    // never truncated or broken mid-word.
+    <Box component="span" data-testid={`team-${side}`} sx={{ display: 'block', minWidth: 0, containerType: 'inline-size' }}>
+      <Stack
+        component="span"
+        direction={isHome ? 'row-reverse' : 'row'}
+        spacing={0.75}
+        sx={{
+          alignItems: 'center',
+          textAlign: isHome ? 'right' : 'left',
+          '@container (max-width: 134px)': { flexDirection: 'column', alignItems: edge, '& > :not(style) + :not(style)': { ml: 0, mt: 0.5 } },
+        }}
+      >
+        <Box
+          component="span"
+          aria-hidden
+          sx={{ position: 'relative', display: 'flex', flexShrink: 0, '& img': { width: { xs: 32, md: 48 }, height: { xs: 32, md: 48 } } }}
+        >
+          <TeamLogo team={team} size={48} />
+          {isWinner && (
+            // Decorative, and on the logo rather than beside the name so it takes no room from long names;
+            // screen readers get the hidden ", X won" text on the status row instead.
+            <CheckCircleIcon
+              aria-hidden
+              fontSize="small"
+              color="success"
+              sx={{ position: 'absolute', right: -6, bottom: -6, bgcolor: 'background.paper', borderRadius: '50%' }}
+            />
+          )}
+        </Box>
+        <Box component="span" sx={{ display: 'block', minWidth: 0 }}>
+          {/* Wraps (and, for a name wider than its cell, breaks) rather than truncating "Commanders" to "Comma…". */}
+          <Typography
+            component="span"
+            sx={{
+              display: 'block',
+              fontWeight: 700,
+              fontSize: { xs: '0.9375rem', sm: '1.125rem' },
+              lineHeight: 1.2,
+              minWidth: 0,
+              overflowWrap: 'anywhere',
+              hyphens: 'auto',
+            }}
+          >
             {team}
           </Typography>
-          {isWinner && (
-            // Decorative: screen readers get the hidden ", X won" text on the status row instead.
-            <CheckCircleIcon aria-hidden fontSize="small" color="success" />
-          )}
-        </Stack>
-        <Typography variant="caption" color="textSecondary" component="span" sx={{ display: 'block' }}>
-          {isHome ? 'Home' : 'Away'}
-        </Typography>
-      </Box>
-    </Stack>
+          <Typography variant="caption" color="textSecondary" component="span" sx={{ display: 'block' }}>
+            {isHome ? 'Home' : 'Away'}
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
   )
 }
 
