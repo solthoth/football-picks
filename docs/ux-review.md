@@ -20,9 +20,19 @@ Reviewed 2026-11-12 against `main` (`5bf44a9`), running locally with live scores
 | 5 | No season view | ✅ Done |
 | 12 | Tiebreaker guess shown without the answer | ✅ Done |
 | 22 | Shared links have no preview | ✅ Done (preview not yet seen in a real chat app) |
-| 7, 14–17, 19–21, 23 | Everything else | Open |
+| 7 | Share gives no confirmation on desktop | ✅ Done |
+| 14 | Team names truncate | ✅ Done (and a wider set of truncations) |
+| 15 | "Pending" is noise once a week is final | ✅ Done |
+| 16 | Pick-split bar colours unexplained | ✅ Done |
+| 17 | "Most divided" sort not in the URL | ✅ Done |
+| 19 | Game page subtitle runs two ideas together | ✅ Done |
+| 20 | No manual refresh on desktop | ✅ Done |
+| 21 | Kickoff times carry no timezone | ✅ Done |
+| 23 | Pick names cut to a letter or two at 320 px | ✅ Done |
 
-Findings 1–4 (branch `feat/ux-quick-wins-1-4`) 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`), 6, 8, 9 and 13 (branch `feat/ux-navigation-6-8-9-13`), and 5, 12 and 22 (branch `feat/ux-features-5-12-22`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
+**All 23 findings are now done.** The limitations that remain are listed at the end of this document.
+
+Findings 1–4 (branch `feat/ux-quick-wins-1-4`) 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`), 6, 8, 9 and 13 (branch `feat/ux-navigation-6-8-9-13`), 5, 12 and 22 (branch `feat/ux-features-5-12-22`), and 7, 14–17, 19–21 and 23 (branch `feat/ux-polish-remaining`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
 
 ## How it was reviewed
 
@@ -170,6 +180,10 @@ Clicking Share produced no snackbar and did not change the clipboard. The code c
 
 - On desktop-sized viewports, copy the link and show "Link copied". Keep the native sheet for touch devices.
 
+> **Status: ✅ Done.** Share now decides by *pointer*, not by whether the browser has a share sheet. On a touch device (coarse primary pointer) it still opens the native sheet; on a desktop pointer it copies the link and shows "Link copied to clipboard", even though the browser offers a share sheet. If copying is blocked (for example an insecure context) it falls back to the share sheet instead of an error, and only reports "Couldn't copy the link" when there is neither.
+>
+> Both paths were checked in a real browser: a desktop pointer with a share sheet present copied the page URL and never opened the sheet, and an emulated phone called the sheet with the right title, text and URL. That also settles the point the original note could not: the OS sheet itself can't be seen under automation, but the decision to open it now can be.
+
 **8. Returning to the home page forgets which week you were viewing** (both)
 
 After opening Week 9 and pressing back, the picker has Week 10 selected again. The players and pot chips also only ever describe the default week, because tapping a tile navigates away immediately.
@@ -251,14 +265,28 @@ The four error states use different controls (a text link on two, a button on th
 **14. Team names truncate when there is room** (both)
 "Commanders" is cut to "Commande…" on the desktop dashboard and "Comma…" on mobile; at 320 px both team names are cut. See [desktop-dash-w9.png](ux-review/desktop-dash-w9.png) and [mobile-320-dash.png](ux-review/mobile-320-dash.png). Allow the name to wrap to two lines, or shrink the font for long names.
 
+> **Status: ✅ Done, and the real problem was wider than the finding.** Measuring every visible text element across the routes at 320, 390 and 1440 px found truncation well beyond the "Commanders" example: team names on every card at every width, the "Picked <team>" headings, pick names on the participant page (finding 23), and a real bug nobody had noticed: in the weekly standings on a phone the **"Week Winner" badge squeezed the winner's name to 0 px at 320 px and to "Jo…" at 390 px**. The season page built for finding 5 had the same pattern.
+>
+> - **Team names** wrap instead of truncating. The winner check moved onto the logo so it takes no room from the name, and the logo and font are slightly smaller on phones. Each cell is also a CSS *size container*: when it is under about 134 px (phones up to ~375 px) the logo stacks above the name, so a name like "Commanders" is never cut or broken mid-word. Measured: no name breaks at any width from 320 to 1440 px. See [mobile-320-team-names.png](ux-review/mobile-320-team-names.png).
+> - **Winner badge** now sits on a full-width row of its own below the card's content on phones. **Participant names** wrap on the weekly and season cards.
+> - **Why a container query:** jsdom cannot lay out text, so the unit tests pin that names are allowed to wrap, and the real-browser measurement is what proves no name is cut or broken.
+>
+> A final audit of 110 page states (11 routes × 5 widths × light/dark) finds no truncated visible text. The back-link ellipsis from finding 18 is deliberate and unchanged.
+
 **15. The "Pending" column and tile are noise once a week is final** (both)
 Final weeks show "0 pending" on every desktop row and a "Pending 0 of 15" tile. Hide them when nothing is pending. On mobile the pending count is dropped entirely, so in-progress weeks lose that information there; a small "3 left" caption would restore it.
+
+> **Status: ✅ Done.** The standings table drops its Pending column once nothing is pending; the participant page drops the Pending tile at 0 (the tile grid resizes to the tiles shown); and phone cards say "13 left" while games are unfinished, restoring the information that was missing on mobile. Checked on live data: Week 9 (final) shows neither, Week 10 (in progress) shows both, and a Week 10 phone card reads "13 left".
 
 **16. The pick-split bar colours are unexplained** (both)
 Blue is always the away team and purple the home team, and the losing side is faded, but nothing says so and the colours have no tie to the teams. Add a one-line legend, or label the bar ends.
 
+> **Status: ✅ Done.** Each team's name now has a small dot in its side's colour (blue for the away team, purple for the home team), so the key sits exactly where the eye already is and the bar needs no separate legend. The dot reads the same colour token as the bar segment, and a test asserts the computed colours are identical so they cannot drift apart. The dots are decorative (`aria-hidden`); the bar already has a full text equivalent. See [mobile-pick-split-key.png](ux-review/mobile-pick-split-key.png).
+
 **17. The "Most divided" sort resets on reload and is not shareable** (both)
 The toggle is local state. Put it in the URL (`?sort=divided`) so it survives refresh and sharing.
+
+> **Status: ✅ Done.** The sort is now the `?sort=divided` query parameter: the page opens in that order from a refresh or a shared link, "Most divided" adds the parameter, "Schedule" removes it, and an unknown value falls back to the schedule order. It replaces the history entry instead of pushing one, so flipping the sort does not fill the back button, and the dashboard's Share button includes it. Checked in a browser: the sort survives a reload and a trip into a game and back.
 
 **18. Titles wrap awkwardly on phones** (mobile)
 "Season 2026 · Week 10" breaks as "Week / 10", leaving the number alone on a line. Keep "Week 10" together with a non-breaking space. At 320 px the uppercase back button also wraps to two lines.
@@ -270,11 +298,19 @@ The toggle is local state. Put it in the URL (`?sort=divided`) so it survives re
 **19. The game page subtitle runs two ideas together** (both)
 "Season 2026 · Week 10 · Select a participant to see their picks." mixes context with an instruction. Split the instruction onto its own line or drop it; the chevrons already signal that rows are tappable. See [desktop-game-w9-final.png](ux-review/desktop-game-w9-final.png).
 
+> **Status: ✅ Done.** The subtitle is now just "Season 2026 · Week 10"; the instruction was dropped because the chevrons already show that rows can be opened.
+
 **20. No manual refresh on desktop** (desktop)
 Scores poll every 60 seconds and pull-to-refresh is touch-only. A small refresh button beside "Scores as of" would help during live games.
 
+> **Status: ✅ Done.** A refresh icon now sits beside the "Scores as of" caption on the standings, dashboard and game screens while games are unfinished. It fetches immediately, shows a spinner and is disabled while it runs, is a 44 px target pulled back with negative margins so the caption row does not grow, and disappears once the week is final. If the first load failed it still offers the button so the user can retry. See [desktop-scores-refresh.png](ux-review/desktop-scores-refresh.png).
+>
+> To do this `useLivePool` gained a small shared status store (`refreshLiveScores()` and `useLiveScoresStatus()`). Checked on live data: one click makes exactly one request, for the week's JSON file.
+
 **21. Kickoff times carry no timezone** (both)
 "Sun 10:00 AM" is the viewer's local time, which is the right choice, but a pool spread across timezones may misread it. Append the short zone ("10:00 AM PT").
+
+> **Status: ✅ Done.** Kickoff times and the "Scores as of" label now include the short timezone name ("Sun, 10:00 AM PST"). It follows the viewer: in a Tokyo-timezone browser the same game reads "Fri, 10:15 AM GMT+9". Showing a zone makes the browser's formatter insert a comma after the weekday, so it reads "Sun, 10:00 AM PST" rather than "Sun 10:00 AM". The tests accept any zone name and pass under `TZ=UTC` and `TZ=Asia/Tokyo` as well as the local zone.
 
 **22. Shared links have no preview** (both)
 There are no Open Graph tags, so a link pasted into a group chat shows a bare URL. Sharing is a primary action here; a static `og:title`, `og:description` and `og:image` would cover every route.
@@ -290,9 +326,20 @@ There are no Open Graph tags, so a link pasted into a group chat shows a bare UR
 **23. Pick names are cut to a letter or two at 320 px** (mobile)
 On the participant page at 320 px the pick name gets only 47 px of room beside the 56 px team logo and the 72 px outcome column, but needs 89-100 px, so names show as "Ja…", "Be…" and "Br…". See [mobile-320-participant.png](ux-review/mobile-320-participant.png). Found while verifying finding 18. Let the name wrap or shrink, or give the logo and outcome column less room on very narrow screens.
 
+> **Status: ✅ Done**, together with finding 14. On a phone the pick name now wraps instead of being cut, with a smaller logo, font and outcome column, and the same measurement approach confirmed no pick name is truncated at 320 px.
+
 ## Suggested order of work
 
 1. **Quick wins (small, low risk):** ~~1, 2, 4, 10, 11, 18~~ (all done).
 2. **Navigation and structure:** ~~3, 6, 8, 9, 13~~ (all done).
 3. **Feature work:** ~~5, 12, 22~~ (all done).
-4. **Polish:** the remaining low-severity items.
+4. **Polish:** ~~7, 14–17, 19–21, 23~~ (all done).
+
+## What is left
+
+All 23 findings are implemented. These limitations are known and recorded, not hidden:
+
+- **Table-row links on tablet and desktop** (26–29 px tall) are under 44 px, although the whole row is clickable and about 77 px tall (see finding 10).
+- **The share preview has not been seen in a real chat app** (finding 22), and every route shows the same generic preview.
+- **Not tested:** real devices, screen readers, Safari and Firefox. The tap-target and layout audits used browser emulation.
+- **Not done:** moving keyboard focus to the new page heading on navigation (finding 2), a per-person season page and a pager on the dashboard (findings 5 and 8).
