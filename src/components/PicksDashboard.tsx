@@ -13,6 +13,7 @@ import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { GamePickCard } from './GamePickCard'
 import { PickSummaryStrip } from './PickSummaryStrip'
+import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
 
 interface PicksDashboardProps {
@@ -47,7 +48,7 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
         </Stack>
 
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
-          Season {pool.season} &middot; Week {pool.week}
+          <SeasonWeekLabel season={pool.season} week={pool.week} />
         </Typography>
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
           How the pool picked every game.

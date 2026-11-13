@@ -25,6 +25,7 @@ import type { Pool } from '../data/types'
 import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { BackLink } from './BackLink'
+import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
 import { WinnerBadge } from './WinnerBadge'
 
@@ -76,7 +77,7 @@ export function ParticipantList({ pool }: ParticipantListProps) {
         </Stack>
 
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
-          Season {pool.season} &middot; Week {pool.week}
+          <SeasonWeekLabel season={pool.season} week={pool.week} />
         </Typography>
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>Select a participant to see their picks.</Typography>
         {scoresAsOf && (

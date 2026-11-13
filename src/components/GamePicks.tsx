@@ -24,6 +24,7 @@ import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { CenteredCard } from './CenteredCard'
 import { GamePickCard } from './GamePickCard'
+import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
@@ -145,7 +146,7 @@ export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
           {game.away} @ {game.home}
         </Typography>
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-          Season {pool.season} &middot; Week {pool.week} &middot; Select a participant to see their picks.
+          <SeasonWeekLabel season={pool.season} week={pool.week} /> &middot; Select a participant to see their picks.
         </Typography>
         {scoresAsOf && (
           <Typography variant="caption" color="textSecondary" component="p">

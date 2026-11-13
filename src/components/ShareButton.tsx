@@ -32,7 +32,13 @@ export function ShareButton({ url, title, text }: ShareButtonProps) {
 
   return (
     <>
-      <Button startIcon={<ShareIcon fontSize="small" />} onClick={handleShare} variant="outlined" size="small">
+      <Button
+        startIcon={<ShareIcon fontSize="small" />}
+        onClick={handleShare}
+        variant="outlined"
+        size="small"
+        sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+      >
         Share
       </Button>
       <Snackbar open={message !== null} autoHideDuration={2500} onClose={() => setMessage(null)} message={message} />

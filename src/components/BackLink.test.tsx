@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
@@ -42,5 +42,17 @@ describe('BackLink', () => {
     await user.keyboard('{/Control}')
 
     expect(screen.getByTestId('location')).toHaveTextContent('/game')
+  })
+
+  it('keeps a long label on one line, truncating with an ellipsis rather than wrapping to a second line', () => {
+    renderWithRouter(<BackLink to="/g" label="Back to Packers @ Patriots" />)
+
+    const link = screen.getByRole('link', { name: 'Back to Packers @ Patriots' })
+    expect(link).toHaveStyle({ minWidth: '0', maxWidth: '100%' })
+    expect(within(link).getByText('Back to Packers @ Patriots')).toHaveStyle({
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    })
   })
 })

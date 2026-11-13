@@ -1,4 +1,5 @@
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import type { SxProps, Theme } from '@mui/material/styles'
 import type { MouseEvent } from 'react'
@@ -13,7 +14,11 @@ interface BackLinkProps {
   sx?: SxProps<Theme>
 }
 
-/** A real link, so it can be opened in a new tab or copied; a plain click still behaves like a browser "back" when it should. */
+/**
+ * A real link, so it can be opened in a new tab or copied; a plain click still behaves like a browser "back" when it should.
+ * The label stays on one line and is truncated with an ellipsis when space is short (labels like
+ * "Back to Packers @ Patriots" are long), so the header row keeps a steady height.
+ */
 export function BackLink({ to, label, pop = false, sx }: BackLinkProps) {
   const navigate = useNavigate()
 
@@ -25,8 +30,16 @@ export function BackLink({ to, label, pop = false, sx }: BackLinkProps) {
   }
 
   return (
-    <Button component={RouterLink} to={to} onClick={handleClick} startIcon={<ArrowBackIosNewIcon fontSize="small" />} sx={sx}>
-      {label}
+    <Button
+      component={RouterLink}
+      to={to}
+      onClick={handleClick}
+      startIcon={<ArrowBackIosNewIcon fontSize="small" />}
+      sx={[{ minWidth: 0, maxWidth: '100%' }, ...(Array.isArray(sx) ? sx : [sx])]}
+    >
+      <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {label}
+      </Box>
     </Button>
   )
 }
