@@ -113,3 +113,50 @@ describe('buildLeaderboard', () => {
     ])
   })
 })
+
+describe('buildLeaderboard before any pick is decided', () => {
+  const undecidedPool: Pool = {
+    ...pool,
+    results: {
+      game_01: { kickoffTime: null, status: 'scheduled', awayScore: null, homeScore: null, winner: null },
+      game_02: { kickoffTime: null, status: 'in_progress', awayScore: 3, homeScore: 0, winner: null },
+      game_03: { kickoffTime: null, status: 'scheduled', awayScore: null, homeScore: null, winner: null },
+    },
+  }
+
+  it('leaves everyone unranked (rank null) while no game has a decided result', () => {
+    expect(buildLeaderboard(undecidedPool).map((e) => [e.name, e.rank])).toEqual([
+      ['Greg', null],
+      ['Steve', null],
+    ])
+  })
+
+  it('stays unranked when the only final game ended level (nobody is right or wrong)', () => {
+    const levelPool: Pool = {
+      ...undecidedPool,
+      results: {
+        ...undecidedPool.results,
+        game_01: { kickoffTime: null, status: 'final', awayScore: 10, homeScore: 10, winner: null },
+      },
+    }
+    expect(buildLeaderboard(levelPool).every((e) => e.rank === null)).toBe(true)
+  })
+
+  it('ranks everyone once a game is decided, even if everyone got it wrong', () => {
+    const allWrong: Pool = {
+      ...undecidedPool,
+      participants: [
+        { name: 'Amy', picks: { game_01: 'Patriots' }, tieBreakerTotalScore: 0 },
+        { name: 'Bob', picks: { game_01: 'Patriots' }, tieBreakerTotalScore: 0 },
+      ],
+      results: {
+        ...undecidedPool.results,
+        game_01: { kickoffTime: null, status: 'final', awayScore: 10, homeScore: 13, winner: 'Seahawks' },
+      },
+    }
+    expect(buildLeaderboard(allWrong).map((e) => [e.name, e.correct, e.rank])).toEqual([
+      ['Amy', 0, 1],
+      ['Bob', 0, 1],
+    ])
+  })
+})

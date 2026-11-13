@@ -33,16 +33,29 @@ interface ParticipantListProps {
   onOpenDashboard: () => void
 }
 
-function rankAvatarSx(rank: number): SxProps<Theme> {
+function rankAvatarSx(rank: number | null): SxProps<Theme> {
   if (rank === 1) return { bgcolor: 'warning.main', color: 'warning.contrastText' }
   if (rank === 2) return { bgcolor: 'grey.400', color: 'common.black' }
   if (rank === 3) return { bgcolor: '#cd7f32', color: 'common.white' }
   return { bgcolor: 'grey.300', color: 'common.black' }
 }
 
+function RankAvatar({ rank, size, fontSize }: { rank: number | null; size: number; fontSize: number }) {
+  const sx = { width: size, height: size, fontSize, fontWeight: 700, flexShrink: 0, ...rankAvatarSx(rank) }
+  if (rank === null) {
+    return (
+      <Avatar role="img" aria-label="Not ranked yet" sx={sx}>
+        &ndash;
+      </Avatar>
+    )
+  }
+  return <Avatar sx={sx}>{rank}</Avatar>
+}
+
 export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
   const { winnerNames } = determineWeekWinner(pool)
+  const unranked = leaderboard.every((entry) => entry.rank === null)
   const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -71,6 +84,11 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
             {scoresAsOf}
           </Typography>
         )}
+        {unranked && (
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+            Rankings start once the first game is final.
+          </Typography>
+        )}
         <Button
           variant="outlined"
           size="large"
@@ -89,9 +107,7 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
                   onClick={() => onSelect(entry.name)}
                   sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 2, minHeight: 68 }}
                 >
-                  <Avatar sx={{ width: 40, height: 40, fontSize: 18, fontWeight: 700, flexShrink: 0, ...rankAvatarSx(entry.rank) }}>
-                    {entry.rank}
-                  </Avatar>
+                  <RankAvatar rank={entry.rank} size={40} fontSize={18} />
                   <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography noWrap sx={{ fontWeight: 700, fontSize: '1.25rem' }}>
                       {entry.name}
@@ -130,9 +146,7 @@ export function ParticipantList({ pool, onSelect, onBack, onOpenDashboard }: Par
                     sx={{ cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: -2 } }}
                   >
                     <TableCell>
-                      <Avatar sx={{ width: 44, height: 44, fontSize: 20, fontWeight: 700, ...rankAvatarSx(entry.rank) }}>
-                        {entry.rank}
-                      </Avatar>
+                      <RankAvatar rank={entry.rank} size={44} fontSize={20} />
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>

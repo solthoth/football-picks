@@ -51,14 +51,22 @@ export function summarizeOutcomes(name: string, outcomes: PickOutcome[]): Partic
 }
 
 export interface LeaderboardEntry extends ParticipantSummary {
-  rank: number
+  /** Competition rank, or null while no pick in the pool has been decided (a 0-0 start is not a tie for first). */
+  rank: number | null
 }
 
-/** Ranks participants by correct picks (competition ranking: ties share a rank). */
+/**
+ * Ranks participants by correct picks (competition ranking: ties share a rank).
+ * Until at least one pick is decided (right or wrong) nobody is ranked and the
+ * list falls back to alphabetical order.
+ */
 export function buildLeaderboard(pool: Pool): LeaderboardEntry[] {
   const summaries = pool.participants
     .map((participant) => summarizeOutcomes(participant.name, getPickOutcomes(pool, participant)))
     .sort((a, b) => b.correct - a.correct || a.name.localeCompare(b.name))
+
+  const anyDecided = summaries.some((summary) => summary.correct + summary.incorrect > 0)
+  if (!anyDecided) return summaries.map((summary) => ({ ...summary, rank: null }))
 
   let rank = 0
   let previousCorrect: number | null = null
