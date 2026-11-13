@@ -1,9 +1,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
 import { fontSizePx, textContrast } from '../testUtils/contrast'
 import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
+import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { renderWithTheme } from '../testUtils/renderWithTheme'
 import { SeasonWeekSelect } from './SeasonWeekSelect'
 
@@ -124,5 +125,40 @@ describe('SeasonWeekSelect touch targets', () => {
     for (const season of ['2026', '2025']) {
       expect(guaranteedHeightPx(screen.getByRole('button', { name: season }))).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
     }
+  })
+})
+
+describe('SeasonWeekSelect week layout', () => {
+  const tenWeeks: Pool[] = Array.from({ length: 10 }, (_, i) => pool(2026, i + 1))
+
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it('on larger screens wraps every week into a grid, so earlier weeks are never hidden off to the side', () => {
+    mockMatchMediaMatches(false)
+    renderWithTheme(<SeasonWeekSelect pools={tenWeeks} onSelect={vi.fn()} />)
+
+    const list = screen.getByRole('listbox', { name: 'Week' })
+    expect(list).toHaveStyle({ flexWrap: 'wrap', justifyContent: 'center', overflowX: 'visible' })
+    expect(screen.getAllByRole('option')).toHaveLength(10)
+  })
+
+  it('on phones keeps the compact swipeable rail', () => {
+    mockMatchMediaMatches(true)
+    renderWithTheme(<SeasonWeekSelect pools={tenWeeks} onSelect={vi.fn()} />)
+
+    expect(screen.getByRole('listbox', { name: 'Week' })).toHaveStyle({ flexWrap: 'nowrap', overflowX: 'auto' })
+  })
+
+  it('still moves focus with the arrow keys across a wrapped grid', async () => {
+    mockMatchMediaMatches(false)
+    const user = userEvent.setup()
+    renderWithTheme(<SeasonWeekSelect pools={tenWeeks} onSelect={vi.fn()} />)
+
+    screen.getByRole('option', { name: 'Week 10' }).focus()
+    await user.keyboard('{ArrowLeft}{ArrowLeft}')
+
+    expect(screen.getByRole('option', { name: 'Week 8' })).toHaveFocus()
   })
 })

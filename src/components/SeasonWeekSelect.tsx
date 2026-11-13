@@ -5,8 +5,9 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, WheelEvent } from 'react'
 import type { Pool } from '../data/types'
@@ -31,6 +32,8 @@ function EmptyState() {
 }
 
 export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const seasons = useMemo(() => [...new Set(pools.map((p) => p.season))].sort((a, b) => b - a), [pools])
   const [season, setSeason] = useState<number | undefined>(seasons[0])
 
@@ -102,7 +105,7 @@ export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
 
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, py: 6 }}>
-      <Paper component="main" variant="outlined" sx={{ width: '100%', maxWidth: 480, p: { xs: 3, sm: 5 }, borderRadius: 4 }}>
+      <Paper component="main" variant="outlined" sx={{ width: '100%', maxWidth: { xs: 480, sm: 560 }, p: { xs: 3, sm: 5 }, borderRadius: 4 }}>
         <Stack spacing={0.75} sx={{ alignItems: 'center', textAlign: 'center', mb: 4 }}>
           <Box
             sx={(theme) => ({
@@ -171,22 +174,34 @@ export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
           role="listbox"
           aria-labelledby="week-select-label"
           aria-orientation="horizontal"
-          onWheel={handleWheel}
+          onWheel={isMobile ? handleWheel : undefined}
           sx={{
             display: 'flex',
             gap: 1.5,
-            overflowX: 'auto',
-            scrollSnapType: 'x proximity',
             py: 0.5,
             px: 0.5,
             mx: -0.5,
-            justifyContent: weeks.length <= 4 ? 'center' : 'flex-start',
-            scrollbarWidth: 'none',
-            '&::-webkit-scrollbar': { display: 'none' },
-            ...(weeks.length > 4 && {
-              maskImage: 'linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)',
-            }),
+            ...(isMobile
+              ? {
+                  // Phones: a compact swipeable rail; the faded edge and the partly visible tile signal there is more.
+                  flexWrap: 'nowrap',
+                  overflowX: 'auto',
+                  scrollSnapType: 'x proximity',
+                  justifyContent: weeks.length <= 4 ? 'center' : 'flex-start',
+                  scrollbarWidth: 'none',
+                  '&::-webkit-scrollbar': { display: 'none' },
+                  ...(weeks.length > 4 && {
+                    maskImage: 'linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent)',
+                  }),
+                }
+              : {
+                  // Larger screens: wrap into a grid so every week is visible. A mouse cannot swipe and the
+                  // scrollbar was hidden, which left earlier weeks reachable only by wheel or arrow keys.
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  overflowX: 'visible',
+                }),
           }}
         >
           {weeks.map((w) => {
