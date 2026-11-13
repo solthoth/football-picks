@@ -10,19 +10,13 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, WheelEvent } from 'react'
 import type { Pool } from '../data/types'
+import { weeksForSeason } from '../data/weeks'
 import { accentTextColor } from '../theme'
 import { CenteredCard } from './CenteredCard'
 
 interface SeasonWeekSelectProps {
   pools: Pool[]
   onSelect: (season: number, week: number) => void
-}
-
-function weeksForSeason(pools: Pool[], season: number | undefined): number[] {
-  return pools
-    .filter((p) => p.season === season)
-    .map((p) => p.week)
-    .sort((a, b) => a - b)
 }
 
 function EmptyState() {

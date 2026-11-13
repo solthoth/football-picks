@@ -60,11 +60,12 @@ describe('ParticipantDetail', () => {
     expect(rows[2]).not.toHaveTextContent('Pending')
   })
 
-  it('shows a fallback with a link back to the standings when the participant is not found', () => {
+  it("shows a titled fallback that leads to the week's standings when the participant is not found", () => {
     renderWithRouter(<ParticipantDetail pool={pool} participantName="Nobody" />)
 
+    expect(screen.getByRole('heading', { level: 1, name: 'Player not found' })).toBeInTheDocument()
     expect(screen.getByText(/couldn't find nobody/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute('href', '/season/2026/week/1')
+    expect(screen.getByRole('link', { name: "See this week's standings" })).toHaveAttribute('href', '/season/2026/week/1')
   })
 
   it("shows a winner badge next to the participant's name once the week is decided", () => {

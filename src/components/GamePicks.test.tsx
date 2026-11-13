@@ -107,10 +107,11 @@ describe('GamePicks', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/kiko')
   })
 
-  it('shows a fallback with a way back for a game that is not in the pool', () => {
+  it('shows a titled fallback that leads to the week\'s games for a game that is not in the pool', () => {
     renderWithRouter(<GamePicks pool={pool()} gameId="Jets@Bills" />)
 
+    expect(screen.getByRole('heading', { level: 1, name: 'Game not found' })).toBeInTheDocument()
     expect(screen.getByText(/couldn't find that game/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /back to dashboard/i })).toHaveAttribute('href', '/season/2026/week/4/dashboard')
+    expect(screen.getByRole('link', { name: "See this week's games" })).toHaveAttribute('href', '/season/2026/week/4/dashboard')
   })
 })

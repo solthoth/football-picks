@@ -22,7 +22,7 @@ import type { Side } from '../domain/pickDistribution'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
-import { CenteredCard } from './CenteredCard'
+import { NotFoundCard } from './NotFoundCard'
 import { GamePickCard } from './GamePickCard'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
@@ -116,10 +116,12 @@ export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
 
   if (!groups || !distribution) {
     return (
-      <CenteredCard>
-        <Typography gutterBottom>Couldn't find that game in this week's pool.</Typography>
-        <BackLink {...back} />
-      </CenteredCard>
+      <NotFoundCard
+        title="Game not found"
+        message="Couldn't find that game in this week's pool."
+        actionLabel="See this week's games"
+        to={`${weekPath}/dashboard`}
+      />
     )
   }
 

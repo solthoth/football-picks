@@ -1,23 +1,8 @@
-import Link from '@mui/material/Link'
-import Typography from '@mui/material/Typography'
-import { Link as RouterLink } from 'react-router-dom'
-import { CenteredCard } from '../components/CenteredCard'
+import { NotFoundCard } from '../components/NotFoundCard'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 export function NotFound() {
   useDocumentTitle('Page not found')
 
-  return (
-    <CenteredCard>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800 }}>
-        Page not found
-      </Typography>
-      <Typography color="textSecondary" gutterBottom>
-        That page doesn't exist.
-      </Typography>
-      <Link component={RouterLink} to="/" sx={{ display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
-        Go to Football Picks
-      </Link>
-    </CenteredCard>
-  )
+  return <NotFoundCard title="Page not found" message="That page doesn't exist." actionLabel="Go to Football Picks" to="/" />
 }

@@ -28,7 +28,7 @@ import { determineWeekWinner } from '../domain/weekWinner'
 import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
-import { CenteredCard } from './CenteredCard'
+import { NotFoundCard } from './NotFoundCard'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
@@ -210,10 +210,12 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
 
   if (!participant) {
     return (
-      <CenteredCard>
-        <Typography gutterBottom>Couldn't find {participantName} in this week's pool.</Typography>
-        <BackLink {...back} label="Back" />
-      </CenteredCard>
+      <NotFoundCard
+        title="Player not found"
+        message={`Couldn't find ${participantName} in this week's pool.`}
+        actionLabel="See this week's standings"
+        to={weekPath}
+      />
     )
   }
 

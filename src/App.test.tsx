@@ -146,6 +146,7 @@ describe('App routing', () => {
 
   it('shows a fallback for a game that does not exist in the week', () => {
     renderApp('/season/2026/week/1/game/nope')
+    expect(screen.getByRole('heading', { level: 1, name: 'Game not found' })).toBeInTheDocument()
     expect(screen.getByText(/couldn't find that game/i)).toBeInTheDocument()
   })
 
@@ -156,12 +157,14 @@ describe('App routing', () => {
 
   it('shows a not-found fallback for a season/week that does not exist', () => {
     renderApp('/season/1999/week/1')
+    expect(screen.getByRole('heading', { level: 1, name: 'Week not found' })).toBeInTheDocument()
     expect(screen.getByText(/isn't available/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /start over/i })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Go to the latest week' })).toHaveAttribute('href', '/season/2026/week/1')
   })
 
   it("shows a fallback within the pool's context for a participant that does not exist", () => {
     renderApp('/season/2026/week/1/participant/Nobody')
+    expect(screen.getByRole('heading', { level: 1, name: 'Player not found' })).toBeInTheDocument()
     expect(screen.getByText(/couldn't find nobody/i)).toBeInTheDocument()
   })
 
