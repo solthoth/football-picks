@@ -103,3 +103,28 @@ export function determineWeekWinner(pool: Pool): WeekWinnerResult {
   // still exactly even -- split the win among everyone left tied.
   return { winnerNames: closest.map((c) => c.name), reason: 'tied-co-winners' }
 }
+
+export interface TiebreakerOutcome {
+  game: Game
+  guess: number
+  /** The tiebreaker game's actual combined score. */
+  actualTotal: number
+  /** How far the guess was from the actual combined score (0 for an exact guess). */
+  difference: number
+}
+
+/**
+ * How a participant's combined-score guess turned out. Null until the tiebreaker game is final with both
+ * scores recorded, or when the participant made no guess.
+ */
+export function getTiebreakerOutcome(pool: Pool, participant: Participant): TiebreakerOutcome | null {
+  const game = getTiebreakerGame(pool)
+  if (!game || participant.tieBreakerTotalScore === null) return null
+
+  const result = pool.results[game.id]
+  if (!result || result.status !== 'final' || result.awayScore === null || result.homeScore === null) return null
+
+  const actualTotal = result.awayScore + result.homeScore
+  return { game, guess: participant.tieBreakerTotalScore, actualTotal, difference: Math.abs(participant.tieBreakerTotalScore - actualTotal) }
+}
+

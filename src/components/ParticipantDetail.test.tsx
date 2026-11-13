@@ -134,6 +134,35 @@ describe('ParticipantDetail mobile layout', () => {
   })
 })
 
+describe('ParticipantDetail tiebreaker result', () => {
+  // game_03 is the tiebreaker (last listed, no kickoff times known). Steve guessed 44.
+  const withMonday = (result: Pool['results'][string]): Pool => ({ ...pool, results: { ...pool.results, game_03: result } })
+  const tile = () => within(screen.getByRole('group', { name: /pick summary/i })).getByText('Tiebreaker guess').parentElement?.parentElement as HTMLElement
+
+  it('shows the actual combined score and how far off the guess was once the game is final', () => {
+    const final = withMonday({ kickoffTime: null, status: 'final', awayScore: 17, homeScore: 24, winner: 'Steelers' })
+    renderWithRouter(<ParticipantDetail pool={final} participantName="Steve" />)
+
+    expect(tile()).toHaveTextContent('Actual 41')
+    expect(tile()).toHaveTextContent('off by 3')
+  })
+
+  it('celebrates an exact guess', () => {
+    const final = withMonday({ kickoffTime: null, status: 'final', awayScore: 20, homeScore: 24, winner: 'Steelers' })
+    renderWithRouter(<ParticipantDetail pool={final} participantName="Steve" />)
+
+    expect(tile()).toHaveTextContent('Actual 44')
+    expect(tile()).toHaveTextContent('exact guess')
+  })
+
+  it('keeps showing "combined score" while the tiebreaker game is unfinished', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(tile()).toHaveTextContent('combined score')
+    expect(tile()).not.toHaveTextContent(/actual/i)
+  })
+})
+
 describe('ParticipantDetail game selection', () => {
   afterEach(() => {
     mockMatchMediaMatches(false)
