@@ -76,6 +76,12 @@ describe('scoresAsOfLabel', () => {
     expect(scoresAsOfLabel({ ...pool, resultsUpdatedAt: '2026-09-27T18:00:00Z' }, now)).toMatch(/^Scores as of /)
   })
 
+  it('names the timezone, since the pool can span several', () => {
+    expect(scoresAsOfLabel({ ...pool, resultsUpdatedAt: '2026-09-27T18:00:00Z' }, now)).toMatch(
+      /^Scores as of (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),? \d{1,2}:\d{2}\s(?:AM|PM) (?:[A-Z]{2,5}|GMT[+-]\d{1,2}(?::\d{2})?)/,
+    )
+  })
+
   it('warns when unfinished games have old data, but not when the week is final', () => {
     const old = '2026-09-27T17:00:00Z'
     expect(scoresAsOfLabel({ ...pool, resultsUpdatedAt: old }, now)).toContain('may be out of date')

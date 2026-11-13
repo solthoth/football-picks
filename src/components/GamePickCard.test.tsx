@@ -252,6 +252,23 @@ describe('GamePickCard text contrast', () => {
   })
 })
 
+describe('GamePickCard kickoff time', () => {
+  // The time is shown in the viewer's own timezone; naming it removes any doubt for a pool spread across zones.
+  const WITH_ZONE = /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),? \d{1,2}:\d{2}\s(?:AM|PM) (?:[A-Z]{2,5}|GMT[+-]\d{1,2}(?::\d{2})?)$/
+
+  it('names the timezone the kickoff time is shown in', () => {
+    render(<GamePickCard game={game({ kickoffTime: '2026-11-08T18:00:00Z' })} />)
+
+    expect(screen.getByText(WITH_ZONE)).toBeInTheDocument()
+  })
+
+  it('shows no time at all when the kickoff is unknown', () => {
+    render(<GamePickCard game={game({ kickoffTime: null })} />)
+
+    expect(screen.queryByText(WITH_ZONE)).not.toBeInTheDocument()
+  })
+})
+
 describe('GamePickCard team names', () => {
   const long = game({ away: 'Commanders', home: 'Buccaneers', status: 'final', awayScore: 24, homeScore: 17, winnerSide: 'away', crowd: 'upset' })
 

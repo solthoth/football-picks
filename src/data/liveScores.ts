@@ -56,7 +56,7 @@ export function scoresAsOfLabel(pool: Pool, now: number = Date.now()): string | 
   const updated = new Date(pool.resultsUpdatedAt)
   if (Number.isNaN(updated.getTime())) return null
 
-  const time = updated.toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' })
+  const time = updated.toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
   const stale = !isPoolFinal(pool) && now - updated.getTime() > STALE_AFTER_MS
   return `Scores as of ${time}${stale ? ' (may be out of date)' : ''}`
 }
