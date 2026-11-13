@@ -223,6 +223,8 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
   const { winnerNames } = determineWeekWinner(pool)
   const isWinner = winnerNames.includes(participant.name)
   const gamesCaption = `of ${summary.totalGames} games`
+  // Correct and Incorrect always show; Pending only while something is pending; Tiebreaker only with a guess.
+  const tileCount = 2 + (summary.pending > 0 ? 1 : 0) + (participant.tieBreakerTotalScore !== null ? 1 : 0)
   const tiebreaker = getTiebreakerOutcome(pool, participant)
   const tiebreakerCaption = tiebreaker
     ? `Actual ${tiebreaker.actualTotal} \u00b7 ${tiebreaker.difference === 0 ? 'exact guess' : `off by ${tiebreaker.difference}`}`
@@ -254,7 +256,7 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
           aria-label="Pick summary"
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${participant.tieBreakerTotalScore !== null ? 4 : 3}, 1fr)` },
+            gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${tileCount}, 1fr)` },
             gap: { xs: 1.5, md: 2 },
             m: 0,
             mt: 3,
@@ -262,7 +264,9 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
         >
           <SummaryTile label="Correct" value={summary.correct} icon={<CheckCircleIcon />} color="success" caption={gamesCaption} />
           <SummaryTile label="Incorrect" value={summary.incorrect} icon={<CancelIcon />} color="error" caption={gamesCaption} />
-          <SummaryTile label="Pending" value={summary.pending} icon={<AccessTimeIcon />} color="grey" caption={gamesCaption} />
+          {summary.pending > 0 && (
+            <SummaryTile label="Pending" value={summary.pending} icon={<AccessTimeIcon />} color="grey" caption={gamesCaption} />
+          )}
           {participant.tieBreakerTotalScore !== null && (
             <SummaryTile
               label="Tiebreaker guess"

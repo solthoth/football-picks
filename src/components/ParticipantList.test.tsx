@@ -71,7 +71,7 @@ describe('ParticipantList', () => {
     const { visited } = renderWithRouter(<ParticipantList pool={pool} />, { initialEntries: ['/week'] })
 
     const row = screen.getByText('Greg').closest('tr') as HTMLElement
-    await user.click(within(row).getByText(/pending/i))
+    await user.click(within(row).getByText('0 / 1'))
 
     expect(visited).toEqual(['/week', '/season/2026/week/1/participant/Greg'])
   })
@@ -308,3 +308,46 @@ describe('ParticipantList rank avatar contrast', () => {
     }
   })
 })
+
+describe('ParticipantList pending picks', () => {
+  const unfinished: Pool = {
+    ...poolWithWinner,
+    results: {
+      ...poolWithWinner.results,
+      game_02: { ...poolWithWinner.results.game_02, status: 'in_progress', winner: null },
+    },
+  }
+
+  afterEach(() => {
+    mockMatchMediaMatches(false)
+  })
+
+  it('has no Pending column once nothing is pending, instead of "0 pending" on every row', () => {
+    renderWithRouter(<ParticipantList pool={poolWithWinner} />)
+
+    expect(screen.queryByRole('columnheader', { name: /pending/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/\d+ pending/)).not.toBeInTheDocument()
+  })
+
+  it('shows the Pending column, with each row\'s count, while games are still unfinished', () => {
+    renderWithRouter(<ParticipantList pool={unfinished} />)
+
+    expect(screen.getByRole('columnheader', { name: /pending/i })).toBeInTheDocument()
+    expect(screen.getAllByText('1 pending')).toHaveLength(2)
+  })
+
+  it('shows how many games are left on each phone card while games are unfinished', () => {
+    mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantList pool={unfinished} />)
+
+    expect(screen.getAllByText('1 left')).toHaveLength(2)
+  })
+
+  it('shows nothing about remaining games on the phone cards once the week is final', () => {
+    mockMatchMediaMatches(true)
+    renderWithRouter(<ParticipantList pool={poolWithWinner} />)
+
+    expect(screen.queryByText(/\d+ left/)).not.toBeInTheDocument()
+  })
+})
+

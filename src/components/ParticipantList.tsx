@@ -41,6 +41,8 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
   const leaderboard = buildLeaderboard(pool)
   const { winnerNames } = determineWeekWinner(pool)
   const unranked = leaderboard.every((entry) => entry.rank === null)
+  // Once every pick is decided a Pending column would just say "0 pending" on every row.
+  const anyPending = leaderboard.some((entry) => entry.pending > 0)
   const scoresAsOf = scoresAsOfLabel(pool)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -94,6 +96,11 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
                     <Typography sx={{ fontWeight: 700, fontSize: { xs: '1.125rem', sm: '1.25rem' }, overflowWrap: 'anywhere' }}>
                       {entry.name}
                     </Typography>
+                    {entry.pending > 0 && (
+                      <Typography variant="body2" color="textSecondary">
+                        {entry.pending} left
+                      </Typography>
+                    )}
                   </Box>
                   <Chip label={`${entry.correct} / ${entry.totalGames}`} sx={{ flexShrink: 0, fontWeight: 700, fontSize: '1rem', height: 32 }} />
                   {winnerNames.includes(entry.name) && (
@@ -114,7 +121,7 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
                   <TableCell>Rank</TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell>Correct</TableCell>
-                  <TableCell>Pending</TableCell>
+                  {anyPending && <TableCell>Pending</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -148,7 +155,7 @@ export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
                     <TableCell>
                       <Chip label={`${entry.correct} / ${entry.totalGames}`} sx={{ fontWeight: 700, fontSize: '1.125rem', height: 36 }} />
                     </TableCell>
-                    <TableCell>{entry.pending} pending</TableCell>
+                    {anyPending && <TableCell>{entry.pending} pending</TableCell>}
                   </TableRow>
                 ))}
               </TableBody>
