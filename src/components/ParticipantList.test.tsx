@@ -109,6 +109,19 @@ describe('ParticipantList', () => {
     expect(screen.getByRole('button', { name: /share/i }).closest('header')).toHaveStyle({ position: 'sticky' })
   })
 
+  it('offers links to the neighbouring weeks when it is told which weeks exist', () => {
+    renderWithRouter(<ParticipantList pool={{ ...pool, week: 2 }} weeks={[1, 2, 3]} />)
+
+    expect(screen.getByRole('link', { name: 'Week 1 (previous week)' })).toHaveAttribute('href', '/season/2026/week/1')
+    expect(screen.getByRole('link', { name: 'Week 3 (next week)' })).toHaveAttribute('href', '/season/2026/week/3')
+  })
+
+  it('shows no week links when it is not told which weeks exist', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    expect(screen.queryByRole('navigation', { name: 'Switch week' })).not.toBeInTheDocument()
+  })
+
   it('links back to the season/week picker', () => {
     renderWithRouter(<ParticipantList pool={pool} />)
 

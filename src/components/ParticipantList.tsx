@@ -26,10 +26,13 @@ import { buildLeaderboard } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
 import { PageHeader } from './PageHeader'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
+import { WeekPager } from './WeekPager'
 import { WinnerBadge } from './WinnerBadge'
 
 interface ParticipantListProps {
   pool: Pool
+  /** Every week in this pool's season; when given, links to the neighbouring weeks are shown. */
+  weeks?: number[]
 }
 
 function rankAvatarSx(rank: number | null): SxProps<Theme> {
@@ -51,7 +54,7 @@ function RankAvatar({ rank, size, fontSize }: { rank: number | null; size: numbe
   return <Avatar sx={sx}>{rank}</Avatar>
 }
 
-export function ParticipantList({ pool }: ParticipantListProps) {
+export function ParticipantList({ pool, weeks = [] }: ParticipantListProps) {
   const navigate = useNavigate()
   const weekPath = `/season/${pool.season}/week/${pool.week}`
   const participantPath = (name: string) => `${weekPath}/participant/${encodeURIComponent(name)}`
@@ -85,6 +88,7 @@ export function ParticipantList({ pool }: ParticipantListProps) {
             Rankings start once the first game is final.
           </Typography>
         )}
+        <WeekPager season={pool.season} week={pool.week} weeks={weeks} />
         <Button
           variant="outlined"
           size="large"

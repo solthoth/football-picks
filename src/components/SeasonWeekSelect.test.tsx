@@ -162,3 +162,30 @@ describe('SeasonWeekSelect week layout', () => {
     expect(screen.getByRole('option', { name: 'Week 8' })).toHaveFocus()
   })
 })
+
+describe('SeasonWeekSelect initial selection', () => {
+  it('preselects the given week instead of the latest', () => {
+    render(<SeasonWeekSelect pools={singleSeasonPools} onSelect={vi.fn()} initial={{ season: 2026, week: 2 }} />)
+
+    expect(screen.getByRole('option', { name: 'Week 2' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('option', { name: 'Week 3' })).toHaveAttribute('aria-selected', 'false')
+  })
+
+  it('preselects the season and week together when there are several seasons', () => {
+    render(<SeasonWeekSelect pools={multiSeasonPools} onSelect={vi.fn()} initial={{ season: 2025, week: 1 }} />)
+
+    expect(screen.getByRole('button', { name: '2025' })).toHaveClass('MuiChip-filled')
+    expect(screen.getByRole('option', { name: 'Week 1' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.queryByRole('option', { name: 'Week 3' })).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['a week that is not in the data', { season: 2026, week: 99 }],
+    ['a season that is not in the data', { season: 1999, week: 1 }],
+    ['nothing', undefined],
+  ])('falls back to the latest week for %s', (_name, initial) => {
+    render(<SeasonWeekSelect pools={singleSeasonPools} onSelect={vi.fn()} initial={initial} />)
+
+    expect(screen.getByRole('option', { name: 'Week 3' })).toHaveAttribute('aria-selected', 'true')
+  })
+})
