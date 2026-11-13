@@ -75,6 +75,12 @@ describe('ParticipantDetail', () => {
     expect(screen.getByText('Week Winner')).toBeInTheDocument()
   })
 
+  it('announces a winner by name and week, not as "you"', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByText('Steve won Week 1!')).toBeInTheDocument()
+  })
+
   it('shows no winner badge while a non-tiebreaker game is still in progress', () => {
     const pendingPool: Pool = {
       ...pool,

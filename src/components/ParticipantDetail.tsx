@@ -224,7 +224,7 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
-      <WinnerCelebration participantName={participant.name} isWinner={isWinner} />
+      <WinnerCelebration participantName={participant.name} week={pool.week} isWinner={isWinner} />
 
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
