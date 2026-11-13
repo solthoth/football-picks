@@ -9,6 +9,15 @@ export const POLL_INTERVAL_MS = 60_000
 // shows current scores immediately instead of flashing the bundled ones.
 const cache = new Map<string, LiveScores>()
 
+/** The last live scores fetched for a week (by any screen), or undefined. Shared with the season view. */
+export function cachedLiveScores(season: number, week: number): LiveScores | undefined {
+  return cache.get(`${season}-${week}`)
+}
+
+export function cacheLiveScores(season: number, week: number, scores: LiveScores) {
+  cache.set(`${season}-${week}`, scores)
+}
+
 /**
  * Returns the pool with live scores overlaid. Uses the bundled data as-is
  * when no scores URL is configured, when the fetch fails, or once every game
@@ -33,7 +42,7 @@ export function useLivePool(pool: Pool | undefined, baseUrl: string | undefined 
       try {
         const live = await fetchLiveScores(baseUrl, season, week, controller.signal)
         if (live) {
-          cache.set(`${season}-${week}`, live)
+          cacheLiveScores(season, week, live)
           setFetched({ key: `${season}-${week}`, scores: live })
         }
       } catch {
