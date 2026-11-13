@@ -17,9 +17,12 @@ Reviewed 2026-11-12 against `main` (`5bf44a9`), running locally with live scores
 | 8 | Home forgets the week; no week-to-week links | ✅ Done |
 | 9 | No persistent navigation on long mobile pages | ✅ Done |
 | 13 | Error pages inconsistent and thin | ✅ Done |
-| 5, 7, 12, 14–17, 19–23 | Everything else | Open |
+| 5 | No season view | ✅ Done |
+| 12 | Tiebreaker guess shown without the answer | ✅ Done |
+| 22 | Shared links have no preview | ✅ Done (preview not yet seen in a real chat app) |
+| 7, 14–17, 19–21, 23 | Everything else | Open |
 
-Findings 1–4 (branch `feat/ux-quick-wins-1-4`) 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`), and 6, 8, 9 and 13 (branch `feat/ux-navigation-6-8-9-13`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
+Findings 1–4 (branch `feat/ux-quick-wins-1-4`) 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`), 6, 8, 9 and 13 (branch `feat/ux-navigation-6-8-9-13`), and 5, 12 and 22 (branch `feat/ux-features-5-12-22`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
 
 ## How it was reviewed
 
@@ -137,6 +140,19 @@ The app only answers "who is winning this week". There is no cumulative leaderbo
 
 - Add a season standings page (total correct, weeks won, winnings) linked from the home card.
 
+> **Status: ✅ Done.** A new page at `/season/:season`, linked from the home card ("Season 2026 standings"). See [mobile-season-standings.png](ux-review/mobile-season-standings.png) and [desktop-home-season-link.png](ux-review/desktop-home-season-link.png).
+>
+> - **Leaderboard:** weeks won, winnings and correct picks per person (a table on larger screens, cards on phones), with the same gold, silver and bronze ranks and neutral unranked state as the weekly page.
+> - **Ranking:** the pool is winner-take-all each week, so it leads with money won, then weeks won, then correct picks, then name. A week's pot goes to its winner and is split equally between co-winners (each still counts the win), reusing the existing tiebreak rules.
+> - **Week by week** (not in the original finding): a list of every week's winners and payout that links into that week, so the page is also a way to browse the season.
+> - **Honest loading:** only Weeks 1 and 2 are mostly final in the bundled data; later weeks only have real results as live scores. The page loads every week's live scores, says "Loading the latest scores…" while it does, and warns which weeks failed to load instead of showing wrong totals. Finished weeks are not fetched again, and only weeks still in progress are polled.
+>
+> **Verified on live data:** the money matches the weekly pots (9 decided weeks, $1,575 paid out), and each person's correct picks match the sum of their weekly standings pages.
+>
+> *Worth knowing:* "correct / decided" excludes a **tied** game, since a tie decides nobody's pick. The weekly page's denominator counts it (Week 5 has a 27-27 tie, so a weekly total reads "x / 15" where the season sums 14). Both are right; they just count different things.
+>
+> *Not included:* a per-person season page, and a pager between seasons.
+
 ### Medium
 
 **6. The week picker hides earlier weeks with little affordance** (both, worse on desktop)
@@ -202,12 +218,16 @@ The banner says "Congratulations, Jose! You're a Week Winner!" to whoever opens 
 - Fire confetti once per week per browser (remember it in `localStorage`).
 
 > **Status: ✅ Done for the wording; the confetti suggestion was deliberately not taken.** The banner now reads "Jose won Week 9!" (it needed the week, so `WinnerCelebration` takes a new `week` prop). Confetti still fires on every load of a winner's page, by the owner's decision, and a test now pins that existing behaviour so it cannot change by accident.
+>
+> *Follow-up:* the second burst is scheduled 150 ms after the first and was never cancelled, so leaving the page in that window still fired confetti on the next screen. That also caused an intermittent test failure. The burst is now cancelled when the page is left (covered by tests), and the behaviour is otherwise unchanged.
 
 **12. The tiebreaker guess is shown without the answer** (both)
 
 "Tiebreaker guess: 48 combined score" never shows the actual combined score or how close the guess was, even when the week is final and the tiebreaker decided the winner.
 
 - Once the tiebreaker game is final, show the actual total and the difference.
+
+> **Status: ✅ Done.** The tile's caption now reads "Actual 29 · off by 25" (or "Actual 44 · exact guess") once the tiebreaker game is final with both scores recorded, and still says "combined score" before then. A new `getTiebreakerOutcome` in the domain does the arithmetic. Checked on live data: Week 9's Monday game (Bills 23, Vikings 6) gives "Actual 29" against a guess of 54.
 
 **13. Error pages are inconsistent and thin** (both)
 
@@ -259,6 +279,14 @@ Scores poll every 60 seconds and pull-to-refresh is touch-only. A small refresh 
 **22. Shared links have no preview** (both)
 There are no Open Graph tags, so a link pasted into a group chat shows a bare URL. Sharing is a primary action here; a static `og:title`, `og:description` and `og:image` would cover every route.
 
+> **Status: ✅ Done, but not yet seen in a real chat app.** `index.html` now carries Open Graph and X/Twitter card tags (title, the same description as the page's own, and a 1200 × 630 image with an alt text), and `public/og-image.png` is a flat, 62 KB branded image (no NFL marks) so it stays under the roughly 300 KB some chat apps allow.
+>
+> - **No `og:url` or canonical link, on purpose.** The site is one static page behind client-side routing, so one fixed URL would make every shared deep link point at a single page. Crawlers use the URL that was actually shared.
+> - **The same preview for every route.** Crawlers do not run JavaScript, so a shared standings link shows the generic site preview, not that week's numbers. Per-page previews would need server-side rendering or pre-built pages, which is a larger change.
+> - **Hosting:** the image is served with `Cross-Origin-Resource-Policy: cross-origin` (the global `same-origin` policy would tell browsers not to embed it elsewhere), a day-long cache, and is kept out of the SPA fallback.
+>
+> **Still to check after the next deploy:** paste a link into a real chat app, or use the Facebook Sharing Debugger or a similar validator, to confirm the preview renders. The tags, the image size and the hosting overrides are covered by tests, but I could not see the result in a real crawler from here.
+
 **23. Pick names are cut to a letter or two at 320 px** (mobile)
 On the participant page at 320 px the pick name gets only 47 px of room beside the 56 px team logo and the 72 px outcome column, but needs 89-100 px, so names show as "Ja…", "Be…" and "Br…". See [mobile-320-participant.png](ux-review/mobile-320-participant.png). Found while verifying finding 18. Let the name wrap or shrink, or give the logo and outcome column less room on very narrow screens.
 
@@ -266,5 +294,5 @@ On the participant page at 320 px the pick name gets only 47 px of room beside t
 
 1. **Quick wins (small, low risk):** ~~1, 2, 4, 10, 11, 18~~ (all done).
 2. **Navigation and structure:** ~~3, 6, 8, 9, 13~~ (all done).
-3. **Feature work:** findings 5, 12, 22.
+3. **Feature work:** ~~5, 12, 22~~ (all done).
 4. **Polish:** the remaining low-severity items.
