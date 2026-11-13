@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
-import { determineWeekWinner, getTiebreakerGame } from './weekWinner'
+import { determineWeekWinner, getTiebreakerGame, getTiebreakerOutcome } from './weekWinner'
 
 // game_03 is the tiebreaker (Monday) game: it kicks off latest, and by
 // convention is also last in the games list.
@@ -186,5 +186,53 @@ describe('determineWeekWinner', () => {
       },
     })
     expect(determineWeekWinner(pool)).toEqual({ winnerNames: [], reason: 'unresolved' })
+  })
+})
+
+describe('getTiebreakerOutcome', () => {
+  const guesser = (tieBreakerTotalScore: number | null) => ({ name: 'A', picks: {}, tieBreakerTotalScore })
+  const poolWithTiebreaker = (result: Pool['results'][string]) =>
+    basePool({
+      results: {
+        game_01: { kickoffTime: '2026-09-13T17:00:00Z', status: 'final', awayScore: 1, homeScore: 0, winner: 'Patriots' },
+        game_02: { kickoffTime: '2026-09-13T20:00:00Z', status: 'final', awayScore: 1, homeScore: 0, winner: '49ers' },
+        game_03: result,
+      },
+    })
+  const finalMonday = { kickoffTime: '2026-09-14T23:00:00Z', status: 'final', awayScore: 17, homeScore: 24, winner: 'Steelers' } as const
+
+  it('gives the actual combined score and how far off the guess was, once the tiebreaker game is final', () => {
+    expect(getTiebreakerOutcome(poolWithTiebreaker(finalMonday), guesser(44))).toEqual({
+      game: GAMES[2],
+      guess: 44,
+      actualTotal: 41,
+      difference: 3,
+    })
+  })
+
+  it('measures the difference the same way for a guess that was too low', () => {
+    expect(getTiebreakerOutcome(poolWithTiebreaker(finalMonday), guesser(38))?.difference).toBe(3)
+  })
+
+  it('reports an exact guess as a difference of zero', () => {
+    expect(getTiebreakerOutcome(poolWithTiebreaker(finalMonday), guesser(41))?.difference).toBe(0)
+  })
+
+  it('has no outcome while the tiebreaker game is unfinished', () => {
+    const live = { kickoffTime: '2026-09-14T23:00:00Z', status: 'in_progress', awayScore: 10, homeScore: 7, winner: null } as const
+    expect(getTiebreakerOutcome(poolWithTiebreaker(live), guesser(44))).toBeNull()
+  })
+
+  it('has no outcome for someone who made no guess', () => {
+    expect(getTiebreakerOutcome(poolWithTiebreaker(finalMonday), guesser(null))).toBeNull()
+  })
+
+  it('has no outcome when the final game has no scores recorded', () => {
+    const noScores = { kickoffTime: '2026-09-14T23:00:00Z', status: 'final', awayScore: null, homeScore: null, winner: 'Steelers' } as const
+    expect(getTiebreakerOutcome(poolWithTiebreaker(noScores), guesser(44))).toBeNull()
+  })
+
+  it('has no outcome for a pool with no games', () => {
+    expect(getTiebreakerOutcome(basePool({ games: [] }), guesser(44))).toBeNull()
   })
 })

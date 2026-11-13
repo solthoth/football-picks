@@ -24,7 +24,7 @@ import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import type { PickOutcome } from '../domain/standings'
 import { accentTextColor } from '../theme'
-import { determineWeekWinner } from '../domain/weekWinner'
+import { determineWeekWinner, getTiebreakerOutcome } from '../domain/weekWinner'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
 import { NotFoundCard } from './NotFoundCard'
@@ -223,6 +223,10 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
   const { winnerNames } = determineWeekWinner(pool)
   const isWinner = winnerNames.includes(participant.name)
   const gamesCaption = `of ${summary.totalGames} games`
+  const tiebreaker = getTiebreakerOutcome(pool, participant)
+  const tiebreakerCaption = tiebreaker
+    ? `Actual ${tiebreaker.actualTotal} \u00b7 ${tiebreaker.difference === 0 ? 'exact guess' : `off by ${tiebreaker.difference}`}`
+    : 'combined score'
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
@@ -265,7 +269,7 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
               value={participant.tieBreakerTotalScore}
               icon={<SportsFootballIcon />}
               color="primary"
-              caption="combined score"
+              caption={tiebreakerCaption}
             />
           )}
         </Box>
