@@ -58,6 +58,13 @@ describe('PicksDashboard', () => {
     }
   })
 
+  it('keeps back and share in a sticky header', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />)
+
+    expect(screen.getByRole('link', { name: 'Back to standings' }).closest('header')).toHaveStyle({ position: 'sticky' })
+    expect(screen.getByRole('button', { name: /share/i }).closest('header')).toHaveStyle({ position: 'sticky' })
+  })
+
   it('links back to the standings', () => {
     renderWithRouter(<PicksDashboard pool={pool()} />)
 

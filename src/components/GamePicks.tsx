@@ -20,12 +20,11 @@ import { groupPicksForGame } from '../domain/gamePicks'
 import { computePickDistribution } from '../domain/pickDistribution'
 import type { Side } from '../domain/pickDistribution'
 import { determineWeekWinner } from '../domain/weekWinner'
-import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { NotFoundCard } from './NotFoundCard'
 import { GamePickCard } from './GamePickCard'
+import { PageHeader } from './PageHeader'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
-import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
 
@@ -135,14 +134,10 @@ export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
-        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <BackLink {...back} sx={{ ml: -1 }} />
-          <ShareButton
-            url={shareUrl}
-            title={`${game.away} at ${game.home} picks`}
-            text={`See who picked ${game.away} and ${game.home} in Season ${pool.season}, Week ${pool.week}`}
-          />
-        </Stack>
+        <PageHeader
+          back={back}
+          share={{ url: shareUrl, title: `${game.away} at ${game.home} picks`, text: `See who picked ${game.away} and ${game.home} in Season ${pool.season}, Week ${pool.week}` }}
+        />
 
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
           {game.away} @ {game.home}

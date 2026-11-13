@@ -180,6 +180,13 @@ describe('ParticipantDetail game selection', () => {
     expect(screen.getByRole('link', { name: 'See who picked 49ers at Rams' })).toHaveAttribute('href', '/season/2026/week/1/game/game_02')
   })
 
+  it('keeps back and share in a sticky header', () => {
+    renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
+
+    expect(screen.getByRole('link', { name: 'Back to participants' }).closest('header')).toHaveStyle({ position: 'sticky' })
+    expect(screen.getByRole('button', { name: /share/i }).closest('header')).toHaveStyle({ position: 'sticky' })
+  })
+
   it('links back to the participants by default', () => {
     renderWithRouter(<ParticipantDetail pool={pool} participantName="Steve" />)
 

@@ -92,6 +92,13 @@ describe('GamePicks', () => {
     expect(screen.queryByText(/Won|Lost/)).not.toBeInTheDocument()
   })
 
+  it('keeps back and share in a sticky header', () => {
+    renderPicks()
+
+    expect(screen.getByRole('link', { name: 'Back to dashboard' }).closest('header')).toHaveStyle({ position: 'sticky' })
+    expect(screen.getByRole('button', { name: /share/i }).closest('header')).toHaveStyle({ position: 'sticky' })
+  })
+
   it('links back to the dashboard by default', () => {
     renderPicks()
 

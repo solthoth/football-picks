@@ -25,12 +25,11 @@ import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import type { PickOutcome } from '../domain/standings'
 import { accentTextColor } from '../theme'
 import { determineWeekWinner } from '../domain/weekWinner'
-import { BackLink } from './BackLink'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
 import { NotFoundCard } from './NotFoundCard'
+import { PageHeader } from './PageHeader'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
-import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
 import { WinnerCelebration } from './WinnerCelebration'
@@ -230,14 +229,10 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
       <WinnerCelebration participantName={participant.name} week={pool.week} isWinner={isWinner} />
 
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
-        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <BackLink {...back} sx={{ ml: -1 }} />
-          <ShareButton
-            url={shareUrl}
-            title={`${participant.name}'s picks`}
-            text={`${participant.name}'s picks for Season ${pool.season}, Week ${pool.week}`}
-          />
-        </Stack>
+        <PageHeader
+          back={back}
+          share={{ url: shareUrl, title: `${participant.name}'s picks`, text: `${participant.name}'s picks for Season ${pool.season}, Week ${pool.week}` }}
+        />
 
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
           <Typography variant="h3" component="h1" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>

@@ -102,6 +102,13 @@ describe('ParticipantList', () => {
     }
   })
 
+  it('keeps back and share in a sticky header', () => {
+    renderWithRouter(<ParticipantList pool={pool} />)
+
+    expect(screen.getByRole('link', { name: /change season\/week/i }).closest('header')).toHaveStyle({ position: 'sticky' })
+    expect(screen.getByRole('button', { name: /share/i }).closest('header')).toHaveStyle({ position: 'sticky' })
+  })
+
   it('links back to the season/week picker', () => {
     renderWithRouter(<ParticipantList pool={pool} />)
 
