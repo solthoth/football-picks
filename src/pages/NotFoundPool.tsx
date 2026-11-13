@@ -1,18 +1,19 @@
-import Link from '@mui/material/Link'
-import Typography from '@mui/material/Typography'
-import { Link as RouterLink } from 'react-router-dom'
-import { CenteredCard } from '../components/CenteredCard'
+import { NotFoundCard } from '../components/NotFoundCard'
+import { pools } from '../data/pools'
+import { latestPool } from '../data/weeks'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
+/** Shown for a season/week that is not in the data. Points at the latest week, the most likely thing the visitor wanted. */
 export function NotFoundPool() {
   useDocumentTitle('Week not found')
+  const latest = latestPool(pools)
 
   return (
-    <CenteredCard>
-      <Typography gutterBottom>That season/week isn't available.</Typography>
-      <Link component={RouterLink} to="/" sx={{ display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
-        Start over
-      </Link>
-    </CenteredCard>
+    <NotFoundCard
+      title="Week not found"
+      message="That season/week isn't available."
+      actionLabel={latest ? 'Go to the latest week' : 'Go to Football Picks'}
+      to={latest ? `/season/${latest.season}/week/${latest.week}` : '/'}
+    />
   )
 }
