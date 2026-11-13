@@ -13,9 +13,13 @@ Reviewed 2026-11-12 against `main` (`5bf44a9`), running locally with live scores
 | 10 | Mobile tap targets under 44 px | ✅ Done |
 | 11 | Winner banner addressed to the wrong person | ✅ Done (confetti unchanged by decision) |
 | 18 | Titles wrap awkwardly on phones | ✅ Done |
-| 5–9, 12–17, 19–23 | Everything else | Open |
+| 6 | Week picker hides earlier weeks | ✅ Done |
+| 8 | Home forgets the week; no week-to-week links | ✅ Done |
+| 9 | No persistent navigation on long mobile pages | ✅ Done |
+| 13 | Error pages inconsistent and thin | ✅ Done |
+| 5, 7, 12, 14–17, 19–23 | Everything else | Open |
 
-Findings 1–4 (branch `feat/ux-quick-wins-1-4`) and 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
+Findings 1–4 (branch `feat/ux-quick-wins-1-4`) 10, 11 and 18 (branch `feat/ux-quick-wins-10-11-18`), and 6, 8, 9 and 13 (branch `feat/ux-navigation-6-8-9-13`) were implemented test-first (red, then green). Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
 
 ## How it was reviewed
 
@@ -142,6 +146,8 @@ On desktop only Weeks 6–10 are visible and 470 px of the rail is scrolled off 
 - On desktop, wrap the tiles into a grid (ten weeks fit in two rows), or add previous/next arrow buttons.
 - On mobile, the swipe rail is fine; a partially visible tile on the left already signals more.
 
+> **Status: ✅ Done.** From the `sm` breakpoint up, the week tiles wrap into a centred grid, so ten weeks show as two rows of five and nothing is hidden (the card is a little wider there to fit five per row). Phones keep the compact swipeable rail. The layout switches with `useMediaQuery`, like the participant list, so both modes are covered by tests. Checked in a browser at 1440, 768, 390 and 320 px. See [desktop-home-week-grid.png](ux-review/desktop-home-week-grid.png).
+
 **7. Share gives no confirmation on desktop** (desktop)
 
 Clicking Share produced no snackbar and did not change the clipboard. The code calls `navigator.share` whenever it exists, and current desktop Chrome, Edge and Safari all expose it, so desktop users get the OS share sheet instead of a copied link. The sheet itself cannot be seen under automation, so confirm this by hand.
@@ -155,11 +161,20 @@ After opening Week 9 and pressing back, the picker has Week 10 selected again. T
 - Preselect the week the user just came from.
 - Add previous/next week controls on the standings page so comparing weeks does not require a trip home.
 
+> **Status: ✅ Done.**
+>
+> - **Home remembers the week.** The app notes which week is open on any of its screens, and the home page reopens on it, with that week's player count and pot. It is kept in memory for the page load, so a reload starts fresh on the latest week. An unknown week or season falls back to the latest.
+> - **Week-to-week links.** A new `WeekPager` on the standings page links to the previous and next weeks that exist (gaps are skipped, and each end is hidden at the first and last week). They are real links with 44 px targets and labels like "Week 4 (previous week)", with contrast of 4.6:1 in light mode and 10.7:1 in dark.
+>
+> *Left as is:* the pager is on the standings page only, as the finding asked; the dashboard does not have one yet. Verified on live data in a browser.
+
 **9. Long pages have no persistent navigation on mobile** (mobile)
 
 The Week 10 dashboard is 4.7 screens tall and a participant page is 3.5. The back button and Share exist only at the very top. See [mobile-dash-w10.png](ux-review/mobile-dash-w10.png).
 
 - Make the header row (back and share) sticky, or add a "back to top" control.
+
+> **Status: ✅ Done (sticky header; no "back to top" control).** A new `PageHeader` holds the back link and Share and sticks to the top of the screen. It replaces four copies of the same row. It spans the card padding, has an opaque background in both colour schemes and a hairline divider, and its z-index keeps it above content but below dialogs and the winner banner. It applies at every width, since long pages exist on desktop too. Checked in a browser: on every screen at 390 and 1440 px it stays at the top after scrolling to the bottom (the dashboard is 4.8 phone screens tall), and the back link still works while stuck.
 
 **10. Several mobile tap targets are under 44 px** (mobile)
 
@@ -176,6 +191,8 @@ The Week 10 dashboard is 4.7 screens tall and a participant page is 3.5. The bac
 > **Status: ✅ Done.** The app theme now gives every `Button` and `ToggleButton` a 44 px minimum height, so existing and future buttons get it without per-call styling (Share, the back buttons, the sort toggle and "See how the pool picked" are all covered). The season chips (40 px) and the two not-found links get 44 px explicitly. The sort toggle's own inline 40 px, which would have overridden the theme, was removed.
 >
 > A browser audit of 122 controls across 12 routes at 390 px finds none under 44 × 44. *Not covered:* the transient winner banner's close "×", which auto-dismisses after 2.5 seconds. The rule applies at every width rather than only on touch screens, so desktop buttons are slightly taller too.
+>
+> *Found later, not fixed:* at tablet and desktop widths (the table layout, 600 px and up) the participant-name and matchup *links* inside table rows are 26–29 px tall. The whole row is clickable and about 77 px tall, so the practical tap target is large, but the link element itself is under 44 px. The 390 px audit above did not see this because phones use cards.
 
 **11. The winner celebration is addressed to the wrong person and repeats** (both)
 
@@ -197,6 +214,17 @@ The banner says "Congratulations, Jose! You're a Week Winner!" to whoever opens 
 The four error states use different controls (a text link on two, a button on the other two), three have no heading at all, and none offers a useful next step. See [mobile-bad-week.png](ux-review/mobile-bad-week.png).
 
 - Give each an `h1`, one consistent primary button, and a helpful target: the latest week for a bad week, the week's standings for an unknown player or game.
+
+> **Status: ✅ Done.** A shared `NotFoundCard` gives every "can't find that" screen an `h1`, one sentence and a single primary button that is a real link:
+>
+> | Error | Heading | Button goes to |
+> |---|---|---|
+> | Unknown page | Page not found | Home |
+> | Unknown week | Week not found | The latest week (home if there is no data) |
+> | Unknown game | Game not found | That week's games |
+> | Unknown player | Player not found | That week's standings |
+>
+> The headings match the document titles added for finding 2. See [mobile-week-not-found.png](ux-review/mobile-week-not-found.png). A browser pass over all four states confirmed one heading and one primary action each.
 
 ### Low
 
@@ -237,6 +265,6 @@ On the participant page at 320 px the pick name gets only 47 px of room beside t
 ## Suggested order of work
 
 1. **Quick wins (small, low risk):** ~~1, 2, 4, 10, 11, 18~~ (all done).
-2. **Navigation and structure:** ~~3~~ (done), 6, 8, 9, 13.
+2. **Navigation and structure:** ~~3, 6, 8, 9, 13~~ (all done).
 3. **Feature work:** findings 5, 12, 22.
 4. **Polish:** the remaining low-severity items.
