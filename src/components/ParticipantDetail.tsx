@@ -1,13 +1,12 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import SportsFootballIcon from '@mui/icons-material/SportsFootball'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Container from '@mui/material/Container'
+import MuiLink from '@mui/material/Link'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -19,12 +18,15 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import type { KeyboardEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import type { GameStatus, Pool } from '../data/types'
 import { getPickOutcomes, summarizeOutcomes } from '../domain/standings'
 import type { PickOutcome } from '../domain/standings'
 import { determineWeekWinner } from '../domain/weekWinner'
-import { CardOverlayButton } from './CardOverlayButton'
+import { BackLink } from './BackLink'
+import type { BackState } from './backNavigation'
+import { CardOverlayLink } from './CardOverlayLink'
 import { CenteredCard } from './CenteredCard'
 import { ShareButton } from './ShareButton'
 import { TeamLogo } from './TeamLogo'
@@ -34,9 +36,7 @@ import { WinnerCelebration } from './WinnerCelebration'
 interface ParticipantDetailProps {
   pool: Pool
   participantName: string
-  onBack: () => void
   /** When set, each game (mobile card / desktop row) opens the who-picked-what view for that game. */
-  onSelectGame?: (gameId: string) => void
   /** Label for the back button; defaults to the standings. */
   backLabel?: string
 }
@@ -187,19 +187,22 @@ function SummaryTile({ label, value, icon, color, caption }: SummaryTileProps) {
   )
 }
 
-export function ParticipantDetail({ pool, participantName, onBack, onSelectGame, backLabel = 'Back to participants' }: ParticipantDetailProps) {
+export function ParticipantDetail({ pool, participantName, backLabel }: ParticipantDetailProps) {
   const participant = pool.participants.find((p) => p.name === participantName)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}/participant/${encodeURIComponent(participantName)}`
+  const navigate = useNavigate()
+  const weekPath = `/season/${pool.season}/week/${pool.week}`
+  const shareUrl = `${window.location.origin}${weekPath}/participant/${encodeURIComponent(participantName)}`
+  const back = { to: weekPath, label: backLabel ?? 'Back to participants', pop: backLabel !== undefined }
+  const gamePath = (gameId: string) => `${weekPath}/game/${encodeURIComponent(gameId)}`
+  const gameState: BackState = { backLabel: `Back to ${participantName}` }
 
   if (!participant) {
     return (
       <CenteredCard>
         <Typography gutterBottom>Couldn't find {participantName} in this week's pool.</Typography>
-        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack}>
-          Back
-        </Button>
+        <BackLink {...back} label="Back" />
       </CenteredCard>
     )
   }
@@ -216,9 +219,7 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
 
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-            {backLabel}
-          </Button>
+          <BackLink {...back} sx={{ ml: -1 }} />
           <ShareButton
             url={shareUrl}
             title={`${participant.name}'s picks`}
@@ -304,12 +305,11 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
                     awayScore={result?.awayScore ?? null}
                     homeScore={result?.homeScore ?? null}
                   />
-                  {onSelectGame && (
-                    <CardOverlayButton
-                      label={`See who picked ${outcome.away} at ${outcome.home}`}
-                      onClick={() => onSelectGame(outcome.gameId)}
-                    />
-                  )}
+                  <CardOverlayLink
+                    label={`See who picked ${outcome.away} at ${outcome.home}`}
+                    to={gamePath(outcome.gameId)}
+                    state={gameState}
+                  />
                 </Card>
               )
             })}
@@ -332,24 +332,25 @@ export function ParticipantDetail({ pool, participantName, onBack, onSelectGame,
                     <TableRow
                       key={outcome.gameId}
                       hover
-                      {...(onSelectGame && {
-                        onClick: () => onSelectGame(outcome.gameId),
-                        tabIndex: 0,
-                        onKeyDown: (e: KeyboardEvent<HTMLTableRowElement>) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            onSelectGame(outcome.gameId)
-                          }
-                        },
-                        sx: { cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: -2 } },
-                      })}
+                      // Convenience only: the matchup link is the real, focusable target.
+                      onClick={(event) => {
+                        if ((event.target as HTMLElement).closest('a')) return
+                        navigate(gamePath(outcome.gameId), { state: gameState })
+                      }}
+                      sx={{ cursor: 'pointer' }}
                     >
                       <TableCell sx={{ whiteSpace: 'nowrap' }}>
                         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
                           <TeamLogo team={outcome.away} size={36} />
-                          <Typography component="span" color="textSecondary" sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
+                          <MuiLink
+                            component={RouterLink}
+                            to={gamePath(outcome.gameId)}
+                            state={gameState}
+                            underline="hover"
+                            sx={{ color: 'text.secondary', whiteSpace: 'nowrap', fontSize: 'inherit', '&:focus-visible': { outline: '2px solid', outlineOffset: 2 } }}
+                          >
                             {outcome.away} @ {outcome.home}
-                          </Typography>
+                          </MuiLink>
                           <TeamLogo team={outcome.home} size={36} />
                         </Stack>
                       </TableCell>

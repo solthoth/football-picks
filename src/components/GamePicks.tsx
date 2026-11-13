@@ -1,9 +1,7 @@
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
 import Container from '@mui/material/Container'
@@ -15,12 +13,15 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useId } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { groupPicksForGame } from '../domain/gamePicks'
 import { computePickDistribution } from '../domain/pickDistribution'
 import type { Side } from '../domain/pickDistribution'
 import { determineWeekWinner } from '../domain/weekWinner'
+import { BackLink } from './BackLink'
+import type { BackState } from './backNavigation'
 import { CenteredCard } from './CenteredCard'
 import { GamePickCard } from './GamePickCard'
 import { ShareButton } from './ShareButton'
@@ -30,9 +31,7 @@ import { WinnerBadge } from './WinnerBadge'
 interface GamePicksProps {
   pool: Pool
   gameId: string
-  onBack: () => void
-  onSelectParticipant: (participantName: string) => void
-  /** Label for the back button; defaults to the pick dashboard. */
+  /** Set (by the screen we came from) to return there instead of to the dashboard; a plain click then pops history. */
   backLabel?: string
 }
 
@@ -43,10 +42,13 @@ interface PickerGroupProps {
   /** true/false once the game is final with a winner; null while undecided. */
   won: boolean | null
   winnerNames: string[]
-  onSelectParticipant: (participantName: string) => void
+  /** Path of the week these picks belong to, e.g. /season/2026/week/4. */
+  weekPath: string
+  /** "Away @ Home", used to label the way back from a participant page. */
+  matchup: string
 }
 
-function PickerGroup({ side, team, names, won, winnerNames, onSelectParticipant }: PickerGroupProps) {
+function PickerGroup({ side, team, names, won, winnerNames, weekPath, matchup }: PickerGroupProps) {
   const headingId = useId()
   const accent = won === true ? 'success.main' : won === false ? 'error.main' : 'divider'
 
@@ -83,7 +85,12 @@ function PickerGroup({ side, team, names, won, winnerNames, onSelectParticipant 
         <List disablePadding sx={{ borderTop: 1, borderColor: 'divider' }}>
           {names.map((name) => (
             <ListItem key={name} disablePadding divider>
-              <ListItemButton onClick={() => onSelectParticipant(name)} sx={{ minHeight: 52, px: 2 }}>
+              <ListItemButton
+                component={RouterLink}
+                to={`${weekPath}/participant/${encodeURIComponent(name)}`}
+                state={{ backLabel: `Back to ${matchup}` } satisfies BackState}
+                sx={{ minHeight: 52, px: 2 }}
+              >
                 <ListItemText primary={name} slotProps={{ primary: { sx: { fontWeight: 600, fontSize: '1.125rem' } } }} />
                 {winnerNames.includes(name) && (
                   <Box sx={{ mr: 1 }}>
@@ -100,7 +107,9 @@ function PickerGroup({ side, team, names, won, winnerNames, onSelectParticipant 
   )
 }
 
-export function GamePicks({ pool, gameId, onBack, onSelectParticipant, backLabel = 'Back to dashboard' }: GamePicksProps) {
+export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
+  const weekPath = `/season/${pool.season}/week/${pool.week}`
+  const back = { to: `${weekPath}/dashboard`, label: backLabel ?? 'Back to dashboard', pop: backLabel !== undefined }
   const groups = groupPicksForGame(pool, gameId)
   const distribution = groups ? computePickDistribution(pool).games.find((g) => g.gameId === gameId) : undefined
 
@@ -108,9 +117,7 @@ export function GamePicks({ pool, gameId, onBack, onSelectParticipant, backLabel
     return (
       <CenteredCard>
         <Typography gutterBottom>Couldn't find that game in this week's pool.</Typography>
-        <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack}>
-          {backLabel}
-        </Button>
+        <BackLink {...back} />
       </CenteredCard>
     )
   }
@@ -118,16 +125,15 @@ export function GamePicks({ pool, gameId, onBack, onSelectParticipant, backLabel
   const { game } = groups
   const { winnerNames } = determineWeekWinner(pool)
   const scoresAsOf = scoresAsOfLabel(pool)
-  const shareUrl = `${window.location.origin}/season/${pool.season}/week/${pool.week}/game/${encodeURIComponent(game.id)}`
+  const matchup = `${game.away} @ ${game.home}`
+  const shareUrl = `${window.location.origin}${weekPath}/game/${encodeURIComponent(game.id)}`
   const wonOn = (side: Side): boolean | null => (distribution.winnerSide ? distribution.winnerSide === side : null)
 
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, md: 5 } }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 }, borderRadius: 4 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Button startIcon={<ArrowBackIosNewIcon fontSize="small" />} onClick={onBack} sx={{ ml: -1 }}>
-            {backLabel}
-          </Button>
+          <BackLink {...back} sx={{ ml: -1 }} />
           <ShareButton
             url={shareUrl}
             title={`${game.away} at ${game.home} picks`}
@@ -152,8 +158,8 @@ export function GamePicks({ pool, gameId, onBack, onSelectParticipant, backLabel
         </Box>
 
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: { xs: 2, md: 2.5 }, mt: 3, alignItems: 'start' }}>
-          <PickerGroup side="away" team={game.away} names={groups.away} won={wonOn('away')} winnerNames={winnerNames} onSelectParticipant={onSelectParticipant} />
-          <PickerGroup side="home" team={game.home} names={groups.home} won={wonOn('home')} winnerNames={winnerNames} onSelectParticipant={onSelectParticipant} />
+          <PickerGroup side="away" team={game.away} names={groups.away} won={wonOn('away')} winnerNames={winnerNames} weekPath={weekPath} matchup={matchup} />
+          <PickerGroup side="home" team={game.home} names={groups.home} won={wonOn('home')} winnerNames={winnerNames} weekPath={weekPath} matchup={matchup} />
         </Box>
 
         {groups.noPick.length > 0 && (

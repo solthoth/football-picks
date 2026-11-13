@@ -11,14 +11,17 @@ import type { Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useId } from 'react'
 import type { GameDistribution, Side } from '../domain/pickDistribution'
-import { CardOverlayButton } from './CardOverlayButton'
+import type { BackState } from './backNavigation'
+import { CardOverlayLink } from './CardOverlayLink'
 import { PickSplitBar } from './PickSplitBar'
 import { TeamLogo } from './TeamLogo'
 
 interface GamePickCardProps {
   game: GameDistribution
-  /** When set, the whole card is a button that opens the who-picked-what view for this game. */
-  onSelect?: (gameId: string) => void
+  /** When set, the whole card is a link to this path (the who-picked-what view for the game). */
+  to?: string
+  /** Router state to carry along, e.g. the label for the next screen's back button. */
+  linkState?: BackState
 }
 
 function formatKickoff(kickoffTime: string | null): string | null {
@@ -134,7 +137,7 @@ function Percent({ pct, count, picked, emphasized, align }: PercentProps) {
   )
 }
 
-export function GamePickCard({ game, onSelect }: GamePickCardProps) {
+export function GamePickCard({ game, to, linkState }: GamePickCardProps) {
   const headingId = useId()
   const kickoff = formatKickoff(game.kickoffTime)
   const status = statusText(game)
@@ -242,7 +245,7 @@ export function GamePickCard({ game, onSelect }: GamePickCardProps) {
         </Stack>
       )}
 
-      {onSelect && (
+      {to && (
         <>
           <Stack direction="row" spacing={0.25} sx={{ mt: 1.5, alignItems: 'center', justifyContent: 'flex-end', color: 'primary.main' }}>
             <Typography variant="caption" aria-hidden sx={{ fontWeight: 700 }}>
@@ -250,7 +253,7 @@ export function GamePickCard({ game, onSelect }: GamePickCardProps) {
             </Typography>
             <ChevronRightIcon aria-hidden fontSize="small" />
           </Stack>
-          <CardOverlayButton label={`See who picked ${game.away} at ${game.home}`} onClick={() => onSelect(game.gameId)} />
+          <CardOverlayLink label={`See who picked ${game.away} at ${game.home}`} to={to} state={linkState} />
         </>
       )}
     </Card>

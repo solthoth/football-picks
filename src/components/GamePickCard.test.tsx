@@ -1,7 +1,8 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { GameDistribution } from '../domain/pickDistribution'
+import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { GamePickCard } from './GamePickCard'
 import { PickSplitBar } from './PickSplitBar'
 
@@ -203,20 +204,29 @@ describe('GamePickCard', () => {
   })
 })
 
-describe('GamePickCard selection', () => {
-  it('is not a button unless onSelect is given', () => {
+describe('GamePickCard link', () => {
+  it('is not a link unless a destination is given', () => {
     render(<GamePickCard game={game()} />)
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 
-  it('opens the game by id when the card is clicked', async () => {
+  it('makes the whole card a real link to the destination', () => {
+    renderWithRouter(<GamePickCard game={game()} to="/season/2026/week/4/game/Falcons%40Packers" />)
+
+    expect(screen.getByRole('link', { name: 'See who picked Falcons at Packers' })).toHaveAttribute(
+      'href',
+      '/season/2026/week/4/game/Falcons%40Packers',
+    )
+  })
+
+  it('passes router state along when the card is opened', async () => {
     const user = userEvent.setup()
-    const onSelect = vi.fn()
-    render(<GamePickCard game={game()} onSelect={onSelect} />)
+    renderWithRouter(<GamePickCard game={game()} to="/next" linkState={{ backLabel: 'Back to dashboard' }} />)
 
-    await user.click(screen.getByRole('button', { name: 'See who picked Falcons at Packers' }))
+    await user.click(screen.getByRole('link', { name: 'See who picked Falcons at Packers' }))
 
-    expect(onSelect).toHaveBeenCalledWith('Falcons@Packers')
+    expect(screen.getByTestId('location')).toHaveTextContent('/next')
+    expect(screen.getByTestId('location-state')).toHaveTextContent('{"backLabel":"Back to dashboard"}')
   })
 })

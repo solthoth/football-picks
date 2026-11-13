@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Pool } from '../data/types'
+import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { PicksDashboard } from './PicksDashboard'
 
 const GAMES = [
@@ -34,27 +35,41 @@ function expectCardOrder(names: string[]) {
 
 describe('PicksDashboard', () => {
   it('renders the week heading and one article per game', () => {
-    render(<PicksDashboard pool={pool()} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool()} />)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Season 2026 · Week 4' })).toBeInTheDocument()
     expect(screen.getAllByRole('article')).toHaveLength(3)
     expectCardOrder(['Falcons at Packers', 'Colts at Commanders', 'Chiefs at Raiders'])
   })
 
-  it('calls onBack from the "Back to standings" button', async () => {
+  it('links back to the standings', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />)
+
+    expect(screen.getByRole('link', { name: 'Back to standings' })).toHaveAttribute('href', '/season/2026/week/4')
+  })
+
+  it('links each game card to its who-picked-what page', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />)
+
+    expect(screen.getByRole('link', { name: 'See who picked Falcons at Packers' })).toHaveAttribute(
+      'href',
+      '/season/2026/week/4/game/Falcons%40Packers',
+    )
+  })
+
+  it('tells the game page to offer a "Back to dashboard" button when a card is opened', async () => {
     const user = userEvent.setup()
-    const onBack = vi.fn()
-    render(<PicksDashboard pool={pool()} onBack={onBack} />)
+    renderWithRouter(<PicksDashboard pool={pool()} />)
 
-    await user.click(screen.getByRole('button', { name: 'Back to standings' }))
+    await user.click(screen.getByRole('link', { name: 'See who picked Chiefs at Raiders' }))
 
-    expect(onBack).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('location-state')).toHaveTextContent('{"backLabel":"Back to dashboard"}')
   })
 
   it('shares a deep link to the dashboard', async () => {
     const user = userEvent.setup()
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
-    render(<PicksDashboard pool={pool()} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool()} />)
 
     await user.click(screen.getByRole('button', { name: /share/i }))
 
@@ -62,7 +77,7 @@ describe('PicksDashboard', () => {
   })
 
   it('explains an empty roster without a summary or sort control', () => {
-    render(<PicksDashboard pool={pool({ participants: [] })} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool({ participants: [] })} />)
 
     expect(screen.getByText('No picks have been submitted for this week yet.')).toBeInTheDocument()
     expect(screen.queryByRole('group', { name: 'Week summary' })).not.toBeInTheDocument()
@@ -71,7 +86,7 @@ describe('PicksDashboard', () => {
   })
 
   it('explains an empty slate without a summary or sort control', () => {
-    render(<PicksDashboard pool={pool({ games: [] })} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool({ games: [] })} />)
 
     expect(screen.getByText('No games are listed for this week yet.')).toBeInTheDocument()
     expect(screen.queryByRole('group', { name: 'Week summary' })).not.toBeInTheDocument()
@@ -80,14 +95,14 @@ describe('PicksDashboard', () => {
 
   it('hides the summary strip for a single participant', () => {
     const base = pool()
-    render(<PicksDashboard pool={pool({ participants: base.participants.slice(0, 1) })} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool({ participants: base.participants.slice(0, 1) })} />)
 
     expect(screen.queryByRole('group', { name: 'Week summary' })).not.toBeInTheDocument()
     expect(screen.getAllByRole('article')).toHaveLength(3)
   })
 
   it('summarizes participants, most popular pick, and most divided game', () => {
-    render(<PicksDashboard pool={pool()} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool()} />)
 
     const strip = screen.getByRole('group', { name: 'Week summary' })
     expect(within(strip).getByText('4')).toBeInTheDocument()
@@ -104,7 +119,7 @@ describe('PicksDashboard', () => {
         { name: 'B', picks: { 'Falcons@Packers': 'Packers', 'Colts@Commanders': 'Commanders', 'Chiefs@Raiders': 'Raiders' }, tieBreakerTotalScore: null },
       ],
     })
-    render(<PicksDashboard pool={tied} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={tied} />)
 
     const strip = screen.getByRole('group', { name: 'Week summary' })
     expect(within(strip).queryByText('Most popular pick')).not.toBeInTheDocument()
@@ -113,7 +128,7 @@ describe('PicksDashboard', () => {
 
   it('reorders the games by how divided they were when toggled', async () => {
     const user = userEvent.setup()
-    render(<PicksDashboard pool={pool()} onBack={vi.fn()} />)
+    renderWithRouter(<PicksDashboard pool={pool()} />)
     expect(screen.getByRole('group', { name: 'Sort games' })).toBeInTheDocument()
     expectCardOrder(['Falcons at Packers', 'Colts at Commanders', 'Chiefs at Raiders'])
 

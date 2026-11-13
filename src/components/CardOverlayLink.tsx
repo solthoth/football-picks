@@ -1,16 +1,20 @@
 import ButtonBase from '@mui/material/ButtonBase'
+import { Link as RouterLink } from 'react-router-dom'
 
-interface CardOverlayButtonProps {
+interface CardOverlayLinkProps {
   label: string
-  onClick: () => void
+  to: string
+  state?: unknown
 }
 
-/** Makes a whole `position: relative` card clickable without nesting its content inside a button. */
-export function CardOverlayButton({ label, onClick }: CardOverlayButtonProps) {
+/** Makes a whole `position: relative` card a real link without nesting its content inside an anchor. */
+export function CardOverlayLink({ label, to, state }: CardOverlayLinkProps) {
   return (
     <ButtonBase
+      component={RouterLink}
+      to={to}
+      state={state}
       aria-label={label}
-      onClick={onClick}
       sx={{
         position: 'absolute',
         inset: 0,
