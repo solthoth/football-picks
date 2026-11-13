@@ -4,7 +4,8 @@ import Paper from '@mui/material/Paper'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { computePickDistribution, sortByDivided } from '../domain/pickDistribution'
@@ -21,11 +22,13 @@ interface PicksDashboardProps {
 type SortMode = 'schedule' | 'divided'
 
 export function PicksDashboard({ pool }: PicksDashboardProps) {
-  const [sort, setSort] = useState<SortMode>('schedule')
+  // The sort lives in the URL (?sort=divided), so it survives a refresh and travels with a shared link.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const sort: SortMode = searchParams.get('sort') === 'divided' ? 'divided' : 'schedule'
   const distribution = useMemo(() => computePickDistribution(pool), [pool])
   const scoresAsOf = scoresAsOfLabel(pool)
   const weekPath = `/season/${pool.season}/week/${pool.week}`
-  const shareUrl = `${window.location.origin}${weekPath}/dashboard`
+  const shareUrl = `${window.location.origin}${weekPath}/dashboard${sort === 'divided' ? '?sort=divided' : ''}`
   const backToDashboard: BackState = { backLabel: 'Back to dashboard' }
 
   const hasGames = distribution.games.length > 0
@@ -73,7 +76,8 @@ export function PicksDashboard({ pool }: PicksDashboardProps) {
                 size="small"
                 value={sort}
                 onChange={(_, next: SortMode | null) => {
-                  if (next) setSort(next)
+                  // Replace, not push: flipping the sort should not fill the back button with entries.
+                  if (next) setSearchParams(next === 'divided' ? { sort: 'divided' } : {}, { replace: true })
                 }}
                 aria-label="Sort games"
               >

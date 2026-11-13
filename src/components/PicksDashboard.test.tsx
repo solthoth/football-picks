@@ -162,3 +162,70 @@ describe('PicksDashboard', () => {
     expectCardOrder(['Falcons at Packers', 'Colts at Commanders', 'Chiefs at Raiders'])
   })
 })
+
+describe('PicksDashboard sort in the URL', () => {
+  const dashboardPath = '/season/2026/week/4/dashboard'
+  const divided = () => screen.getByRole('button', { name: 'Most divided' })
+  const schedule = () => screen.getByRole('button', { name: 'Schedule' })
+
+  it('shows the schedule order by default, with no query string', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [dashboardPath] })
+
+    expect(schedule()).toHaveAttribute('aria-pressed', 'true')
+    expectCardOrder(['Falcons at Packers', 'Colts at Commanders', 'Chiefs at Raiders'])
+  })
+
+  it('opens already sorted by "Most divided" when the link says so, e.g. after a refresh or from a shared link', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [`${dashboardPath}?sort=divided`] })
+
+    expect(divided()).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getAllByRole('heading', { level: 2 })[0]).toHaveAccessibleName('Colts at Commanders') // the 2-2 split
+  })
+
+  it('puts the choice in the URL when "Most divided" is chosen, and takes it out for "Schedule"', async () => {
+    const user = userEvent.setup()
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [dashboardPath] })
+
+    await user.click(divided())
+    expect(screen.getByTestId('location-search')).toHaveTextContent('?sort=divided')
+
+    await user.click(schedule())
+    expect(screen.getByTestId('location-search')).toBeEmptyDOMElement()
+  })
+
+  it('replaces the history entry, so flipping the sort does not fill the back button', async () => {
+    const user = userEvent.setup()
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [dashboardPath] })
+
+    await user.click(divided())
+
+    expect(screen.getByTestId('navigation-type')).toHaveTextContent('REPLACE')
+  })
+
+  it('ignores a sort it does not know', () => {
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [`${dashboardPath}?sort=banana`] })
+
+    expect(schedule()).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('shares the sorted view, not just the dashboard', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [`${dashboardPath}?sort=divided`] })
+
+    await user.click(screen.getByRole('button', { name: /share/i }))
+
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}${dashboardPath}?sort=divided`)
+  })
+
+  it('shares the plain dashboard link in the default order', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+    renderWithRouter(<PicksDashboard pool={pool()} />, { initialEntries: [dashboardPath] })
+
+    await user.click(screen.getByRole('button', { name: /share/i }))
+
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}${dashboardPath}`)
+  })
+})
+
