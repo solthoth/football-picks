@@ -5,6 +5,7 @@ import { alpha } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import type { ReactNode } from 'react'
 import type { PickSummary } from '../domain/pickDistribution'
+import { accentTextColor } from '../theme'
 import { TeamLogo } from './TeamLogo'
 
 interface PickSummaryStripProps {
@@ -64,7 +65,7 @@ function StripItem({ label, color, value, caption }: StripItemProps) {
           textTransform: 'uppercase',
           fontSize: { xs: '0.75rem', md: '0.875rem' },
           color: 'text.secondary',
-          [theme.breakpoints.up('md')]: { color: theme.palette[color].main, mb: 0.5 },
+          [theme.breakpoints.up('md')]: { color: accentTextColor(theme, color), mb: 0.5 },
         })}
       >
         {label}

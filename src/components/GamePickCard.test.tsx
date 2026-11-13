@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import type { GameDistribution } from '../domain/pickDistribution'
+import { textContrast } from '../testUtils/contrast'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { GamePickCard } from './GamePickCard'
 import { PickSplitBar } from './PickSplitBar'
@@ -228,5 +229,24 @@ describe('GamePickCard link', () => {
 
     expect(screen.getByTestId('location')).toHaveTextContent('/next')
     expect(screen.getByTestId('location-state')).toHaveTextContent('{"backLabel":"Back to dashboard"}')
+  })
+})
+
+
+describe('GamePickCard text contrast', () => {
+  it.each([
+    ['light', '#ffffff'],
+    ['dark', '#121212'],
+  ] as const)('keeps the LIVE label and the "See who picked" hint readable on the live card in %s mode', (mode, surface) => {
+    renderWithRouter(<GamePickCard game={game({ status: 'in_progress', awayScore: 10, homeScore: 7 })} to="/next" />, { mode })
+
+    expect(textContrast(screen.getByText('LIVE 10-7'), surface), 'LIVE label').toBeGreaterThanOrEqual(4.5)
+    expect(textContrast(screen.getByText('See who picked each team'), surface), 'link hint').toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('keeps the "See who picked" hint readable on an ordinary card too', () => {
+    renderWithRouter(<GamePickCard game={game()} to="/next" />)
+
+    expect(textContrast(screen.getByText('See who picked each team'))).toBeGreaterThanOrEqual(4.5)
   })
 })

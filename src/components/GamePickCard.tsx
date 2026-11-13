@@ -6,11 +6,11 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
-import { alpha, darken } from '@mui/material/styles'
-import type { Theme } from '@mui/material/styles'
+import { alpha } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useId } from 'react'
 import type { GameDistribution, Side } from '../domain/pickDistribution'
+import { accentTextColor } from '../theme'
 import type { BackState } from './backNavigation'
 import { CardOverlayLink } from './CardOverlayLink'
 import { PickSplitBar } from './PickSplitBar'
@@ -49,15 +49,6 @@ const visuallyHiddenSx = {
   whiteSpace: 'nowrap',
   width: '1px',
 } as const
-
-/**
- * Small warning-coloured text. `warning.dark` is only 3.8:1 on a white card, so
- * light mode darkens it to clear WCAG AA (4.5:1, also on the live card's tint);
- * dark mode uses `warning.light`, which is already bright on the dark surface.
- */
-function warningTextColor(theme: Theme): string {
-  return theme.palette.mode === 'dark' ? theme.palette.warning.light : darken(theme.palette.warning.dark, 0.3)
-}
 
 const captionSx = { fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' } as const
 
@@ -171,7 +162,7 @@ export function GamePickCard({ game, to, linkState }: GamePickCardProps) {
         {status && (
           <Typography
             variant="caption"
-            sx={(theme) => ({ ...captionSx, fontVariantNumeric: 'tabular-nums', color: live ? warningTextColor(theme) : theme.palette.text.secondary })}
+            sx={(theme) => ({ ...captionSx, fontVariantNumeric: 'tabular-nums', color: live ? accentTextColor(theme, 'warning') : theme.palette.text.secondary })}
           >
             {status}
             {winnerTeam && <Box component="span" sx={visuallyHiddenSx}>{`, ${winnerTeam} won`}</Box>}
@@ -218,7 +209,7 @@ export function GamePickCard({ game, to, linkState }: GamePickCardProps) {
               icon={<BoltIcon />}
               label="Upset - crowd was wrong"
               sx={(theme) => ({
-                color: warningTextColor(theme),
+                color: accentTextColor(theme, 'warning'),
                 borderColor: theme.palette.warning.main,
                 '& .MuiChip-icon': { color: 'inherit' },
               })}
@@ -235,7 +226,7 @@ export function GamePickCard({ game, to, linkState }: GamePickCardProps) {
             </Typography>
           )}
           {game.unrecognized > 0 && (
-            <Stack direction="row" spacing={0.5} sx={(theme) => ({ alignItems: 'center', color: warningTextColor(theme) })}>
+            <Stack direction="row" spacing={0.5} sx={(theme) => ({ alignItems: 'center', color: accentTextColor(theme, 'warning') })}>
               <WarningAmberIcon aria-hidden sx={{ fontSize: 16 }} />
               <Typography variant="caption" sx={{ color: 'inherit' }}>
                 {game.unrecognized} unrecognized {game.unrecognized === 1 ? 'pick' : 'picks'}
@@ -248,7 +239,7 @@ export function GamePickCard({ game, to, linkState }: GamePickCardProps) {
       {to && (
         <>
           <Stack direction="row" spacing={0.25} sx={{ mt: 1.5, alignItems: 'center', justifyContent: 'flex-end', color: 'primary.main' }}>
-            <Typography variant="caption" aria-hidden sx={{ fontWeight: 700 }}>
+            <Typography variant="caption" aria-hidden sx={(theme) => ({ fontWeight: 700, color: accentTextColor(theme, 'primary') })}>
               See who picked each team
             </Typography>
             <ChevronRightIcon aria-hidden fontSize="small" />

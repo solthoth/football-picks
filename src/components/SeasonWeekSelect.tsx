@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, WheelEvent } from 'react'
 import type { Pool } from '../data/types'
+import { accentTextColor } from '../theme'
 import { CenteredCard } from './CenteredCard'
 
 interface SeasonWeekSelectProps {
@@ -234,13 +235,13 @@ export function SeasonWeekSelect({ pools, onSelect }: SeasonWeekSelectProps) {
               >
                 <Typography
                   variant="caption"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    fontSize: '0.65rem',
-                    color: isSelected ? 'primary.main' : 'text.secondary',
-                  }}
+                    fontSize: '0.75rem',
+                    color: isSelected ? accentTextColor(theme, 'primary') : theme.palette.text.secondary,
+                  })}
                 >
                   Week
                 </Typography>
