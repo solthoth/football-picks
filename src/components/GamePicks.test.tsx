@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import type { Pool } from '../data/types'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
+import { expectNotTruncated } from '../testUtils/truncation'
 import { GamePicks } from './GamePicks'
 
 const GAME_ID = 'Steelers@Browns'
@@ -44,6 +45,13 @@ describe('GamePicks', () => {
     expect(away.getAllByRole('link').map((b) => b.textContent)).toEqual(['Bob', 'Zed'])
     expect(home.getByRole('heading', { name: 'Picked Browns' })).toBeInTheDocument()
     expect(home.getAllByRole('link').map((b) => b.textContent)).toEqual(['Amy'])
+  })
+
+  it('lets a long "Picked <team>" heading wrap instead of cutting the team name off', () => {
+    renderPicks()
+
+    expectNotTruncated(screen.getByRole('heading', { name: 'Picked Steelers' }))
+    expectNotTruncated(screen.getByRole('heading', { name: 'Picked Browns' }))
   })
 
   it('lists participants without a pick separately, outside both groups', () => {

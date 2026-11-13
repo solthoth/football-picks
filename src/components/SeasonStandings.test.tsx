@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { SeasonStandings as Standings } from '../domain/seasonStandings'
 import { guaranteedHeightPx, MIN_TOUCH_TARGET_PX } from '../testUtils/layout'
+import { expectNotTruncated } from '../testUtils/truncation'
 import { mockMatchMediaMatches } from '../testUtils/mockMatchMedia'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { SeasonStandings } from './SeasonStandings'
@@ -69,6 +70,13 @@ describe('SeasonStandings', () => {
     expect(screen.getByText('1 win · $150')).toBeInTheDocument()
     expect(screen.getByText('0 wins · $0')).toBeInTheDocument()
     expect(screen.getByText('5 / 6')).toBeInTheDocument()
+  })
+
+  it('lets a long name wrap on a phone instead of cutting it off', () => {
+    mockMatchMediaMatches(true)
+    render()
+
+    expectNotTruncated(screen.getByText('Ben'))
   })
 
   it('shows a week-by-week list that links to each week and names the winners and money', () => {

@@ -293,17 +293,20 @@ export function ParticipantDetail({ pool, participantName, backLabel }: Particip
                     <TeamLogo team={outcome.home} size={24} />
                   </Stack>
 
-                  <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                    <TeamLogo team={outcome.pickedTeam} size={56} />
+                  <Stack direction="row" spacing={{ xs: 1.5, sm: 2 }} sx={{ alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', flexShrink: 0, '& img': { width: { xs: 40, sm: 56 }, height: { xs: 40, sm: 56 } } }}>
+                      <TeamLogo team={outcome.pickedTeam} size={56} />
+                    </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Typography variant="overline" color="textSecondary" sx={{ lineHeight: 1.4, display: 'block' }}>
                         Pick
                       </Typography>
-                      <Typography component="p" noWrap sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 }}>
+                      {/* Wraps instead of being cut to "Ja…" on a 320px phone. */}
+                      <Typography component="p" sx={{ fontSize: { xs: '1.125rem', sm: '1.5rem' }, fontWeight: 700, lineHeight: 1.2, overflowWrap: 'anywhere', hyphens: 'auto' }}>
                         {outcome.pickedTeam ?? '—'}
                       </Typography>
                     </Box>
-                    <Stack sx={{ alignItems: 'center', flexShrink: 0, minWidth: 72 }}>
+                    <Stack sx={{ alignItems: 'center', flexShrink: 0, minWidth: { xs: 60, sm: 72 } }}>
                       <OutcomeIcon correct={outcome.correct} tied={outcome.tied} fontSize="large" />
                       <Typography variant="body2" color={outcomeColor(outcome)} sx={{ fontWeight: 700, mt: 0.25 }}>
                         {correctLabel(outcome)}

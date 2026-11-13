@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import type { GameDistribution } from '../domain/pickDistribution'
 import { textContrast } from '../testUtils/contrast'
+import { expectNotTruncated } from '../testUtils/truncation'
 import { renderWithRouter } from '../testUtils/renderWithRouter'
 import { GamePickCard } from './GamePickCard'
 import { PickSplitBar } from './PickSplitBar'
@@ -250,3 +251,30 @@ describe('GamePickCard text contrast', () => {
     expect(textContrast(screen.getByText('See who picked each team'))).toBeGreaterThanOrEqual(4.5)
   })
 })
+
+describe('GamePickCard team names', () => {
+  const long = game({ away: 'Commanders', home: 'Buccaneers', status: 'final', awayScore: 24, homeScore: 17, winnerSide: 'away', crowd: 'upset' })
+
+  it('can wrap long team names instead of cutting them off', () => {
+    render(<GamePickCard game={long} />)
+
+    expectNotTruncated(screen.getByText('Commanders'))
+    expectNotTruncated(screen.getByText('Buccaneers'))
+  })
+
+  it('breaks a name that is wider than its cell rather than overflowing or truncating it', () => {
+    render(<GamePickCard game={long} />)
+
+    expect(screen.getByText('Commanders')).toHaveStyle({ overflowWrap: 'anywhere' })
+  })
+
+  it('puts the winner check on the logo, so it does not take room from the name', () => {
+    render(<GamePickCard game={long} />)
+
+    const name = screen.getByText('Commanders')
+    const check = within(screen.getByTestId('team-away')).getByTestId('CheckCircleIcon')
+    expect(name.parentElement).not.toContainElement(check)
+    expect(check).toHaveAttribute('aria-hidden', 'true')
+  })
+})
+
