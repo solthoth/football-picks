@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POLL_INTERVAL_MS, resetLivePoolCache, useLivePool } from './useLivePool'
+import { POLL_INTERVAL_MS, refreshLiveScores, resetLivePoolCache, useLivePool, useLiveScoresStatus } from './useLivePool'
 import type { Pool } from './types'
 
 const BASE = 'https://example.blob.core.windows.net/scores'
@@ -88,3 +88,73 @@ describe('useLivePool', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 })
+
+describe('manual refresh', () => {
+  const fetchMock = vi.fn()
+
+  beforeEach(() => {
+    resetLivePoolCache()
+    fetchMock.mockReset()
+    vi.stubGlobal('fetch', fetchMock)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  const useBoth = (p: Pool | undefined, base: string | undefined) => ({ pool: useLivePool(p, base), status: useLiveScoresStatus() })
+
+  it('fetches again as soon as a refresh is requested, without waiting for the next poll', async () => {
+    fetchMock.mockReturnValueOnce(respond(payload('in_progress'))).mockReturnValue(respond(payload('final')))
+    const { result } = renderHook(() => useBoth(pool, BASE))
+    await waitFor(() => expect(result.current.pool?.results['A@B'].status).toBe('in_progress'))
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    act(() => refreshLiveScores())
+
+    await waitFor(() => expect(result.current.pool?.results['A@B'].status).toBe('final'))
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('can only refresh while a pool with unfinished games is being polled', async () => {
+    fetchMock.mockReturnValue(respond(payload('in_progress')))
+    const { result } = renderHook(() => useBoth(pool, BASE))
+    await waitFor(() => expect(result.current.status.canRefresh).toBe(true))
+  })
+
+  it.each([
+    ['there is no scores URL', pool, undefined],
+    ['every game is already final', { ...pool, results: { 'A@B': { ...scheduled, status: 'final', winner: 'A' } } } as Pool, BASE],
+    ['there is no pool', undefined, BASE],
+  ])('cannot refresh when %s', (_name, p, base) => {
+    const { result } = renderHook(() => useBoth(p as Pool | undefined, base))
+
+    expect(result.current.status.canRefresh).toBe(false)
+  })
+
+  it('stops being refreshable once the week is final', async () => {
+    fetchMock.mockReturnValue(respond(payload('final')))
+    const { result } = renderHook(() => useBoth(pool, BASE))
+
+    await waitFor(() => expect(result.current.pool?.results['A@B'].status).toBe('final'))
+    await waitFor(() => expect(result.current.status.canRefresh).toBe(false))
+  })
+
+  it('says it is refreshing while a fetch is in flight, and not before or after', async () => {
+    let finish: (value: Response) => void = () => {}
+    fetchMock.mockReturnValue(new Promise<Response>((resolve) => (finish = resolve)))
+    const { result } = renderHook(() => useBoth(pool, BASE))
+
+    await waitFor(() => expect(result.current.status.refreshing).toBe(true))
+    await act(async () => finish({ ok: true, json: () => Promise.resolve(payload('in_progress')) } as Response))
+
+    await waitFor(() => expect(result.current.status.refreshing).toBe(false))
+  })
+
+  it('has nothing to refresh before anything is polling', () => {
+    const { result } = renderHook(() => useLiveScoresStatus())
+
+    expect(result.current).toMatchObject({ canRefresh: false, refreshing: false })
+  })
+})
+

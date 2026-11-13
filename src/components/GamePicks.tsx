@@ -14,7 +14,6 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useId } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { scoresAsOfLabel } from '../data/liveScores'
 import type { Pool } from '../data/types'
 import { groupPicksForGame } from '../domain/gamePicks'
 import { computePickDistribution } from '../domain/pickDistribution'
@@ -24,6 +23,7 @@ import type { BackState } from './backNavigation'
 import { NotFoundCard } from './NotFoundCard'
 import { GamePickCard } from './GamePickCard'
 import { PageHeader } from './PageHeader'
+import { ScoresAsOf } from './ScoresAsOf'
 import { SeasonWeekLabel } from './SeasonWeekLabel'
 import { TeamLogo } from './TeamLogo'
 import { WinnerBadge } from './WinnerBadge'
@@ -126,7 +126,6 @@ export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
 
   const { game } = groups
   const { winnerNames } = determineWeekWinner(pool)
-  const scoresAsOf = scoresAsOfLabel(pool)
   const matchup = `${game.away} @ ${game.home}`
   const shareUrl = `${window.location.origin}${weekPath}/game/${encodeURIComponent(game.id)}`
   const wonOn = (side: Side): boolean | null => (distribution.winnerSide ? distribution.winnerSide === side : null)
@@ -145,11 +144,7 @@ export function GamePicks({ pool, gameId, backLabel }: GamePicksProps) {
         <Typography color="textSecondary" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
           <SeasonWeekLabel season={pool.season} week={pool.week} />
         </Typography>
-        {scoresAsOf && (
-          <Typography variant="caption" color="textSecondary" component="p">
-            {scoresAsOf}
-          </Typography>
-        )}
+        <ScoresAsOf pool={pool} />
 
         <Box sx={{ mt: 3 }}>
           <GamePickCard game={distribution} />
