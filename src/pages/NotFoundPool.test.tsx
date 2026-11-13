@@ -19,6 +19,15 @@ describe('NotFoundPool', () => {
     expect(screen.getByRole('link', { name: 'Go to the latest week' })).toHaveAttribute('href', '/season/2026/week/10')
   })
 
+  it('can name a missing season instead, still leading to the latest week', () => {
+    mockPools.current = [pool(2026, 2), pool(2026, 10)]
+    renderWithRouter(<NotFoundPool title="Season not found" message="That season isn't available." />)
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Season not found' })).toBeInTheDocument()
+    expect(screen.getByText("That season isn't available.")).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Go to the latest week' })).toHaveAttribute('href', '/season/2026/week/10')
+  })
+
   it('falls back to the home page when there is no week to suggest', () => {
     mockPools.current = []
     renderWithRouter(<NotFoundPool />)

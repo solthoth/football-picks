@@ -1,7 +1,9 @@
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import SavingsIcon from '@mui/icons-material/Savings'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import SportsFootballIcon from '@mui/icons-material/SportsFootball'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
@@ -9,6 +11,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 import type { KeyboardEvent, WheelEvent } from 'react'
 import type { Pool } from '../data/types'
 import { weeksForSeason } from '../data/weeks'
@@ -285,6 +288,14 @@ export function SeasonWeekSelect({ pools, onSelect, initial }: SeasonWeekSelectP
               <Chip icon={<SavingsIcon />} label={`$${selectedPool.pot} pot`} variant="outlined" sx={{ fontWeight: 600 }} />
             )}
           </Stack>
+        )}
+
+        {season !== undefined && (
+          <Box sx={{ mt: 2, textAlign: 'center' }}>
+            <Button component={RouterLink} to={`/season/${season}`} endIcon={<ChevronRightIcon />}>
+              Season {season} standings
+            </Button>
+          </Box>
         )}
       </Paper>
     </Box>
