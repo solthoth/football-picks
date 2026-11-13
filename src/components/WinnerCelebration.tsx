@@ -11,13 +11,23 @@ interface WinnerCelebrationProps {
   isWinner: boolean
 }
 
-function fireConfetti() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+/** Fires the two-burst confetti. Returns a cleanup that cancels whatever has not fired yet (e.g. on leaving the page). */
+function fireConfetti(): () => void {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
+
+  let cancelled = false
+  let secondBurst: ReturnType<typeof setTimeout> | undefined
 
   import('canvas-confetti').then(({ default: confetti }) => {
+    if (cancelled) return
     confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } })
-    setTimeout(() => confetti({ particleCount: 80, spread: 110, startVelocity: 45, origin: { y: 0.5 } }), 150)
+    secondBurst = setTimeout(() => confetti({ particleCount: 80, spread: 110, startVelocity: 45, origin: { y: 0.5 } }), 150)
   })
+
+  return () => {
+    cancelled = true
+    clearTimeout(secondBurst)
+  }
 }
 
 /**
@@ -38,9 +48,10 @@ export function WinnerCelebration({ participantName, week, isWinner }: WinnerCel
   }
 
   // The confetti burst is a genuine external side effect (dynamic import,
-  // canvas drawing), so it belongs in an effect.
+  // canvas drawing), so it belongs in an effect. Leaving the page cancels
+  // whatever has not fired yet, so a burst never lands on the next screen.
   useEffect(() => {
-    if (isWinner) fireConfetti()
+    if (isWinner) return fireConfetti()
   }, [participantName, isWinner])
 
   return (
