@@ -1,0 +1,226 @@
+# UX review: Football Picks
+
+Reviewed 2026-11-12 against `main` (`5bf44a9`), running locally with live scores from the dev environment. Week 10 had one game in progress and Week 9 was final, so both states were covered.
+
+## Progress
+
+| # | Finding | Status |
+|---|---|---|
+| 1 | Everyone ranked #1 before any game finishes | ✅ Done |
+| 2 | Every page has the same title | ✅ Done |
+| 3 | Navigation is buttons, not links | ✅ Done |
+| 4 | Orange accents fail contrast in light mode | ✅ Done |
+| 5–22 | Everything else | Open |
+
+Findings 1–4 were implemented test-first (red, then green) on branch `feat/ux-quick-wins-1-4`. Each has a **Status** note below saying what changed and anything the work turned up that the original write-up got wrong or missed.
+
+## How it was reviewed
+
+Driven with Playwright (Chromium) across every route, including the error states:
+
+| Mode | Viewport | Also checked |
+|---|---|---|
+| Desktop | 1440 × 900 | Keyboard-only navigation, browser back, share |
+| Mobile | 390 × 844 | Dark mode, reduced motion |
+| Narrow phone | 320 × 640 | Horizontal overflow only |
+| Tablet | 768 × 1024 | Horizontal overflow only |
+
+Each page was checked for layout overflow, tap-target size, text contrast (WCAG AA), heading structure, focus order and console errors. Screenshots are in [ux-review/](ux-review/).
+
+**Not covered:** real devices, screen readers, Safari and Firefox, and the touch-only pull-to-refresh gesture. The native share sheet could not be observed under automation (see finding 7).
+
+## What already works well
+
+- **No layout breakage.** No horizontal overflow on any page at 320, 390, 768 or 1440 px.
+- **Dark mode is solid.** Every text element passed AA contrast in dark mode.
+- **The mobile layouts are purpose-built**, not squeezed tables: standings become cards, pick rows become score cards, and the dashboard summary collapses to a compact list.
+- **Whole cards are tappable** on the dashboard and participant pages, not just the small link text.
+- **Keyboard support exists everywhere**: visible focus rings, arrow keys on the week picker, Enter/Space on table rows.
+- **In-app back buttons are contextual** ("Back to Packers @ Patriots") and fall back sensibly on a shared deep link.
+- **Live state is clear** where it appears: the highlighted LIVE card and the "Scores as of" timestamp.
+- **No console errors or warnings** on any route.
+
+## Findings
+
+Ordered by impact. "Both" means the issue appears on desktop and mobile.
+
+### High
+
+**1. Before any game finishes, everyone is ranked #1 in gold** (both)
+
+In Week 10 all ten players show a gold "1" with `0 / 14`. It reads as a ten-way tie for first when nothing has been decided. See [mobile-list-w10-live.png](ux-review/mobile-list-w10-live.png).
+
+- Show a neutral avatar (or a dash) until at least one game is final.
+- Consider sorting alphabetically with a "No games final yet" note in that state.
+
+> **Status: ✅ Done.** `buildLeaderboard` now returns `rank: null` until at least one pick is decided (right or wrong). While unranked, the list shows a neutral "–" avatar, sorts alphabetically and says "Rankings start once the first game is final." Once any game is decided, ranks appear as before, even if everyone got it wrong (that is a genuine tie).
+>
+> *Worth knowing:* the app paints bundled data first and live scores replace it a moment later, so on a cold load of a finished week the unranked state can show for a second before the real standings arrive. That is an existing property of the data flow; the neutral state is a far better first paint than the old gold "1" for everyone.
+
+**2. Every page has the same title, "Football Picks"** (both)
+
+Browser tabs, history entries and bookmarks are indistinguishable, and screen-reader users get no announcement on navigation.
+
+- Set `document.title` per route, for example "Week 9 standings · Football Picks" and "Jose · Week 9 · Football Picks".
+
+> **Status: ✅ Done.** A `useDocumentTitle` hook sets a title on every screen, including the not-found states:
+>
+> | Screen | Title |
+> |---|---|
+> | Home | Football Picks |
+> | Standings | Week 9 standings (2026) · Football Picks |
+> | Dashboard | Week 9 pick split (2026) · Football Picks |
+> | Game | Packers @ Patriots · Week 9 (2026) · Football Picks |
+> | Participant | Jose · Week 9 (2026) · Football Picks |
+> | Missing week / game / player / page | Week not found, Game not found, Player not found, Page not found |
+>
+> The season is included so a 2027 season will not make titles ambiguous. *Not covered:* moving keyboard focus to the new page heading on navigation, which is the other half of announcing a route change to screen readers.
+
+**3. Navigation is built from buttons and clickable rows, not links** (both)
+
+The standings page contains zero `<a>` elements. That means no Cmd/Ctrl-click or middle-click to open a player in a new tab, no long-press "copy link" on mobile, and no URL preview on hover. Desktop table rows are focusable `<tr>` elements with no role or label, so a screen reader announces the whole row's text with no hint that it is actionable.
+
+- Render participant names, game cards and back buttons as router `<Link>`s. The whole-row click can stay as a convenience.
+
+> **Status: ✅ Done.** Participant names (table and mobile cards), game cards, the who-picked lists, the dashboard button and every back button are now real `<a>` links, so Cmd/Ctrl-click, middle-click and copy-link work. This was verified in a real browser, including that Ctrl-click on a back button opens a new tab.
+>
+> - Components now build their own destinations from the pool and render router links, replacing the `onSelect` / `onBack` / `onSelectGame` callback props. The pages shrank to data wiring.
+> - A new `BackLink` is a real link to the fallback route, but a plain click still pops history when the user arrived from another screen, so "back" behaves exactly as before.
+> - Desktop table rows keep click-anywhere as a convenience (and navigate once, not twice, when the link itself is clicked), but rows are no longer focusable. The name or matchup link is the keyboard stop, which also fixes the unlabelled-row announcement.
+>
+> *Left as is:* the week tiles on the home page are a listbox rather than links (they select, not navigate to a URL the user would share), and the error pages still use their own controls (finding 13).
+
+**4. Orange accents fail contrast in light mode** (both)
+
+White or orange text on the `warning` orange measures about 3.1:1; AA needs 4.5:1 at these sizes. Dark mode passes.
+
+| Element | Measured | Size |
+|---|---|---|
+| "Week Winner" badge | 3.11:1 | 13 px |
+| Rank 1 avatar number | 3.11:1 | 18 px |
+| "LIVE" label on score cards | 3.11:1 | 12 px |
+| "See who picked each team" | 4.03:1 | 12 px |
+| "Tiebreaker guess" tile label | 4.20:1 | 12 px |
+| "WEEK" label on the week tiles | 3.93:1 | 10.4 px |
+
+- Use a darker orange (`warning.dark`) behind white text, or dark text on the current orange.
+- Raise the 10.4 px tile label to at least 12 px.
+
+> **Status: ✅ Done.**
+>
+> **Correction to the suggestion above:** `warning.dark` behind white text does *not* pass; it measures 3.8:1. The fix that works is dark text on the existing orange for filled surfaces, and a darker shade for small orange *text*.
+>
+> - New `src/theme.ts`, shared by the app and the tests. `createAppTheme` sets `contrastThreshold: 4.5`, so every filled warning / error / info surface (chips, avatars, buttons) takes dark text where white would fail.
+> - `accentTextColor(theme, colour)` gives accent text a shade that clears 4.5:1 on paper and on every tinted surface the app uses. It is applied to the "See who picked each team" hint, the summary tile labels, the live score row and label, the dashboard summary labels and the week tile caption (now 12 px).
+> - Light mode and dark mode are both covered by tests that measure the real computed colours against the production theme.
+>
+> **Also found while verifying** (not in the original audit):
+>
+> | Extra failure | Was | How it was missed |
+> |---|---|---|
+> | Rank 3 bronze avatar | 3.14:1 | No screenshot had a third place |
+> | Filled `error` in dark mode | 3.68:1 | No filled error surface is rendered today (only icons and text); a latent theme default that would bite the first error chip or button |
+> | Desktop dashboard summary labels ("Participants", "Most divided game") | 4.20:1 and 3.54:1 | The first contrast pass only ran at mobile width, where these render as plain text |
+>
+> A final browser audit of 12 routes × 3 viewports (390, 768, 1440 px) × light/dark finds no text below WCAG AA.
+
+**5. There is no season view** (both)
+
+The app only answers "who is winning this week". There is no cumulative leaderboard, win count or winnings total across weeks, even though ten weeks of data are bundled. This is the largest product gap rather than a defect.
+
+- Add a season standings page (total correct, weeks won, winnings) linked from the home card.
+
+### Medium
+
+**6. The week picker hides earlier weeks with little affordance** (both, worse on desktop)
+
+On desktop only Weeks 6–10 are visible and 470 px of the rail is scrolled off to the left. The scrollbar is hidden, there are no arrows, and click-drag does not scroll; only a mouse wheel or arrow keys reach Weeks 1–5. The fade on the left edge is the only hint. See [desktop-home.png](ux-review/desktop-home.png) and [mobile-home.png](ux-review/mobile-home.png).
+
+- On desktop, wrap the tiles into a grid (ten weeks fit in two rows), or add previous/next arrow buttons.
+- On mobile, the swipe rail is fine; a partially visible tile on the left already signals more.
+
+**7. Share gives no confirmation on desktop** (desktop)
+
+Clicking Share produced no snackbar and did not change the clipboard. The code calls `navigator.share` whenever it exists, and current desktop Chrome, Edge and Safari all expose it, so desktop users get the OS share sheet instead of a copied link. The sheet itself cannot be seen under automation, so confirm this by hand.
+
+- On desktop-sized viewports, copy the link and show "Link copied". Keep the native sheet for touch devices.
+
+**8. Returning to the home page forgets which week you were viewing** (both)
+
+After opening Week 9 and pressing back, the picker has Week 10 selected again. The players and pot chips also only ever describe the default week, because tapping a tile navigates away immediately.
+
+- Preselect the week the user just came from.
+- Add previous/next week controls on the standings page so comparing weeks does not require a trip home.
+
+**9. Long pages have no persistent navigation on mobile** (mobile)
+
+The Week 10 dashboard is 4.7 screens tall and a participant page is 3.5. The back button and Share exist only at the very top. See [mobile-dash-w10.png](ux-review/mobile-dash-w10.png).
+
+- Make the header row (back and share) sticky, or add a "back to top" control.
+
+**10. Several mobile tap targets are under 44 px** (mobile)
+
+| Control | Size |
+|---|---|
+| Share | 87 × 31 |
+| Back buttons | 37 tall |
+| Schedule / Most divided toggle | 40 tall |
+| "See how the pool picked" | 42 tall |
+| "Start over" and "Go to Football Picks" links | 19 tall |
+
+- Set a 44 px minimum height on these. Share is the furthest off.
+
+**11. The winner celebration is addressed to the wrong person and repeats** (both)
+
+The banner says "Congratulations, Jose! You're a Week Winner!" to whoever opens Jose's page, and the confetti fires on every load. See [desktop-winner-w9.png](ux-review/desktop-winner-w9.png).
+
+- Reword to third person: "Jose won Week 9!".
+- Fire confetti once per week per browser (remember it in `localStorage`).
+
+**12. The tiebreaker guess is shown without the answer** (both)
+
+"Tiebreaker guess: 48 combined score" never shows the actual combined score or how close the guess was, even when the week is final and the tiebreaker decided the winner.
+
+- Once the tiebreaker game is final, show the actual total and the difference.
+
+**13. Error pages are inconsistent and thin** (both)
+
+The four error states use different controls (a text link on two, a button on the other two), three have no heading at all, and none offers a useful next step. See [mobile-bad-week.png](ux-review/mobile-bad-week.png).
+
+- Give each an `h1`, one consistent primary button, and a helpful target: the latest week for a bad week, the week's standings for an unknown player or game.
+
+### Low
+
+**14. Team names truncate when there is room** (both)
+"Commanders" is cut to "Commande…" on the desktop dashboard and "Comma…" on mobile; at 320 px both team names are cut. See [desktop-dash-w9.png](ux-review/desktop-dash-w9.png) and [mobile-320-dash.png](ux-review/mobile-320-dash.png). Allow the name to wrap to two lines, or shrink the font for long names.
+
+**15. The "Pending" column and tile are noise once a week is final** (both)
+Final weeks show "0 pending" on every desktop row and a "Pending 0 of 15" tile. Hide them when nothing is pending. On mobile the pending count is dropped entirely, so in-progress weeks lose that information there; a small "3 left" caption would restore it.
+
+**16. The pick-split bar colours are unexplained** (both)
+Blue is always the away team and purple the home team, and the losing side is faded, but nothing says so and the colours have no tie to the teams. Add a one-line legend, or label the bar ends.
+
+**17. The "Most divided" sort resets on reload and is not shareable** (both)
+The toggle is local state. Put it in the URL (`?sort=divided`) so it survives refresh and sharing.
+
+**18. Titles wrap awkwardly on phones** (mobile)
+"Season 2026 · Week 10" breaks as "Week / 10", leaving the number alone on a line. Keep "Week 10" together with a non-breaking space. At 320 px the uppercase back button also wraps to two lines.
+
+**19. The game page subtitle runs two ideas together** (both)
+"Season 2026 · Week 10 · Select a participant to see their picks." mixes context with an instruction. Split the instruction onto its own line or drop it; the chevrons already signal that rows are tappable. See [desktop-game-w9-final.png](ux-review/desktop-game-w9-final.png).
+
+**20. No manual refresh on desktop** (desktop)
+Scores poll every 60 seconds and pull-to-refresh is touch-only. A small refresh button beside "Scores as of" would help during live games.
+
+**21. Kickoff times carry no timezone** (both)
+"Sun 10:00 AM" is the viewer's local time, which is the right choice, but a pool spread across timezones may misread it. Append the short zone ("10:00 AM PT").
+
+**22. Shared links have no preview** (both)
+There are no Open Graph tags, so a link pasted into a group chat shows a bare URL. Sharing is a primary action here; a static `og:title`, `og:description` and `og:image` would cover every route.
+
+## Suggested order of work
+
+1. **Quick wins (small, low risk):** ~~1, 2, 4~~ (done), 10, 11, 18.
+2. **Navigation and structure:** ~~3~~ (done), 6, 8, 9, 13.
+3. **Feature work:** findings 5, 12, 22.
+4. **Polish:** the remaining low-severity items.
